@@ -115,22 +115,40 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 LINK_DIRECTORIES(${RadarProjectLib})
 
 # ctk插件的方式添加依赖库，不使用TARGET_LINK_LIBRARIES
-ctkMacroBuildPlugin(
-  NAME ${PROJECT_NAME}
-  EXPORT_DIRECTIVE ${PLUGIN_export_directive}
-  SRCS ${PLUGIN_SRCS} ${PLUGIN_HDRS}
-  MOC_SRCS ${PLUGIN_MOC_SRCS}
-  UI_FORMS ${PLUGIN_UI_FORMS}
-  RESOURCES ${PLUGIN_resources}
-  TARGET_LIBRARIES ${PLUGIN_target_libraries} ${VLD_LIB}
-  ctkLogger
-  ctkPublicFun
-  ctkProtocol
-  ${QT_QTCORE_LIBRARY}
-  ${QT_QTGUI_LIBRARY}
-  Mpr.lib
-  ${RadarProjectLib}/libcurl_imp.lib
-)
+IF (WIN32)
+    ctkMacroBuildPlugin(
+      NAME ${PROJECT_NAME}
+      EXPORT_DIRECTIVE ${PLUGIN_export_directive}
+      SRCS ${PLUGIN_SRCS} ${PLUGIN_HDRS}
+      MOC_SRCS ${PLUGIN_MOC_SRCS}
+      UI_FORMS ${PLUGIN_UI_FORMS}
+      RESOURCES ${PLUGIN_resources}
+      TARGET_LIBRARIES ${PLUGIN_target_libraries} ${VLD_LIB}
+      ctkLogger
+      ctkPublicFun
+      ctkProtocol
+      ${QT_QTCORE_LIBRARY}
+      ${QT_QTGUI_LIBRARY}
+      Mpr.lib
+      ${RadarProjectLib}/libcurl_imp.lib
+    )
+ELSE (WIN32)
+    ctkMacroBuildPlugin(
+      NAME ${PROJECT_NAME}
+      EXPORT_DIRECTIVE ${PLUGIN_export_directive}
+      SRCS ${PLUGIN_SRCS} ${PLUGIN_HDRS}
+      MOC_SRCS ${PLUGIN_MOC_SRCS}
+      UI_FORMS ${PLUGIN_UI_FORMS}
+      RESOURCES ${PLUGIN_resources}
+      TARGET_LIBRARIES ${PLUGIN_target_libraries} ${VLD_LIB}
+      ctkLogger
+      ctkPublicFun
+      ctkProtocol
+      ${QT_QTCORE_LIBRARY}
+      ${QT_QTGUI_LIBRARY}
+      ${RadarProjectLib}/libcurl.so
+    )
+ENDIF (WIN32)
 
 INSTALL(TARGETS ${PROJECT_NAME}
 		RUNTIME DESTINATION bin/plugins/org.radar.datacollection_v1.0

@@ -20,6 +20,7 @@
 #include <QVector>
 #include <QDateTime>
 #include <QObject>
+#include <QPointF>
 //#include "org.radar.dataadapter/ProductDef.h"
 
 
@@ -398,7 +399,7 @@ struct UserInfo
     int			conput;
     int			tryCount;
 
-    struct UserInfo ()
+    UserInfo ()
     {
         conput = 0;
         tryCount = 3;
@@ -439,7 +440,7 @@ struct CollectTask
     int		port;
     bool    recordLatestTime;	// 是否记录最后收集时间，一旦记录了最后收集时间，下次启动收集时，就会从比最后收集时间新的文件开始收集
 
-    struct CollectTask()
+    CollectTask()
     {
         enable = 1;
     }

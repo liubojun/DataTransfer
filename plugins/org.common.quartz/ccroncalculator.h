@@ -78,8 +78,8 @@ private:
     std::map<ECronPart, std::vector<int> > c_partsMap;
     std::vector<std::string> split(const std::string &s, const char delimiter);
     bool initPart(const std::pair<ECronPart, SMinMax> &part, const std::string &crontabPartSpec);
-    int getNextTo(const ECronPart part, const int val, bool *pOverflow = nullptr);
-    int toInt(const std::string &s, bool *pOk = nullptr);
+    int getNextTo(const ECronPart part, const int val, bool *pOverflow = NULL);
+    int toInt(const std::string &s, bool *pOk = NULL);
 };
 
 #endif // CCRONCALCULATOR_H

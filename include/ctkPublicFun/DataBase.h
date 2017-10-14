@@ -7,6 +7,7 @@
 #include <QSqlQuery>
 #include <QString>
 #include <QMap>
+#include <QMutex>
 #include "macro.h"
 #include "commontypedef.h"
 

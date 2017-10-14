@@ -354,7 +354,7 @@ int CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringL
     QStringList lstLines = info.split("\n");
     for (int i=0; i<lstLines.size(); ++i)
     {
-        QString &strLine = lstLines.at(i).trimmed();
+        QString strLine = lstLines.at(i).trimmed();
         if (strLine.isEmpty())
         {
             continue;
@@ -767,7 +767,7 @@ int CurlFtp::uploadFileToDir(const char *url, const char *user_pwd, const string
     CURLcode res = CURLE_OK;
     string strUrl = url;
     strUrl += filename + tmpsuffix;
-    res = curl_easy_setopt(pCurl, CURLOPT_UPLOAD, TRUE);
+    res = curl_easy_setopt(pCurl, CURLOPT_UPLOAD, 1);
     if (CURLE_OK != res)
     {
         QSLOG_ERROR(QString("curl_easy_setopt error: errcode = %1, reason = %2").arg(res).arg(curl_easy_strerror(res)));
@@ -929,8 +929,8 @@ bool CurlFtp::getFileSize(const char *url, const char *user_pwd, const string &f
     curl_easy_setopt(curl, CURLOPT_URL, strUrl.c_str());
     curl_easy_setopt(curl, CURLOPT_USERPWD, user_pwd);
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
-    curl_easy_setopt(curl, CURLOPT_NOBODY, TRUE);
-    curl_easy_setopt(curl, CURLOPT_HEADER, FALSE);
+    curl_easy_setopt(curl, CURLOPT_NOBODY, 1);
+    curl_easy_setopt(curl, CURLOPT_HEADER, 0);
     curl_easy_setopt(curl, CURLOPT_NOSIGNAL,1L);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     //---File模式必须这样写---
@@ -995,10 +995,10 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
 
     headerlist = curl_slist_append(headerlist, cmdTmpName.c_str());
     headerlist = curl_slist_append(headerlist, cmdOrgName.c_str());
-    curl_easy_setopt(curl, CURLOPT_UPLOAD, TRUE);
+    curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
     curl_easy_setopt(curl, CURLOPT_URL, strUrl.c_str());
     curl_easy_setopt(curl, CURLOPT_USERPWD, user_pwd);
-    curl_easy_setopt(curl, CURLOPT_FTP_CREATE_MISSING_DIRS, TRUE);
+    curl_easy_setopt(curl, CURLOPT_FTP_CREATE_MISSING_DIRS, 1);
     curl_easy_setopt(curl, CURLOPT_READDATA, pfile);
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, ReadFromFile);
     curl_easy_setopt(curl, CURLOPT_POSTQUOTE, headerlist);
@@ -1045,7 +1045,7 @@ int CurlFtp::conputFileToDir(const char *url, const char *user_pwd, const string
         curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
         string strUrl = url;
         strUrl += filename + sendsuffix;
-        curl_easy_setopt(curl, CURLOPT_UPLOAD, TRUE);
+        curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
         //////////////////////////////////////////////////////////////////////////
         // 断点续传（另一个方式）
         FILE *pfile = fopen(localPath, "rb");
@@ -1066,7 +1066,7 @@ int CurlFtp::conputFileToDir(const char *url, const char *user_pwd, const string
         }
 
         //fseek(pfile, tHasSend, SEEK_SET);
-        curl_easy_setopt(curl, CURLOPT_APPEND, TRUE);
+        curl_easy_setopt(curl, CURLOPT_APPEND, 1);
         curl_easy_setopt(curl, CURLOPT_RESUME_FROM, tHasSend);
         //////////////////////////////////////////////////////////////////////////
         curl_easy_setopt(curl, CURLOPT_URL, strUrl.c_str());
@@ -1123,7 +1123,7 @@ int CurlFtp::conputFileToFtp(const char *url, const char *user_pwd, const string
         struct curl_slist *headerlist = NULL;
         headerlist = curl_slist_append(headerlist, cmdTmpName.c_str());
         headerlist = curl_slist_append(headerlist, cmdOrgName.c_str());
-        curl_easy_setopt(curl, CURLOPT_UPLOAD, TRUE);
+        curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
         //////////////////////////////////////////////////////////////////////////
         // 断点续传
         FILE *pfile = fopen(localPath, "rb");
@@ -1144,12 +1144,12 @@ int CurlFtp::conputFileToFtp(const char *url, const char *user_pwd, const string
 
         fseek(pfile, tHasSend, SEEK_SET);
 
-        curl_easy_setopt(curl, CURLOPT_APPEND, TRUE);
+        curl_easy_setopt(curl, CURLOPT_APPEND, 1);
         //curl_easy_setopt(curl, CURLOPT_RESUME_FROM, tHasSend);
         //////////////////////////////////////////////////////////////////////////
         curl_easy_setopt(curl, CURLOPT_URL, strUrl.c_str());
         curl_easy_setopt(curl, CURLOPT_USERPWD, user_pwd);
-        curl_easy_setopt(curl, CURLOPT_FTP_CREATE_MISSING_DIRS, TRUE);
+        curl_easy_setopt(curl, CURLOPT_FTP_CREATE_MISSING_DIRS, 1);
         curl_easy_setopt(curl, CURLOPT_READDATA, pfile);
         curl_easy_setopt(curl, CURLOPT_READFUNCTION, ReadFromFile);
         curl_easy_setopt(curl, CURLOPT_POSTQUOTE, headerlist);
@@ -1185,10 +1185,10 @@ bool CurlFtp::TestConnection(const char *url, const char *user_pwd)
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_USERPWD, user_pwd);
     //curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
-    curl_easy_setopt(curl, CURLOPT_FTP_CREATE_MISSING_DIRS, TRUE);	// 目录不存在自动创建
+    curl_easy_setopt(curl, CURLOPT_FTP_CREATE_MISSING_DIRS, 1);	// 目录不存在自动创建
     //curl_easy_setopt(curl, CURLOPT_VERBOSE, TRUE);
-    curl_easy_setopt(curl, CURLOPT_NOBODY, TRUE);
-    curl_easy_setopt(curl, CURLOPT_HEADER, FALSE);
+    curl_easy_setopt(curl, CURLOPT_NOBODY, 1);
+    curl_easy_setopt(curl, CURLOPT_HEADER, 0);
 
     CURLcode res = curl_easy_perform(curl);
     if (CURLE_OK != res)

@@ -142,7 +142,7 @@ private:
 
     //static void makeVtbFun(SharedDirCollector *pParent, FileInfo fileinfo);
 
-    QList<QFuture<void>> m_threadFun;	///< 记录当前运行的标准化线程
+    QList<QFuture<void> > m_threadFun;	///< 记录当前运行的标准化线程
 
     //QSharedPointer<FileWatcher> m_pFileWatcher;		///< 实时监控
 };

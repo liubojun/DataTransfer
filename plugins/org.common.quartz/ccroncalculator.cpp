@@ -45,7 +45,7 @@ std::string CCronCalculator::getCronspec() const
 
 time_t CCronCalculator::nextExecution(bool bUTC)
 {
-    time_t next = time(nullptr);
+    time_t next = time(NULL);
 
     if(next == -1)
         return -1;
@@ -295,20 +295,9 @@ int CCronCalculator::toInt(const std::string &s, bool *pOk)
     if(pOk)
         *pOk = true;
 
-    try
-    {
-        i = std::stoi(s);
-    }
-    catch(std::invalid_argument &e)
-    {
-        if(pOk)
-            *pOk = false;
-    }
-    catch(std::out_of_range &e)
-    {
-        if(pOk)
-            *pOk = false;
-    }
+
+    i = atoi(s.c_str());
+
 
     return i;
 }

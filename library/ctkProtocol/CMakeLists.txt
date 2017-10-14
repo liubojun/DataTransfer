@@ -107,7 +107,7 @@ ELSE (WIN32)
 	  ${QT_QTMAIN_LIBRARY}
 	  ${QT_QTCORE_LIBRARY}
 	  ${VLD_LIB}
-	  ${RadarProjectRunTimeLib}/libboost_serialization.so
+          ${RadarProjectLib}/libboost_serialization.so
 	)
 ENDIF (WIN32)
 

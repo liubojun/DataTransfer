@@ -74,10 +74,12 @@ ELSE (WIN32)
 		${QT_QTMAIN_LIBRARY}
 		${QT_QTCORE_LIBRARY}
 		${QT_UITOOLS_LIBRARY}
+                ${QT_QTSQL_LIBRARY}
 		${VLD_LIB}
 		${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libctkLogger.so	#需要明确路径
 		${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libctkProtocol.so
-		${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libCTKPluginFramework.so
+      CTKPluginFramework
+        #	${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libCTKPluginFramework.so
 	)
 ENDIF (WIN32)
 

@@ -1189,8 +1189,8 @@ void BinaryFindCloseValue(float value, const QVector<float> &group, int &pos)
 
     if (pos < group.size() - 2)
     {
-        float a = abs(group[pos] - value);
-        float b = abs(group[pos+1] - value);
+        float a = abs(long(group[pos] - value));
+        float b = abs(long(group[pos+1] - value));
         if (b < a)
         {
             pos = pos + 1;

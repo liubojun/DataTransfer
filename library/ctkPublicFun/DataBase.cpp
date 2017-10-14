@@ -6,6 +6,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QUuid>
+#include <QMutex>
 
 DataBase *DataBase::s_db = NULL;
 QMutex DataBase::m_oMutex;
@@ -37,6 +38,12 @@ DataBase::DataBase()
     m_bDB = false;
     m_dbName = "Transfer";
     m_dbPath = qApp->applicationDirPath() + "/config/Transfer.db";
+    QFileInfo fi(qApp->applicationDirPath() + "/config");
+    if (!fi.exists())
+    {
+
+        QDir("").mkpath(fi.absoluteFilePath());
+    }
     if (!QFile::exists(m_dbPath))
     {
         InitDB();

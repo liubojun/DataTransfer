@@ -9,7 +9,7 @@
 bool DispatchTimerImp::SetDispatchTimer(const std::string &cronspec , DispatchInterface* pObject, const QSharedPointer<TimerCallBackParam> &callBackParam, QSharedPointer<QObject> &pDelObj)
 {
     qRegisterMetaType<CCronCalculator>("CCronCalculator");
-    qRegisterMetaType<QSharedPointer<TimerCallBackParam>>("TimerParam");	//多线程中使用信号槽需要注册
+    qRegisterMetaType<QSharedPointer<TimerCallBackParam> >("TimerParam");	//多线程中使用信号槽需要注册
 
     pDelObj = QSharedPointer<QObject>(new CCronTimer(pObject, callBackParam));
     CCronTimer *cT = dynamic_cast<CCronTimer *>(pDelObj.data());

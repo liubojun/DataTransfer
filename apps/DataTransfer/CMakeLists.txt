@@ -112,7 +112,10 @@ INCLUDE_DIRECTORIES(
 				)
 
 
-SET(CMAKE_CXX_FLAGS  /DWIN32 /D_WINDOWS /W3 /GR)
+IF (WIN32)
+    SET(CMAKE_CXX_FLAGS  /DWIN32 /D_WINDOWS /W3 /GR)
+ENDIF (WIN32)
+
 message(status "${CMAKE_CXX_FLAGS}")
 #设置需要翻译的源文件				
 #SET(PLUGINS_FILES_TO_TRANSLATE ${RADAR_DATATRANSFER_FILES_TO_TRANSLATE} ${SRCS} ${HDRS} PARENT_SCOPE)
@@ -124,20 +127,40 @@ ADD_EXECUTABLE(${PROJECT_NAME} ${HDRS} ${SRCS} ${MOC_SRCS} ${UI_H} ${ICON_SRCS} 
 
 #ADD_EXECUTABLE(PROJECT_NAME ${HDRS} ${SRCS} ${MOC_SRCS} ${UI_H} ${ICON_SRCS} ${RESOUCES})
 
-TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-	${QT_QTMAIN_LIBRARY}
-	${QT_QTCORE_LIBRARY}
-	${QT_QTGUI_LIBRARY}
-	${QT_QTUITOOLS_LIBRARY}
-	${QT_QTQML_LIBRARY}
-	${QT_QTQUICK_LIBRARY}
-	ctkLogger
-	ctkPublicFun
-	ctkProtocol
-	${VLD_LIB}
-	CTKPluginFramework
-	libcurl_imp
-	)
+IF (WIN32)
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME}
+            ${QT_QTMAIN_LIBRARY}
+            ${QT_QTCORE_LIBRARY}
+            ${QT_QTGUI_LIBRARY}
+            ${QT_QTUITOOLS_LIBRARY}
+            ${QT_QTQML_LIBRARY}
+            ${QT_QTQUICK_LIBRARY}
+            ctkLogger
+            ctkPublicFun
+            ctkProtocol
+            ${VLD_LIB}
+            CTKPluginFramework
+            libcurl_imp
+            )
+
+ELSE (WIN32)
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME}
+            ${QT_QTMAIN_LIBRARY}
+            ${QT_QTCORE_LIBRARY}
+            ${QT_QTGUI_LIBRARY}
+            ${QT_QTUITOOLS_LIBRARY}
+            #${QT_QTQML_LIBRARY}
+            #${QT_QTQUICK_LIBRARY}
+            ctkLogger
+            ctkPublicFun
+            ctkProtocol
+            ctkPluginManager
+            ${VLD_LIB}
+            CTKPluginFramework
+            ${RadarProjectLib}/libcurl.so
+            #${RadarProjectLib}/libboost_serialization.so
+            )
+ENDIF (WIN32)
 
 #TARGET_LINK_LIBRARIES(DataTransfer_DebugInfo
 	#${QT_QTMAIN_LIBRARY}

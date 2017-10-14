@@ -28,6 +28,7 @@
 #include <QDir>
 #include <QFileInfoList>
 #include <ctkLog.h>
+#include <exception>
 
 #include "pluginmanagerImp.h"
 #include "IBaseInterface.h"
@@ -304,7 +305,7 @@ QObject * CPluginManagerImp::getService( const QString &interfaceName )
         catch (const ctkPluginException& e)
         {
             QSLOG_ERROR(tr("get Service:") + interfaceName + tr("from ctk pluginFramework exception, reason :") + e.what());
-            throw std::exception(interfaceName.toStdString().c_str());
+            //throw std::exception(interfaceName.toStdString().c_str());
             return NULL;
         }
     }

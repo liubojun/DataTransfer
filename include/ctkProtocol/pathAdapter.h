@@ -33,7 +33,7 @@ class DataPathSetList
 public:
     DataPathSetList() {}
     //string strRoot;							//根目录
-    map<string, vector<string>> type_root;			///< 类型—根目录(data,pic)
+    map<string, vector<string> > type_root;			///< 类型—根目录(data,pic)
     map<string, string> type_third;			//文件类型及对应的可配三级目录
     map<string, vector<string> > type_name;	//文件类型及对应的文件名规则（数据，图片）
 };

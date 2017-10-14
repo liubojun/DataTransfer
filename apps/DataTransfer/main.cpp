@@ -47,11 +47,13 @@
 
 
 //----异常相关----
+#ifdef _WIN32
 #include <tchar.h>
 #include <Windows.h>
 #include <ImageHlp.h>
 #include <stdlib.h>
 #pragma comment(lib, "dbghelp.lib")
+#endif
 //----
 
 //#pragma comment(linker,"/subsystem:windows /entry:mainCRTStartup")
@@ -59,7 +61,7 @@
 #ifdef WITH_MEM_CHECK
 #include "vld.h"
 #endif
-
+#ifdef _WIN32
 //----捕获异常----
 inline BOOL IsDataSectionNeeded(const WCHAR* pModuleName)
 {
@@ -224,28 +226,32 @@ void RunCrashHandler()
     SetUnhandledExceptionFilter(ApplicationCrashHandler);
     PreventSetUnhandledExceptionFilter();
 }
+
+#endif
 //----
 
 int main(int argc, char **argv)
 {
+    #ifdef _WIN32
     RunCrashHandler();
-    Q_TRY_BEGIN
+    #endif
+	Q_TRY_BEGIN  
 
     QApplication app(argc, argv);
 
     QSLOG_INFO("START DATA TRANSFER PROGRAM");
     std::cout << "START DATA TRANSFER PROGRAM" << std::endl;
     // 控制程序运行一个唯一实例
-    QSharedMemory mem("DataTransfer");
-    if (!mem.create(1))
-    {
-        QMessageBox box(QMessageBox::Information, QStringLiteral("提示"), "");
-        box.setStandardButtons(QMessageBox::Ok);
-        box.setButtonText(QMessageBox::Ok, QStringLiteral("确认"));
-        box.setText(QStringLiteral("数据传输系统已运行！"));
-        box.exec();
-        return 0;
-    }
+//    QSharedMemory mem("DataTransfer");
+//    if (!mem.create(1))
+//    {
+//        QMessageBox box(QMessageBox::Information, QStringLiteral("提示"), "");
+//        box.setStandardButtons(QMessageBox::Ok);
+//        box.setButtonText(QMessageBox::Ok, QStringLiteral("确认"));
+//        box.setText(QStringLiteral("数据传输系统已运行！"));
+//        box.exec();
+//        return 0;
+//    }
 //////////////////////////////////////////////////////////////////////////
 
 //用于支持中文路径
