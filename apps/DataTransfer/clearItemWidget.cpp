@@ -1,0 +1,63 @@
+#include "clearItemWidget.h"
+#include <QDateTime>
+
+ClearItemWidget::ClearItemWidget(const QString &name, QWidget *parent /*= NULL*/) : QWidget(parent)
+{
+    ui.setupUi(this);
+    setWindowFlags(Qt::FramelessWindowHint);
+    ui.label->setText(name);
+    // 设置无边框
+    QPixmap picuture(":/dirclean.png");
+    ui.leIcon->setPixmap(picuture);
+
+    // gif动画
+    m_pMovie = new QMovie(":/working.gif");
+    m_pMovie->setSpeed(50);
+    ui.le_gif->setMovie(m_pMovie);
+
+    QString strTime = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
+    QString state = QStringLiteral("%1/%2 %3:%4 启动").arg(strTime.mid(4,2)).arg(strTime.mid(6,2))
+                    .arg(strTime.mid(8,2)).arg(strTime.mid(10,2));
+    ui.label_2->setText(state);
+}
+
+void ClearItemWidget::ShowGif(bool bFlag)
+{
+    if (bFlag)
+    {
+        ui.le_gif->show();
+        m_pMovie->start();
+    }
+    else
+    {
+        ui.le_gif->hide();
+        m_pMovie->stop();
+    }
+}
+
+void ClearItemWidget::SetEnable(bool bFlag)
+{
+    //if (bFlag)
+    //{
+    //	m_curIcon = (ICONTYPE)(m_curIcon + 4);
+    //}
+    //else
+    //{
+    //	m_curIcon = (ICONTYPE)(m_curIcon - 4);
+    //}
+    //SetIcon(m_curIcon);
+    ui.leIcon->setEnabled(bFlag);
+}
+
+void ClearItemWidget::setName(const QString &name)
+{
+    ui.label->setText(name);
+}
+
+void ClearItemWidget::addSuccess(const QDateTime &dt)
+{
+    QString strTime =  dt.toString("yyyyMMddhhmmss");
+    QString state = QStringLiteral("最近：%1/%2 %3:%4").arg(strTime.mid(4,2)).arg(strTime.mid(6,2))
+                    .arg(strTime.mid(8,2)).arg(strTime.mid(10,2));
+    ui.label_2->setText(state);
+}

@@ -1,0 +1,7 @@
+set(Plugin-ActivationPolicy "eager")
+set(Plugin-Name "org.common.quartz")
+set(Plugin-Version "1.0")
+set(Plugin-Vendor "nriet")
+set(Plugin-Description "quartz for c++")
+set(Custom-Headers "Export-Interface")
+set(Export-Interface "IDispatchTimer")

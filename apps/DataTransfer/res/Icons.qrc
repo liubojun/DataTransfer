@@ -1,0 +1,39 @@
+<RCC>
+    <qresource prefix="/">
+        <file>sysTrayicon.png</file>
+        <file>openDst.png</file>
+        <file>openSrc.png</file>
+        <file>delete.png</file>
+        <file>doNow.png</file>
+        <file>start.png</file>
+        <file>stop.png</file>
+        <file>add.png</file>
+        <file>back.png</file>
+        <file>clear.png</file>
+        <file>property.png</file>
+        <file>fileTofile.png</file>
+        <file>fileToftp.png</file>
+        <file>ftpTofile.png</file>
+        <file>ftpToftp.png</file>
+        <file>fileTofile2.png</file>
+        <file>fileToftp2.png</file>
+        <file>ftpTofile2.png</file>
+        <file>ftpToftp2.png</file>
+        <file>fileTofile3.png</file>
+        <file>fileToftp3.png</file>
+        <file>ftpTofile3.png</file>
+        <file>ftpToftp3.png</file>
+        <file>fileTofile4.png</file>
+        <file>fileToftp4.png</file>
+        <file>ftpTofile4.png</file>
+        <file>ftpToftp4.png</file>
+        <file>allUser.png</file>
+        <file>01.png</file>
+        <file>02.png</file>
+        <file>03.png</file>
+        <file>working.gif</file>
+        <file>startPic.png</file>
+        <file>dirclean.png</file>
+        <file>help.jpg</file>
+    </qresource>
+</RCC>

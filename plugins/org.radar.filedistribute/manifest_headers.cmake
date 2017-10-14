@@ -1,0 +1,7 @@
+﻿set(Plugin-ActivationPolicy "eager")
+set(Plugin-Name "org.radar.filedistribute")
+set(Plugin-Version "1.0")
+set(Plugin-Vendor "nriet")
+set(Plugin-Description "get and distribute files")
+set(Custom-Headers "Export-Interface")
+set(Export-Interface "IFileDistribute,IFileCrypt")

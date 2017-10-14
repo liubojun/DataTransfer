@@ -1,0 +1,247 @@
+﻿#include "ftpCollector.h"
+#include "CltDispatch.h"
+#include "pathbuilder.h"
+#include "ctkLog.h"
+#include "publicthread.h"
+#include "DistributeFile.h"
+#include <QElapsedTimer>
+#include <QCoreApplication>
+
+FtpCollector::FtpCollector(CollectManager *pManager, QWaitCondition &in_oCond, QMutex &in_oLocker, int &in_iLogsize)
+    : CollectorBase(pManager, in_oCond, in_oLocker, in_iLogsize)
+{
+}
+
+FtpCollector::~FtpCollector()
+{
+
+}
+
+int FtpCollector::start()
+{
+    QObject *op = m_pCtkManager->getService("IDispatchTimer");
+    IDispatchTimer *iDt = qobject_cast<IDispatchTimer *>(op);
+    if (iDt)
+    {
+        m_pCftp = QSharedPointer<CurlFtp>(new CurlFtp(this));
+        QObject::connect(m_pCftp.data(), SIGNAL(done()), this, SLOT(ftpDone()));
+
+        QSharedPointer<CltDispatch> cDispatch = QSharedPointer<CltDispatch>(new CltDispatch(this));
+        m_oThread.start();
+        cDispatch->moveToThread(&m_oThread);
+
+        bool bFlag = iDt->SetDispatchTimer(m_collectSet.dispatch.toStdString(), cDispatch.data(), QSharedPointer<TimerCallBackParam>(new TimerCallBackParam()), m_pTimerObj);
+        if (bFlag)
+        {
+            m_oProcess = cDispatch;
+        }
+        else
+        {
+            QSLOG_ERROR(QString("FtpCollector SetDispatchTimer failed: %1").arg(m_collectSet.dispatch));
+        }
+
+        m_bRun = true;
+    }
+
+    return 0;
+}
+
+int FtpCollector::stop()
+{
+    m_bRun = false;
+
+    QObject *op = m_pCtkManager->getService("IDispatchTimer");
+    if (op != NULL)
+    {
+        IDispatchTimer *iDt = qobject_cast<IDispatchTimer *>(op);
+        iDt->stopDispatchTimer(m_pTimerObj);
+
+        PublicThread::msleep(500);
+
+//             QElapsedTimer t;
+//             t.start();
+//             while(t.elapsed() < 1000)
+//             {
+//                 QCoreApplication::processEvents();
+//             }
+    }
+
+    return 0;
+}
+
+void FtpCollector::getNewFiles()
+{
+    if (!m_bFinish)
+    {
+        QSLOG_DEBUG("Last ftp collect isn't finished.");
+        return;
+    }
+
+    if (!readSet())
+    {
+        return;
+    }
+
+    m_bRun = (bool)m_collectSet.enable;
+    if (!m_bRun)
+    {
+        return;
+    }
+
+    // E:/workspace/DataTransfer/DataTransfer_code_20170831/vs2013/apps/DataTransfer/%T-1H%t%y/%t%m/%td
+    // modified by liubojun. 支持按照特定时间获取数据
+    m_collectSet.rltvPath = getFinalPathFromUrl(m_collectSet.rltvPath);
+
+    m_pCftp->setHostPort(m_collectSet.ip, m_collectSet.port);
+    m_pCftp->setUserPwd(m_collectSet.loginUser, m_collectSet.loginPass);
+    m_pCftp->setRootPath(m_collectSet.rltvPath);
+    m_pCftp->setFtpTransferMode(m_collectSet.ftp_transferMode);
+    m_pCftp->setFtpConnectMode(m_collectSet.ftp_connectMode);
+    m_pCftp->setSubDirFlag(m_collectSet.subdirFlag);
+
+    emit print(QStringLiteral("[%1]: 开始收集任务 %2[%3]").arg(QDateTime::currentDateTime().toString(Qt::ISODate)).arg(m_collectSet.dirName)
+               .arg(m_collectSet.rltvPath));
+
+    bool bConnect = true;
+    // 先测试源路径是否正常
+    bConnect = testFtpConnection(m_collectSet.ip, m_collectSet.port, m_collectSet.loginUser, m_collectSet.loginPass, m_collectSet.ftp_transferMode, m_collectSet.ftp_connectMode);
+
+    if (!bConnect)
+    {
+        m_nLineState = 1;
+        emit taskState(m_collectSet, 0, m_nLineState);
+        return;
+    }
+    // 在测试目标路径是否正常 临时屏蔽
+//     if (m_userInfo.user.sendType == 0)
+//     {
+//         bConnect = testFileConnection(m_userInfo.user.rootPath);
+//     }
+//     else
+//     {
+//         bConnect = testFtpConnection(m_userInfo.user.ip, m_userInfo.user.port, m_userInfo.user.lgUser, m_userInfo.user.lgPass);
+//     }
+
+    if (bConnect)
+    {
+        m_nLineState = 0;
+        emit taskState(m_collectSet, 0, m_nLineState);
+        emit startGif(m_collectSet.dirID, true);
+        m_bFinish = false;
+        m_fileList.clear();	//清空新文件列表
+
+        m_pCftp->getNewFiles(m_fileList);
+        emit startGif(m_collectSet.dirID, false);
+    }
+    else
+    {
+        m_nLineState = 1;
+        emit taskState(m_collectSet, 0, m_nLineState);
+    }
+}
+
+void FtpCollector::ftpDone()
+{
+    QSLOG_DEBUG(QString("Finished ftp collect, %1 files").arg(m_fileList.size()));
+    if (m_fileList.isEmpty() || !m_bRun)
+    {
+        m_bFinish = true;
+        return;
+    }
+
+    for (int i=0; i<m_fileList.size(); ++i)
+    {
+        TransTask task;
+        if (m_bRun && !compareWithDest(m_fileList.at(i), task))
+        {
+            task.collectSet = m_collectSet;
+            //task.userInfo = m_userInfo.user;
+            // 发送文件
+            DistributeFile sendFile(this);
+            sendFile.transfer(task);
+        }
+    }
+
+    m_bFinish = true;
+}
+
+bool FtpCollector::testCollection()
+{
+//     QSharedPointer<CurlFtp> pFtp = QSharedPointer<CurlFtp>(new CurlFtp(this));
+//     pFtp->setHostPort(m_strIP, m_iPort);
+//     pFtp->setUserPwd(m_strUser, m_strPassword);
+// 	char url[100] = {0};
+// 	char usrpwd[100] = {0};
+// 	sprintf(ftpurl, "ftp://%s:%s@%s:%d/%s", m_strUser, m_strPwd, m_strIP, m_nPort, m_strRoot);
+// 	sprintf(url, "")
+// 		sprintf(usrpwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
+//    return pFtp->connectToHost();
+    return true;
+}
+
+void FtpCollector::taskDone(bool bFlag, const FileInfo &file)
+{
+    return;
+}
+
+bool FtpCollector::compareWithDest(const FileInfo &fi, TransTask &tTask)
+{
+    // libcurl不能传输大小为0的文件
+    if (fi.nFileSize <= 0)
+    {
+        return true;
+    }
+
+    for (int i=0; i<m_tUser.lstUser.size(); ++i)
+    {
+        CollectUser &cUser = m_tUser.lstUser[i];
+        QString strFileFullPath = QString::fromLocal8Bit(fi.strFilePath.c_str());
+        QString strFileName = QString::fromLocal8Bit(fi.strFileName.c_str());
+        QString dstFileFullPath = getDestFilePath(strFileFullPath, strFileName, cUser);
+        QString dstFilePath = dstFileFullPath;
+        tTask.fileName = strFileName;
+        tTask.srcFileFullPath = strFileFullPath;
+        dstFileFullPath += strFileName;
+        // 分发到目录
+        if (cUser.user.sendType == 0)
+        {
+            QFile file(dstFileFullPath);
+            if (file.exists() && fi.nFileSize == file.size())
+            {
+                continue;
+            }
+        }
+        // 分发到FTP
+        else
+        {
+            char ftpUrl[200] = {0};
+            char usrPwd[100] = {0};
+            string strIp = cUser.user.ip.toStdString();
+            int nPort = cUser.user.port;
+            string strPath = dstFileFullPath.toLocal8Bit().data();
+            string strName = tTask.fileName.toLocal8Bit().data();
+            string strUsr = cUser.user.lgUser.toLocal8Bit().data();
+            string strPwd = cUser.user.lgPass.toLocal8Bit().data();
+            sprintf(ftpUrl, "ftp://%s:%d%s", strIp.c_str(), nPort, strPath.c_str());
+            sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
+
+            static CurlFtp m_ftp;
+            double dSize = 0;
+            if (m_ftp.getFileSize(ftpUrl, usrPwd, "", dSize))
+            {
+                continue;
+            }
+        }
+
+        tTask.userInfo.append(cUser.user);
+        tTask.dstFilePath.append(dstFilePath);
+    }
+
+    return tTask.userInfo.empty();
+}
+
+int FtpCollector::reStart()
+{
+    return start();
+}
+

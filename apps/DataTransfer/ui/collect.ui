@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>collectDlg</class>
+ <widget class="QDialog" name="collectDlg">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>421</width>
+    <height>398</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>收集分发设置</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_4">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>收集策略</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>16</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>任务名称：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="le_DirName"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_19">
+          <property name="styleSheet">
+           <string notr="true">color: rgb(255, 0, 0);</string>
+          </property>
+          <property name="text">
+           <string>*</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>16</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>收集方式：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radFile">
+          <property name="text">
+           <string>FILE</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Preferred</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radFtp">
+          <property name="text">
+           <string>FTP</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_bin">
+          <item>
+           <property name="text">
+            <string>binary</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ascii</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_passive">
+          <item>
+           <property name="text">
+            <string>被动模式</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>主动模式</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <property name="spacing">
+         <number>16</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>相对路径：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="le_RelvPath">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;路径设置支持收集指定时间的目录&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;配置参数：%T-/+NF %t%&lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; color:#ff0000;&quot;&gt;Y&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt; %t%&lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; color:#ff0000;&quot;&gt;m&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt; %t%&lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; color:#ff0000;&quot;&gt;d&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt; %t%&lt;/span&gt;&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt;H&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt; %t%&lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; color:#ff0000;&quot;&gt;M&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt; %t%&lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; color:#ff0000;&quot;&gt;S&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;%T : &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;表示执行操作&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;-/+ : &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;可选择&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt; -&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;（减法）&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;（加法）&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;N :  &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;整数值&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;F :  &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;可选择&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;Y(&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;年&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;)/m(&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;月&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;)/d(&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;日&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;)/H(&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;时&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;)/M(&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;分&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;)/S(&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;秒&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;%Y: &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;年&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;  %m: &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;月&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;  %d: &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;日&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;  %H: &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;时&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt; %M: &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;分&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt; %S: &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;秒&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;%t: &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; color:#ff0000;&quot;&gt;分隔符&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;当收集目录包含此配置时（如：&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt; color:#ff0000;&quot;&gt;%T-1d%t%Y%t%m%t%d&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;将收集目录中的天数减去一天），收集传输软件将在收集此目录时将根据配置在&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt; color:#ff0000;&quot;&gt;Y(&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;年&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt; color:#ff0000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;或&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt; color:#ff0000;&quot;&gt;m(&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;月&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt; color:#ff0000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;或&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt; color:#ff0000;&quot;&gt; d(&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;日&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt; color:#ff0000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;或&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt; color:#ff0000;&quot;&gt; h(&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;时&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt; color:#ff0000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;或&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt; color:#ff0000;&quot;&gt; M(&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;分&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt; color:#ff0000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;或&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt; color:#ff0000;&quot;&gt; s(&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;秒&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt; color:#ff0000;&quot;&gt;)&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;加上或减去指定&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt; color:#ff0000;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt; color:#ff0000;&quot;&gt;的数字。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnBrowse">
+          <property name="maximumSize">
+           <size>
+            <width>60</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>浏览</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <property name="spacing">
+         <number>16</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>调度规则：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_3"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_22">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'宋体';&quot;&gt;调度规则：&lt;/span&gt;&lt;span style=&quot; font-family:'宋体';&quot;&gt;秒&lt;/span&gt;&lt;span style=&quot; font-family:'宋体';&quot;&gt;分&lt;/span&gt;&lt;span style=&quot; font-family:'宋体';&quot;&gt;时&lt;/span&gt;&lt;span style=&quot; font-family:'宋体';&quot;&gt;日&lt;/span&gt;&lt;span style=&quot; font-family:'宋体';&quot;&gt;月&lt;/span&gt;&lt;span style=&quot; font-family:'宋体';&quot;&gt;周&lt;/span&gt;(f1 f2 f3 f4 f5 f6)&lt;span style=&quot; font-family:'宋体';&quot;&gt;。配置规则如下所示：&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'宋体';&quot;&gt;其中&lt;/span&gt; f1&lt;span style=&quot; font-family:'宋体';&quot;&gt;是表示秒，&lt;/span&gt;f2&lt;span style=&quot; font-family:'宋体';&quot;&gt;是表示分钟，&lt;/span&gt;f3 &lt;span style=&quot; font-family:'宋体';&quot;&gt;表示小时，&lt;/span&gt;f4 &lt;span style=&quot; font-family:'宋体';&quot;&gt;表示一个月份中的第几日，&lt;/span&gt;f5 &lt;span style=&quot; font-family:'宋体';&quot;&gt;表示月份，&lt;/span&gt;f6 &lt;span style=&quot; font-family:'宋体';&quot;&gt;表示一个星期中的第几天。&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'宋体';&quot;&gt;当&lt;/span&gt; f1 &lt;span style=&quot; font-family:'宋体';&quot;&gt;为&lt;/span&gt; * &lt;span style=&quot; font-family:'宋体';&quot;&gt;时表示每秒钟都要执行，&lt;/span&gt;f2 &lt;span style=&quot; font-family:'宋体';&quot;&gt;为&lt;/span&gt; * &lt;span style=&quot; font-family:'宋体';&quot;&gt;时表示每分钟都要执行程式，其余类推&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'宋体';&quot;&gt;当&lt;/span&gt; f2 &lt;span style=&quot; font-family:'宋体';&quot;&gt;为&lt;/span&gt; * &lt;span style=&quot; font-family:'宋体';&quot;&gt;时表示每分钟都要执行，&lt;/span&gt;f3 &lt;span style=&quot; font-family:'宋体';&quot;&gt;为&lt;/span&gt; * &lt;span style=&quot; font-family:'宋体';&quot;&gt;时表示每小时都要执行程式，其余类推&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'宋体';&quot;&gt;当&lt;/span&gt; f2 &lt;span style=&quot; font-family:'宋体';&quot;&gt;为&lt;/span&gt; a-b &lt;span style=&quot; font-family:'宋体';&quot;&gt;时表示从第&lt;/span&gt; a &lt;span style=&quot; font-family:'宋体';&quot;&gt;分钟到第&lt;/span&gt; b &lt;span style=&quot; font-family:'宋体';&quot;&gt;分钟这段时间内要执行，&lt;/span&gt;f3 &lt;span style=&quot; font-family:'宋体';&quot;&gt;为&lt;/span&gt; a-b &lt;span style=&quot; font-family:'宋体';&quot;&gt;时表示从第&lt;/span&gt; a &lt;span style=&quot; font-family:'宋体';&quot;&gt;到第&lt;/span&gt; b &lt;span style=&quot; font-family:'宋体';&quot;&gt;小时都要执行，其余类推&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'宋体';&quot;&gt;当&lt;/span&gt; f2 &lt;span style=&quot; font-family:'宋体';&quot;&gt;为&lt;/span&gt; */n &lt;span style=&quot; font-family:'宋体';&quot;&gt;时表示每&lt;/span&gt; n &lt;span style=&quot; font-family:'宋体';&quot;&gt;分钟个时间间隔执行一次，&lt;/span&gt;f3 &lt;span style=&quot; font-family:'宋体';&quot;&gt;为&lt;/span&gt; */n &lt;span style=&quot; font-family:'宋体';&quot;&gt;表示每&lt;/span&gt; n &lt;span style=&quot; font-family:'宋体';&quot;&gt;小时个时间间隔执行一次，其余类推&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt;&quot;&gt;当&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt;&quot;&gt; f2 &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt;&quot;&gt;为&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt;&quot;&gt; a, b, c,... &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt;&quot;&gt;时表示第&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt;&quot;&gt; a, b, c,... &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt;&quot;&gt;分钟要执行，&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt;&quot;&gt;f3 &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt;&quot;&gt;为&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt;&quot;&gt; a, b, c,... &lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt;&quot;&gt;时表示第&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:10.5pt;&quot;&gt; a, b, c...&lt;/span&gt;&lt;span style=&quot; font-family:'宋体'; font-size:10.5pt;&quot;&gt;个小时要执行，其余类推&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: rgb(255, 0, 0);</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../res/Icons.qrc">:/help.jpg</pixmap>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <property name="spacing">
+         <number>16</number>
+        </property>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="spacing">
+           <number>16</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>文件模板：</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_4"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_test">
+          <property name="maximumSize">
+           <size>
+            <width>60</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>测试</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="gridLayout">
+        <property name="verticalSpacing">
+         <number>16</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>IP地址：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="lineEdit_7"/>
+        </item>
+        <item row="0" column="2">
+         <spacer name="horizontalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>28</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>端口：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4">
+         <widget class="QLineEdit" name="lineEdit_8">
+          <property name="text">
+           <string>21</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>用户名：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="lineEdit_5"/>
+        </item>
+        <item row="1" column="2">
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>28</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="3">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>密码：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4">
+         <widget class="QLineEdit" name="lineEdit_6">
+          <property name="echoMode">
+           <enum>QLineEdit::PasswordEchoOnEdit</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>收集时效</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="col_time_range">
+          <property name="minimumSize">
+           <size>
+            <width>70</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;自定义配置，适用格式为：时间+单位。&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;单位目前仅支持：天、小时、分钟&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+          <item>
+           <property name="text">
+            <string>所有</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>30分钟</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>1小时</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>2小时</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>3小时</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>6小时</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>12小时</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>1天</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>2天</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>3天</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBox_2">
+          <property name="text">
+           <string>收集子目录</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_9">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="recordLatestTime">
+          <property name="text">
+           <string>每次取最新</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>分发策略</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>选择分发用户</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_sendUser"/>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_10">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>16</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <item>
+      <widget class="QPushButton" name="btn_test_2">
+       <property name="text">
+        <string>测试</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_result">
+       <property name="text">
+        <string>    </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_7">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnApply">
+       <property name="text">
+        <string>确 定</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCancel">
+       <property name="text">
+        <string>取 消</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../res/Icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>
