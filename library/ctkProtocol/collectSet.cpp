@@ -10,8 +10,8 @@
 #include "boost/archive/text_oarchive.hpp"
 #include "boost/archive/text_iarchive.hpp"
 #include "boost/serialization/nvp.hpp"
-
-
+#include <iostream>
+using namespace std;
 bool CollectSetToXml(const string &strPath, const CollectSetList &setlst)
 {
     try
@@ -53,44 +53,44 @@ bool XmlToCollectSet(const string &strPath, CollectSetList &setlst)
 
 namespace boost
 {
-namespace serialization
-{
-template<class Archive>
-void serialize(Archive& ar, CollectSet &set, const unsigned int version)
-{
-    ar & BOOST_SERIALIZATION_NVP(set.strId);
-    ar & BOOST_SERIALIZATION_NVP(set.strPath);
-    ar & BOOST_SERIALIZATION_NVP(set.nWtype);
-    ar & BOOST_SERIALIZATION_NVP(set.strDispatch);
-    ar & BOOST_SERIALIZATION_NVP(set.mapTypeRegs);
-    ar & BOOST_SERIALIZATION_NVP(set.vecQueNames);
-    ar & BOOST_SERIALIZATION_NVP(set.strStation);
-    ar & BOOST_SERIALIZATION_NVP(set.bEnable);
-    //ar & BOOST_SERIALIZATION_NVP(set.strCapRegular);
-    //ar & BOOST_SERIALIZATION_NVP(set.nStationCapIndex);
-    //ar & BOOST_SERIALIZATION_NVP(set.nTimeCapIndex);
-}
+    namespace serialization
+    {
+        template<class Archive>
+        void serialize(Archive& ar, CollectSet &set, const unsigned int version)
+        {
+            ar & BOOST_SERIALIZATION_NVP(set.strId);
+            ar & BOOST_SERIALIZATION_NVP(set.strPath);
+            ar & BOOST_SERIALIZATION_NVP(set.nWtype);
+            ar & BOOST_SERIALIZATION_NVP(set.strDispatch);
+            ar & BOOST_SERIALIZATION_NVP(set.mapTypeRegs);
+            ar & BOOST_SERIALIZATION_NVP(set.vecQueNames);
+            ar & BOOST_SERIALIZATION_NVP(set.strStation);
+            ar & BOOST_SERIALIZATION_NVP(set.bEnable);
+            //ar & BOOST_SERIALIZATION_NVP(set.strCapRegular);
+            //ar & BOOST_SERIALIZATION_NVP(set.nStationCapIndex);
+            //ar & BOOST_SERIALIZATION_NVP(set.nTimeCapIndex);
+        }
 
-template<class Archive>
-void serialize(Archive& ar, CollectSetList &set, const unsigned int version)
-{
-    ar & BOOST_SERIALIZATION_NVP(set.lsSets);
-}
+        template<class Archive>
+        void serialize(Archive& ar, CollectSetList &set, const unsigned int version)
+        {
+            ar & BOOST_SERIALIZATION_NVP(set.lsSets);
+        }
 
-template<class Archive>
-void serialize(Archive& ar, CDataInfo &di, const unsigned int version)
-{
-    ar & BOOST_SERIALIZATION_NVP(di.typeReg);
-    ar & BOOST_SERIALIZATION_NVP(di.queNames);
-}
+        template<class Archive>
+        void serialize(Archive& ar, CDataInfo &di, const unsigned int version)
+        {
+            ar & BOOST_SERIALIZATION_NVP(di.typeReg);
+            ar & BOOST_SERIALIZATION_NVP(di.queNames);
+        }
 
-template<class Archive>
-void serialize(Archive& ar, NameMatchRule &di, const unsigned int version)
-{
-    ar & BOOST_SERIALIZATION_NVP(di.strNameRegExp);
-    ar & BOOST_SERIALIZATION_NVP(di.nTimeIndex);
-    ar & BOOST_SERIALIZATION_NVP(di.nStationIndex);
-}
+        template<class Archive>
+        void serialize(Archive& ar, NameMatchRule &di, const unsigned int version)
+        {
+            ar & BOOST_SERIALIZATION_NVP(di.strNameRegExp);
+            ar & BOOST_SERIALIZATION_NVP(di.nTimeIndex);
+            ar & BOOST_SERIALIZATION_NVP(di.nStationIndex);
+        }
 
-}
+    }
 }

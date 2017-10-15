@@ -11,20 +11,22 @@
 #include "boost/archive/text_iarchive.hpp"
 #include "boost/serialization/nvp.hpp"
 
+#include <iostream>
+
 namespace boost
 {
-namespace serialization
-{
+    namespace serialization
+    {
 
-template<class Archive>
-void serialize(Archive& ar, FileTmplate &set, const unsigned int version)
-{
-    ar & BOOST_SERIALIZATION_NVP(set.vecType);
-    ar & BOOST_SERIALIZATION_NVP(set.vecReg);
-    ar & BOOST_SERIALIZATION_NVP(set.vecIndex);
-}
+        template<class Archive>
+        void serialize(Archive& ar, FileTmplate &set, const unsigned int version)
+        {
+            ar & BOOST_SERIALIZATION_NVP(set.vecType);
+            ar & BOOST_SERIALIZATION_NVP(set.vecReg);
+            ar & BOOST_SERIALIZATION_NVP(set.vecIndex);
+        }
 
-}
+    }
 }
 
 bool FileTmplateToXml(const string &strPath, const FileTmplate &set)

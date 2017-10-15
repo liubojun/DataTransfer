@@ -42,42 +42,8 @@ public:
     DataCollectionImp();
     virtual ~DataCollectionImp();
 
-	virtual QSharedPointer<ICollectManager> createCollector(QWaitCondition &in_oCondition, QMutex &in_oLocker, int &logsize);
+    virtual QSharedPointer<ICollectManager> createCollector(QWaitCondition &in_oCondition, QMutex &in_oLocker, int &logsize);
 
-    /**
-     * @brief  读取数据传输配置文件
-     * @param  TransferSetList & allSets：返回所有的设置
-     * @param  QString & strPath：配置文件的路径
-     * @return bool：读取成功返回ture，否则返回false
-     */
-    //virtual bool ReadTransferSet(TransferSetList &allSets, QString &strPath);
-    /**
-     * @brief  添加数据传输设置
-     * @param  const TransferSet & set：数据传输设置
-     * @return void：无
-     */
-    //virtual void AddTransferSet(const TransferSet &set, bool bFlag=true);
-    /**
-     * @brief  删除指定的数据传输设置
-     * @param  const string & pathID：要删除的目录ID
-     * @return void：无
-     */
-    //virtual void DelTransferSet(const string &pathID);
-    /**
-     * @brief  修改指定的传输设置
-     * @param  const TransferSet & set：修改后的设置
-     * @return void：无
-     */
-    //virtual void MdyTransferSet(const TransferSet &set);
-
-    /**
-     * @brief  测试收集连接
-     * @param  const TransferSet & set
-     * @return bool：描述返回值
-     */
-    //virtual bool TestCollection(const TransferSet &set);
-
-    //virtual bool TestDesCollection(const SendSet &set);
 
     /**
      * @brief  获取给定子站在指定时间段内的最新vtb数据全路径
@@ -118,7 +84,7 @@ private:
     void createLogView();
 
 private slots:
-    void SendHeartMsg();
+
     void collectControl(bool bFlag);
     void showLogView(bool bFlag);
     void resetLogView();

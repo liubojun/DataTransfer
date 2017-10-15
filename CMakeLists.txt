@@ -40,6 +40,31 @@ ENDIF (WITH_QT5)
 MESSAGE(STATUS "${QT5_WRAP_UI}")
 find_package(CTK REQUIRED)
 
+#关闭boost自动链接
+ADD_DEFINITIONS("-DBOOST_ALL_NO_LIB")
+#output窗口中输出链接boost库版本以及链接顺序。
+ADD_DEFINITIONS("-DBOOST_LIB_DIAGNOSTIC")
+
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREAD ON)
+find_package(Boost REQUIRED COMPONENTS serialization)
+
+
+
+#Boost相关的三个变量 
+MESSAGE(STATUS "${Boost_INCLUDE_DIR}\n" 
+"Boost_LIBRARY_DIR = ${Boost_LIBRARY_DIR}"
+"${Boost_LIBRARY_DIR_DEBUG}\n"
+"${Boost_LIBRARY_DIR_RELEASE}\n"
+"${Boost_SERIALIZATION_LIBRARY_DEBUG}\n"
+"${Boost_SERIALIZATION_LIBRARY_RELEASE}")
+
+SET(Boost_LIBRARY_DIR ${Boost_SERIALIZATION_LIBRARY_DEBUG})
+MESSAGE(STATUS ">>>>>>>>${Boost_LIBRARY_DIR}<<<<<<<<<<<<")
+
+find_package(CURL REQUIRED)
+
+
 # Qt翻译家
 FIND_PROGRAM(QT_LRELEASE_EXECUTABLE
     NAMES lrelease
@@ -144,7 +169,7 @@ endmacro()
 #> Create a list of available plug-ins and make them known to the build system
 set(plugins
   plugins/org.common.quartz:ON
-  plugins/org.common.crypt:ON
+  #plugins/org.common.crypt:ON
   plugins/org.radar.datacollection:ON
   plugins/org.radar.dataclear:ON
 )

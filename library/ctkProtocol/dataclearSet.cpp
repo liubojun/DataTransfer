@@ -11,27 +11,29 @@
 #include "boost/archive/text_iarchive.hpp"
 #include "boost/serialization/nvp.hpp"
 
+using namespace std;
+
 namespace boost
 {
-namespace serialization
-{
-template<class Archive>
-void serialize(Archive& ar, DataClearSet &set, const unsigned int version)
-{
-    ar & BOOST_SERIALIZATION_NVP(set.strTask);
-    ar & BOOST_SERIALIZATION_NVP(set.strPath);
-    ar & BOOST_SERIALIZATION_NVP(set.strDrule);
-    ar & BOOST_SERIALIZATION_NVP(set.nStyle);
-    ar & BOOST_SERIALIZATION_NVP(set.reges);
-    ar & BOOST_SERIALIZATION_NVP(set.nSize);
-    ar & BOOST_SERIALIZATION_NVP(set.nTime);
-}
+    namespace serialization
+    {
+        template<class Archive>
+        void serialize(Archive& ar, DataClearSet &set, const unsigned int version)
+        {
+            ar & BOOST_SERIALIZATION_NVP(set.strTask);
+            ar & BOOST_SERIALIZATION_NVP(set.strPath);
+            ar & BOOST_SERIALIZATION_NVP(set.strDrule);
+            ar & BOOST_SERIALIZATION_NVP(set.nStyle);
+            ar & BOOST_SERIALIZATION_NVP(set.reges);
+            ar & BOOST_SERIALIZATION_NVP(set.nSize);
+            ar & BOOST_SERIALIZATION_NVP(set.nTime);
+        }
 
-template<class Archive>
-void serialize(Archive& ar, DataClearSetList &set, const unsigned int version)
-{
-    ar & BOOST_SERIALIZATION_NVP(set.lst);
-}
+        template<class Archive>
+        void serialize(Archive& ar, DataClearSetList &set, const unsigned int version)
+        {
+            ar & BOOST_SERIALIZATION_NVP(set.lst);
+        }
 
 // 		template<class Archive>
 // 		void serialize(Archive& ar, DataClearSet_N &set, const unsigned int version)
@@ -51,7 +53,7 @@ void serialize(Archive& ar, DataClearSetList &set, const unsigned int version)
 // 		{
 // 			ar & BOOST_SERIALIZATION_NVP(set.arrayDCS);
 // 		}
-}
+    }
 }
 
 bool DataClearSetToXml(const string &strPath, const DataClearSetList &setlst)

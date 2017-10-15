@@ -103,18 +103,18 @@ ENDIF (WIN32)
 #			  ${RadarProjectRunTimeLib}/CTKPluginFramework.dll
 #		DESTINATION bin)	
 
-IF (WIN32)
-	INSTALL(FILES ${RadarProjectRunTimeLib}/CTKCore.dll
-			  ${RadarProjectRunTimeLib}/CTKPluginFramework.dll
-		DESTINATION bin)
-ELSE (WIN32)
-	INSTALL(FILES ${RadarProjectRunTimeLib}/libCTKCore.so
-			  ${RadarProjectRunTimeLib}/libCTKPluginFramework.so
-		DESTINATION bin)
-ENDIF (WIN32)
+#IF (WIN32)
+#	INSTALL(FILES ${RadarProjectRunTimeLib}/CTKCore.dll
+#			  ${RadarProjectRunTimeLib}/CTKPluginFramework.dll
+#		DESTINATION bin)
+#ELSE (WIN32)
+#	INSTALL(FILES ${RadarProjectRunTimeLib}/libCTKCore.so
+#			  ${RadarProjectRunTimeLib}/libCTKPluginFramework.so
+#		DESTINATION bin)
+#ENDIF (WIN32)
 
 
 # 安装sqldriver驱动
-INSTALL(DIRECTORY ${RadarProjectRunTimeLib}/sqldrivers	
-		DESTINATION bin)
+#INSTALL(DIRECTORY ${RadarProjectRunTimeLib}/sqldrivers	
+#		DESTINATION bin)
 

@@ -28,7 +28,6 @@ SET(SRCS
 SET(HDRS
   #${CMAKE_CURRENT_SOURCE_DIR}/CollectionInfo.h
   #${RadarProjectInclude}/interface/IBaseInterface.h
-  ${RadarProjectInclude}/curl/curl.h
   ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
   ${CMAKE_CURRENT_SOURCE_DIR}/collectSetDlg.h
   ${CMAKE_CURRENT_SOURCE_DIR}/userInfoDlg.h
@@ -107,6 +106,7 @@ INCLUDE_DIRECTORIES(
 					${RadarProjectInclude}/QsLog
 					${RadarProjectInclude}/ctkPublicFun
 					${RadarProjectInclude}/ctkProtocol
+					${CURL_INCLUDE_DIR}
 					#${RadarProjectInclude}/3dpart/zeromq
 					${VLD_INCLUDE}
 				)
@@ -127,6 +127,7 @@ ADD_EXECUTABLE(${PROJECT_NAME} ${HDRS} ${SRCS} ${MOC_SRCS} ${UI_H} ${ICON_SRCS} 
 
 #ADD_EXECUTABLE(PROJECT_NAME ${HDRS} ${SRCS} ${MOC_SRCS} ${UI_H} ${ICON_SRCS} ${RESOUCES})
 
+message(STATUS "CURL_LIBRARY == ${CURL_LIBRARY}")
 IF (WIN32)
     TARGET_LINK_LIBRARIES(${PROJECT_NAME}
             ${QT_QTMAIN_LIBRARY}
@@ -140,7 +141,7 @@ IF (WIN32)
             ctkProtocol
             ${VLD_LIB}
             CTKPluginFramework
-            libcurl_imp
+            ${CURL_LIBRARY}
             )
 
 ELSE (WIN32)

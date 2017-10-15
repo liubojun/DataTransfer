@@ -2,8 +2,7 @@
 #include "shareddirCollector.h"
 #include "ftpCollector.h"
 #include "pathbuilder.h"
-#include "ConnectConfig.h"
-#include "IClientMessage.h"
+
 #include "ctkPublicFun.h"
 #include <QSettings>
 
@@ -17,7 +16,7 @@ CollectManager::CollectManager(ICtkPluginManager *pCtkManager, QWaitCondition &i
 
 {
     m_bFirstReadTcXml = true;
-    connectMsgServer();		//连接消息服务器
+    //connectMsgServer();		//连接消息服务器
 
     m_pThread = QSharedPointer<QThread>(new QThread(this));
     QObject::connect(m_pThread.data(), SIGNAL(finished()), m_pThread.data(), SLOT(deleteLater()));
@@ -204,36 +203,36 @@ void CollectManager::ToFileTable(const std::map<string, NameMatchRule > &mapType
     }
 }
 
-bool CollectManager::connectMsgServer()
-{
-    QObject *op = m_pCtkManager->getService("IClientMessage");
-    if (op == NULL)
-    {
-        return false;
-    }
-    //创建消息客户端
-    m_pIClient = (qobject_cast<IClientMessage *>(op))->createClient();
-    if (m_pIClient != NULL)
-    {
-        CPathBuilder pbd;
-        QString qsXmlPath = pbd.getConfigPath() + "/ClientInfo.xml";
-        if (QFile::exists(qsXmlPath))
-        {
-            ClientConfig cConfig;
-            if (DeserializeXmlFile2Client(qsXmlPath.toLocal8Bit().data(), cConfig))
-            {
-                if (m_pIClient->connect(cConfig.m_sIP, cConfig.m_nPort))
-                {
-                    connect(m_pIClient.data(), SIGNAL(msgIncoming(const MSGSTRUCT&)), this, SLOT(onMsgResp()));
-                    return true;
-                }
-            }
-        }
-    }
-
-    QSLOG_ERROR("CollectorBase failed to connectMsgServer");
-    return false;
-}
+//bool CollectManager::connectMsgServer()
+//{
+//    QObject *op = m_pCtkManager->getService("IClientMessage");
+//    if (op == NULL)
+//    {
+//        return false;
+//    }
+//    //创建消息客户端
+//    m_pIClient = (qobject_cast<IClientMessage *>(op))->createClient();
+//    if (m_pIClient != NULL)
+//    {
+//        CPathBuilder pbd;
+//        QString qsXmlPath = pbd.getConfigPath() + "/ClientInfo.xml";
+//        if (QFile::exists(qsXmlPath))
+//        {
+//            ClientConfig cConfig;
+//            if (DeserializeXmlFile2Client(qsXmlPath.toLocal8Bit().data(), cConfig))
+//            {
+//                if (m_pIClient->connect(cConfig.m_sIP, cConfig.m_nPort))
+//                {
+//                    connect(m_pIClient.data(), SIGNAL(msgIncoming(const MSGSTRUCT&)), this, SLOT(onMsgResp()));
+//                    return true;
+//                }
+//            }
+//        }
+//    }
+//
+//    QSLOG_ERROR("CollectorBase failed to connectMsgServer");
+//    return false;
+//}
 
 bool CollectManager::TestSrcCollection(const TransferSet &set)
 {

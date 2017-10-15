@@ -1,16 +1,16 @@
 ﻿#include "shareddirCollector.h"
 #include "ctkPublicFun.h"
 #include "CltDispatch.h"
-#include "IClientMessage.h"
+//#include "IClientMessage.h"
 //#include "INofity.h"
 #include "pathbuilder.h"
 #include "IRadarBaseDataParse.h"
 #include "ctkLog.h"
 #include "toVtbThread.h"
 #include <time.h>
-#ifdef _WIN32
-#include <WinNetWk.h>
-#endif
+//#ifdef _WIN32
+//#include <WinNetWk.h>
+//#endif
 #include <QTimer>
 #include <QElapsedTimer>
 #include <QCoreApplication>

@@ -5,8 +5,8 @@
 #include "pathbuilder.h"
 #include "IMakePath.h"
 #include "IRadarPathAdapter.h"
-#include "IClientMessage.h"
-#include "ConnectConfig.h"
+//#include "IClientMessage.h"
+//#include "ConnectConfig.h"
 #include "CollectManager.h"
 //#include <QHostInfo>
 
@@ -295,37 +295,7 @@ QMap<QString, QString> DataCollectionImp::GetLastVtbPath(const QStringList &stat
     return result;
 }
 
-void DataCollectionImp::SendHeartMsg()
-{
-    ConnectInfo CI;
-    CI.connId   = m_strIPaddr.toStdString();
-    CI.connTime = time(NULL);
 
-    std::string s;
-    bool bFlag = SerializeConnectionInfo2String(s, CI);
-    if (bFlag)
-    {
-        MSGSTRUCT msg;
-        msg.head.m_msgid = 12068;
-        msg.body.m_msgdata = s;
-
-        // m_pIClient->heartbeat(msg);		//临时屏蔽
-    }
-}
-
-// void DataCollectionImp::getIpaddr(QString &strIP)
-// {
-//     QString localHostName = QHostInfo::localHostName();
-//     QHostInfo info = QHostInfo::fromName(localHostName);
-//     foreach (QHostAddress addr, info.addresses())
-//     {
-//         if (addr.protocol() == QAbstractSocket::IPv4Protocol)
-//         {
-//             strIP = addr.toString();
-//             break;
-//         }
-//     }
-// }
 
 void DataCollectionImp::initgui(UIInterface *in_pGuiInterace)
 {
@@ -380,20 +350,20 @@ void DataCollectionImp::collectControl(bool bFlag)
 
 void DataCollectionImp::startComCollection()
 {
-	/*  ICtkPluginManager *pManager = getCtkPluginManager();
-	if (pManager != NULL)
-	{
-	if (m_pComCollector.isNull())
-	{
-	m_pComCollector = QSharedPointer<CollectManager>(new CollectManager(pManager));
-	BIND_LOG(m_pComCollector.data(), m_pLogView.data(), addLine(const QString&));
-	}
-	CPathBuilder pb;
-	QString setXmlPath = pb.getConfigPath() + "/CollectSet.xml";
-	QString timeXmlPath = pb.getConfigPath() + "/LatestFileTime.xml";
-	m_pComCollector->setXmlPath(setXmlPath, timeXmlPath);
-	m_pComCollector->startAllCollection();
-	}*/
+    /*  ICtkPluginManager *pManager = getCtkPluginManager();
+    if (pManager != NULL)
+    {
+    if (m_pComCollector.isNull())
+    {
+    m_pComCollector = QSharedPointer<CollectManager>(new CollectManager(pManager));
+    BIND_LOG(m_pComCollector.data(), m_pLogView.data(), addLine(const QString&));
+    }
+    CPathBuilder pb;
+    QString setXmlPath = pb.getConfigPath() + "/CollectSet.xml";
+    QString timeXmlPath = pb.getConfigPath() + "/LatestFileTime.xml";
+    m_pComCollector->setXmlPath(setXmlPath, timeXmlPath);
+    m_pComCollector->startAllCollection();
+    }*/
 }
 
 void DataCollectionImp::stopComCollection()

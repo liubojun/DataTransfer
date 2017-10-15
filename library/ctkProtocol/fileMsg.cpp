@@ -28,20 +28,20 @@ void StringToFileInfo(const std::string &strMsg, FileInfo &fileInfo)
 
 namespace boost
 {
-namespace serialization
-{
-template<class Archive>
-void serialize(Archive& ar, FileInfo &fi, const unsigned int version)
-{
-    ar & BOOST_SERIALIZATION_NVP(fi.strFileName);
-    ar & BOOST_SERIALIZATION_NVP(fi.strFilePath);
-    ar & BOOST_SERIALIZATION_NVP(fi.strFileTime);
-    ar & BOOST_SERIALIZATION_NVP(fi.strFileType);
-    ar & BOOST_SERIALIZATION_NVP(fi.strStation);
-    ar & BOOST_SERIALIZATION_NVP(fi.strMdyTime);
-    ar & BOOST_SERIALIZATION_NVP(fi.nFileType);
-}
-}
+    namespace serialization
+    {
+        template<class Archive>
+        void serialize(Archive& ar, FileInfo &fi, const unsigned int version)
+        {
+            ar & BOOST_SERIALIZATION_NVP(fi.strFileName);
+            ar & BOOST_SERIALIZATION_NVP(fi.strFilePath);
+            ar & BOOST_SERIALIZATION_NVP(fi.strFileTime);
+            ar & BOOST_SERIALIZATION_NVP(fi.strFileType);
+            ar & BOOST_SERIALIZATION_NVP(fi.strStation);
+            ar & BOOST_SERIALIZATION_NVP(fi.strMdyTime);
+            ar & BOOST_SERIALIZATION_NVP(fi.nFileType);
+        }
+    }
 }
 
 // FileInfo& FileInfo::operator=(const FileInfo &fi)

@@ -11,6 +11,9 @@
 #include "boost/archive/text_iarchive.hpp"
 #include "boost/serialization/nvp.hpp"
 
+#include <iostream>
+
+using namespace std;
 
 namespace boost
 {

@@ -40,7 +40,6 @@ set(PLUGIN_HDRS
   ${RadarProjectInclude}/org.radar.datacollection/CollectManager.h
   ${RadarProjectInclude}/org.radar.datacollection/ICollectManager.h
   ${RadarProjectInclude}/org.common.quartz/DispatchInterface.h
-  ${RadarProjectInclude}/org.radar.clientmessage/IClientMessage.h
   ${RadarProjectInclude}/interface/ILogPrint.h
 )
 
@@ -100,6 +99,7 @@ INCLUDE_DIRECTORIES(
 					${RadarProjectInclude}/ctkProtocol
 					${RadarProjectInclude}/org.radar.radarmosaic
 					${RadarProjectInclude}/org.radar.filedistribute
+					${CURL_INCLUDE_DIR}
 					${VLD_INCLUDE}
 				)
 
@@ -130,7 +130,7 @@ IF (WIN32)
       ${QT_QTCORE_LIBRARY}
       ${QT_QTGUI_LIBRARY}
       Mpr.lib
-      ${RadarProjectLib}/libcurl_imp.lib
+      ${CURL_LIBRARY}
     )
 ELSE (WIN32)
     ctkMacroBuildPlugin(
@@ -154,6 +154,6 @@ INSTALL(TARGETS ${PROJECT_NAME}
 		RUNTIME DESTINATION bin/plugins/org.radar.datacollection_v1.0
 		LIBRARY DESTINATION bin/plugins/org.radar.datacollection_v1.0)
 
-INSTALL(FILES
-		${RadarProjectRunTimeLib}/libcurl.dll
-		DESTINATION bin)	
+#INSTALL(FILES
+		#${RadarProjectRunTimeLib}/libcurl.dll
+		#DESTINATION bin)	

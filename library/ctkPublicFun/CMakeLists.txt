@@ -7,7 +7,6 @@ SET(SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/ctkPublicFun.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/pathbuilder.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ginformation.cpp	
-	${CMAKE_CURRENT_SOURCE_DIR}/queuemsgoper.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/dllloader.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/DataBase.cpp
 )
@@ -18,7 +17,6 @@ SET(HDRS
 	${RadarProjectInclude}/ctkPublicFun/pathbuilder.h
 	${RadarProjectInclude}/ctkPublicFun/language.h
 	${RadarProjectInclude}/ctkPublicFun/ginformation.h
-	${RadarProjectInclude}/ctkPublicFun/queuemsgoper.h
 	${RadarProjectInclude}/ctkPublicFun/publicthread.h
 	${RadarProjectInclude}/ctkPublicFun/dllloader.h
 	${RadarProjectInclude}/ctkPublicFun/event_macro.h
@@ -66,7 +64,6 @@ IF (WIN32)
 		CTKPluginFramework
 		ctkLogger
 		ctkProtocol
-		${RadarProjectLib}/bzip2.lib
 		Mpr
 	)
 ELSE (WIN32)
@@ -74,7 +71,7 @@ ELSE (WIN32)
 		${QT_QTMAIN_LIBRARY}
 		${QT_QTCORE_LIBRARY}
 		${QT_UITOOLS_LIBRARY}
-                ${QT_QTSQL_LIBRARY}
+         ${QT_QTSQL_LIBRARY}
 		${VLD_LIB}
 		${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libctkLogger.so	#需要明确路径
 		${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libctkProtocol.so
