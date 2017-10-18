@@ -11,10 +11,10 @@
 class DistributeFile : public QObject
 {
 public:
-    DistributeFile(CollectorBase *pBase);
+    DistributeFile(CollectorBase *pBase, CurlFtp &oCurlFtp);
     virtual ~DistributeFile();
 
-    void transfer(TransTask &tTask);
+    void transfer(TransTask &task);
 
     int getCurlAddr();
     TransTask m_fileInfo;
@@ -49,7 +49,8 @@ protected:
     void taskFinish();
 
 private:
-    QSharedPointer<CurlFtp>	m_pFtp;
+    CurlFtp &m_oCurlFtp;
+    // QSharedPointer<CurlFtp>	m_pFtp;
     CollectorBase	*m_pBase;
     IFileCrypt	*m_pFileCrypt;
     KeyIv		m_keyiv[4];		///< 加密使用的key和iv

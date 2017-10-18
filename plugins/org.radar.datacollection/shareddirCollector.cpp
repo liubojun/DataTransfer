@@ -805,6 +805,7 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
     list<string> t_oNewLatestFiles = t_oLatestFileList;
     bool listUpdate = false;
 
+    CurlFtp m_ftp;
     for (int i=0; i<qfileList.size(); ++i)
     {
         //tt.start();
@@ -873,12 +874,12 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
                 if (filterFileName(qf.fileName()))
                 {
                     TransTask tTask;
-                    if (!compareWithDest(qf, tTask))
+                    if (!compareWithDest(m_ftp, qf, tTask))
                     {
                         tTask.collectSet = m_collectSet;
                         //tTask.userInfo = m_userInfo.user;
                         // 发送文件
-                        DistributeFile sendFile(this);
+                        DistributeFile sendFile(this, m_ftp);
                         sendFile.transfer(tTask);
                     }
                 }
@@ -886,6 +887,7 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
             }
         }
     }
+
 
     // 判断是否需要记录当前目录的最后处理时间
     // 记录当前目录最后修改时间
@@ -913,7 +915,7 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
     }
 }
 
-bool SharedDirCollector::compareWithDest(const QFileInfo &fi, TransTask &tTask)
+bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi, TransTask &tTask)
 {
     // libcurl不能传输大小为0的文件
     if (fi.size() <= 0)
@@ -965,9 +967,9 @@ bool SharedDirCollector::compareWithDest(const QFileInfo &fi, TransTask &tTask)
             sprintf(ftpUrl, "ftp://%s:%d%s", strIp.c_str(), nPort, strPath.c_str());
             sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
 
-            static CurlFtp m_ftp;
+            // CurlFtp m_ftp;
             double dSize = 0;
-            if (m_ftp.getFileSize(ftpUrl, usrPwd, strName, dSize))
+            if (oCurlFtp.getFileSize(ftpUrl, usrPwd, strName, dSize))
             {
                 continue;
             }
@@ -988,23 +990,23 @@ void SharedDirCollector::onCheckDir(QSet<QString> lstPath)
     }
 }
 
-void SharedDirCollector::fileCreated(const QString &strFilePath)
-{
-    if (m_tUser.lstUser.isEmpty() && !readSet())
-    {
-        return;
-    }
-
-    QFileInfo qf(strFilePath);
-    if (qf.isFile() && filterFileName(qf.fileName()))
-    {
-        TransTask tTask;
-        if (!compareWithDest(qf, tTask))
-        {
-            tTask.collectSet = m_collectSet;
-            // 发送文件
-            DistributeFile sendFile(this);
-            sendFile.transfer(tTask);
-        }
-    }
-}
+//void SharedDirCollector::fileCreated(const QString &strFilePath)
+//{
+//    if (m_tUser.lstUser.isEmpty() && !readSet())
+//    {
+//        return;
+//    }
+//
+//    QFileInfo qf(strFilePath);
+//    if (qf.isFile() && filterFileName(qf.fileName()))
+//    {
+//        TransTask tTask;
+//        if (!compareWithDest(qf, tTask))
+//        {
+//            tTask.collectSet = m_collectSet;
+//            // 发送文件
+//            DistributeFile sendFile(this);
+//            sendFile.transfer(tTask);
+//        }
+//    }
+//}

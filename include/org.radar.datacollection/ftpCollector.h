@@ -20,6 +20,8 @@
 //#include "MyFtp.h"
 #include "curlftp.h"
 
+class CurlFtp;
+
 class FtpCollector : public CollectorBase
 {
     Q_OBJECT
@@ -39,7 +41,7 @@ public:
     virtual void taskDone(bool bFlag, const FileInfo &file);
 
     // 相同返回true，不同返回false
-    bool compareWithDest(const FileInfo &fi, TransTask &tTask);
+    bool compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransTask &tTask);
 
 private slots:
     void ftpDone();

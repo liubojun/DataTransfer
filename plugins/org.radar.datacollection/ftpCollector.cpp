@@ -149,15 +149,16 @@ void FtpCollector::ftpDone()
         return;
     }
 
+    CurlFtp m_ftp;
     for (int i=0; i<m_fileList.size(); ++i)
     {
         TransTask task;
-        if (m_bRun && !compareWithDest(m_fileList.at(i), task))
+        if (m_bRun && !compareWithDest(m_ftp, m_fileList.at(i), task))
         {
             task.collectSet = m_collectSet;
             //task.userInfo = m_userInfo.user;
             // 发送文件
-            DistributeFile sendFile(this);
+            DistributeFile sendFile(this, m_ftp);
             sendFile.transfer(task);
         }
     }
@@ -184,7 +185,7 @@ void FtpCollector::taskDone(bool bFlag, const FileInfo &file)
     return;
 }
 
-bool FtpCollector::compareWithDest(const FileInfo &fi, TransTask &tTask)
+bool FtpCollector::compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransTask &tTask)
 {
     // libcurl不能传输大小为0的文件
     if (fi.nFileSize <= 0)
@@ -225,9 +226,9 @@ bool FtpCollector::compareWithDest(const FileInfo &fi, TransTask &tTask)
             sprintf(ftpUrl, "ftp://%s:%d%s", strIp.c_str(), nPort, strPath.c_str());
             sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
 
-            static CurlFtp m_ftp;
+            // CurlFtp m_ftp;
             double dSize = 0;
-            if (m_ftp.getFileSize(ftpUrl, usrPwd, "", dSize))
+            if (oCurlFtp.getFileSize(ftpUrl, usrPwd, "", dSize))
             {
                 continue;
             }

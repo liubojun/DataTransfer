@@ -8,16 +8,17 @@
 
 const QString g_suffix[4] = { "", ".jm1", ".jm2", ".jm3" };
 
-DistributeFile::DistributeFile(CollectorBase *pBase)
+DistributeFile::DistributeFile(CollectorBase *pBase, CurlFtp &oCurlFtp)
     : m_pFileCrypt(NULL)
     , m_pBase(pBase)
+    , m_oCurlFtp(oCurlFtp)
 {
-    m_pFtp = QSharedPointer<CurlFtp>(new CurlFtp());
-    if (m_pFtp == NULL)
-    {
-        QSLOG_ERROR("Create CurlFtp error.");
-        exit(-1);
-    }
+    //m_pFtp = QSharedPointer<CurlFtp>(new CurlFtp());
+    //if (m_pFtp == NULL)
+    //{
+    //    QSLOG_ERROR("Create CurlFtp error.");
+    //    exit(-1);
+    //}
     m_pFileCrypt = pBase->m_pFileCrypt;
 
     // m_downloadPath = qApp->applicationDirPath() + "/work/download/" + QString::number(getCurlAddr());
@@ -57,9 +58,9 @@ void DistributeFile::transfer(TransTask &task)
         // modified by liubojun@20170928,与收集统一方式
         sprintf(ftpUrl, "ftp://%s:%d%s", strIP.c_str(), task.collectSet.port, task.srcFileFullPath.toLocal8Bit().data());
         sprintf(usrPwd, "%s:%s", task.collectSet.loginUser.toLocal8Bit().data(), task.collectSet.loginPass.toLocal8Bit().data());
-        m_pFtp->setFtpConnectMode(task.collectSet.ftp_connectMode);
-        m_pFtp->setFtpTransferMode(task.collectSet.ftp_transferMode);
-        if (0 != m_pFtp->downloadFile(ftpUrl, usrPwd, &fileData))
+        m_oCurlFtp.setFtpConnectMode(task.collectSet.ftp_connectMode);
+        m_oCurlFtp.setFtpTransferMode(task.collectSet.ftp_transferMode);
+        if (0 != m_oCurlFtp.downloadFile(ftpUrl, usrPwd, &fileData))
         {
             QString logInfo = QStringLiteral("从FTP下载文件[%1]失败。").arg(task.fileName);
             //m_pBase->emitLog(task.collectSet.dirName, logInfo);
@@ -264,11 +265,11 @@ bool DistributeFile::sendToDir(const char *fullPath, KeyIv &keyiv, TransTask &ta
     int bRet = -1;
     if (taskInfo.userInfo.at(userIndex).conput)	// 断点续传
     {
-        bRet = m_pFtp->conputFileToDir(url, NULL, taskInfo.fileName.toLocal8Bit().data(), fullPath, taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
+        bRet = m_oCurlFtp.conputFileToDir(url, NULL, taskInfo.fileName.toLocal8Bit().data(), fullPath, taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
     }
     else
     {
-        bRet = m_pFtp->uploadFileToDir(url, NULL, taskInfo.fileName.toLocal8Bit().data(), fullPath, taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
+        bRet = m_oCurlFtp.uploadFileToDir(url, NULL, taskInfo.fileName.toLocal8Bit().data(), fullPath, taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
     }
     if (bRet != 0)
     {
@@ -356,11 +357,11 @@ bool DistributeFile::sendToFtp(const char *fullPath, KeyIv &keyiv, TransTask &ta
     int bRet = -1;
     if (task.userInfo.at(userIndex).conput)	// 断点续传
     {
-        bRet = m_pFtp->conputFileToFtp(ftpUrl, usrPwd, task.fileName.toLocal8Bit().data(), fullPath, task.userInfo.at(userIndex).sendSuffix.toAscii().data());
+        bRet = m_oCurlFtp.conputFileToFtp(ftpUrl, usrPwd, task.fileName.toLocal8Bit().data(), fullPath, task.userInfo.at(userIndex).sendSuffix.toAscii().data());
     }
     else
     {
-        bRet = m_pFtp->uploadFileToFtp(ftpUrl, usrPwd, task.fileName.toLocal8Bit().data(), fullPath, task.userInfo.at(userIndex).sendSuffix.toAscii().data());
+        bRet = m_oCurlFtp.uploadFileToFtp(ftpUrl, usrPwd, task.fileName.toLocal8Bit().data(), fullPath, task.userInfo.at(userIndex).sendSuffix.toAscii().data());
     }
     if (bRet != 0)
     {

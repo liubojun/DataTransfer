@@ -112,11 +112,27 @@ CurlFtp::CurlFtp(CollectorBase *pBase)
     m_pCoBase = pBase;
 
     connect(this, SIGNAL(emitLog(const QString &, int)), m_pCoBase, SLOT(emitLog(const QString &, int)));
+
+    m_pSourceCurl = curl_easy_init();
+
+    m_pDestCurl = curl_easy_init();
 }
 
 CurlFtp::~CurlFtp()
 {
     uninitcurl();
+
+    if (NULL != m_pSourceCurl)
+    {
+        curl_easy_cleanup(m_pSourceCurl);
+        m_pSourceCurl = NULL;
+    }
+
+    if (NULL != m_pDestCurl)
+    {
+        curl_easy_cleanup(m_pDestCurl);
+        m_pDestCurl = NULL;
+    }
 }
 
 int CurlFtp::setCommOpt()
@@ -581,7 +597,8 @@ int CurlFtp::downloadFile(const char *url, const char *user_pwd, FileData *fileD
     //// 重置
     //curl_easy_reset(m_pCurl);
 
-    CURL *curl = curl_easy_init();
+    CURL *curl = m_pSourceCurl;
+    // CURL *curl = curl_easy_init();
     if (NULL == curl)
     {
         QSLOG_ERROR(QStringLiteral("初始化curl失败!"));
@@ -648,17 +665,18 @@ int CurlFtp::downloadFile(const char *url, const char *user_pwd, FileData *fileD
     {
         QString strLogInfo(QString("downloadFile error: %1").arg(curl_easy_strerror(res)));
         QSLOG_ERROR(strLogInfo);
-        curl_easy_cleanup(curl);
+        //curl_easy_cleanup(curl);
         emit emitLog(strLogInfo, FAIL);
         return -1;
     }
     QSLOG_INFO(QString::fromLocal8Bit("文件下载到:%1成功").arg(fileData->filename));
-    curl_easy_cleanup(curl);
+    //curl_easy_cleanup(curl);
 
     // 先做目录及的剪切
     // pBase->
     return 0;
 }
+
 
 int CurlFtp::uploadFile(const char *url, const char *user_pwd, MemoryData *memData, const string &filename, const char *sendsuffix)
 {
@@ -916,8 +934,8 @@ int CurlFtp::deleteLocalFile(const char *url, const char *user_pwd, const string
 
 bool CurlFtp::getFileSize(const char *url, const char *user_pwd, const string &filename, double &fileSize)
 {
-    CURL *curl = curl_easy_init();
-
+    // CURL *curl = curl_easy_init();
+    CURL *curl = m_pCurl;
     if (curl == NULL)
     {
         QSLOG_ERROR("curl_easy_init error.");
@@ -943,25 +961,26 @@ bool CurlFtp::getFileSize(const char *url, const char *user_pwd, const string &f
         res = curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &fileSize);
         if((CURLE_OK == res) && (fileSize > 0.0))
         {
-            curl_easy_cleanup(curl);
+            //curl_easy_cleanup(curl);
             return true;
         }
     }
 
-    curl_easy_cleanup(curl);
+    //curl_easy_cleanup(curl);
     return false;
 }
+
 
 int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string &filename, const char *localPath, const char *sendsuffix)
 {
     // 连接ftp服务器
-    if (!TestConnection(url, user_pwd))
-    {
-        return -1;
-    }
+    //if (!TestConnection(url, user_pwd))
+    //{
+    //	return -1;
+    //}
 
     // 删除已有文件
-    deleteFtpFile(url, user_pwd, filename);
+    //deleteFtpFile(url, user_pwd, filename);
 
     // 打开本地文件，并获取文件大小
     FILE *pfile = fopen(localPath, "rb");
@@ -981,8 +1000,9 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
     //    return -1;
     //}
     //curl_easy_reset(m_pCurl);
-
-    CURL *curl = curl_easy_init();
+    // 当前m_pCurl保存的是目标目录的curl对象，所以应该复用
+    CURL *curl = m_pDestCurl;
+    // CURL *curl = curl_easy_init();
     // QSharedPointer<CURL> autoRelease(curl, curl_easy_cleanup);
     curl_easy_setopt(curl, CURLOPT_NOSIGNAL,1L);
     struct curl_slist *headerlist = NULL;
@@ -1020,11 +1040,11 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
         QString logInfo(QString("uploadFile error: %1").arg(curl_easy_strerror(res)));
         QSLOG_ERROR(logInfo);
         emit emitLog(logInfo, FAIL);
-        curl_easy_cleanup(curl);
+        //curl_easy_cleanup(curl);
         return -1;
     }
 
-    curl_easy_cleanup(curl);
+    //curl_easy_cleanup(curl);
     return 0;
 }
 

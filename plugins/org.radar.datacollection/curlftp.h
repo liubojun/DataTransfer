@@ -190,6 +190,15 @@ private:
 public:
     CURL *m_pCurl;
 
+    // 创建收集目录的libcurl对象，便于反复复用
+    //CURL *createSourceCurl();
+
+    CURL *m_pSourceCurl;
+
+    // 创建收集目录的libcurl对象，便于反复复用
+    //CURL *createDestCurl();
+
+    CURL *m_pDestCurl;
     /**
     * @brief  从ftp或file下载到文件
     * @param  const char * url
@@ -198,6 +207,7 @@ public:
     * @return int：无
     */
     int downloadFile(const char *url, const char *user_pwd, FileData *fileData);
+
 
     /**
     * @brief  从内存上传到ftp
@@ -226,6 +236,7 @@ public:
     int deleteLocalFile(const char *url, const char *user_pwd, const string &filename);
 
     bool getFileSize(const char *url, const char *user_pwd, const string &filename, double &fileSize);
+
     //////////////////////////////////////////////////////////////////////////
 
     void process4Ftp(CListInfo &oneInfo, const QStringList &lstParts);

@@ -30,6 +30,7 @@ using namespace QtConcurrent;
 
 class CltDispatch;
 class IFileWatcher;
+class CurlFtp;
 
 class SharedDirCollector : public CollectorBase
 {
@@ -56,7 +57,7 @@ public:
 public slots:
     virtual int stop();
     void onCheckDir(QSet<QString>);
-    void fileCreated(const QString &strFilePath);
+    //void fileCreated(const QString &strFilePath);
 public:
     /**
      * @brief  重写父类虚函数，被定时调用，查找新文件
@@ -70,8 +71,9 @@ public:
 
     void syncTransfer();
     void getSynclessFiles(QString strDir, bool bSubdir);
+
     // 相同返回true，不同返回false
-    bool compareWithDest(const QFileInfo &fi, TransTask &tTask);
+    bool compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi, TransTask &tTask);
 
     /**
      * @brief  数据传输检索新文件
