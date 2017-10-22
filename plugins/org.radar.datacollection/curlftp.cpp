@@ -143,7 +143,7 @@ int CurlFtp::setCommOpt()
     if (m_pCurl != NULL)
     {
         char ftpurl[260] = {0};
-        sprintf(ftpurl, "ftp://%s:%s@%s:%d/%s", m_strUser, m_strPwd, m_strIP, m_nPort, m_strRoot);
+        sprintf(ftpurl, "ftp://%s:%s@%s:%d/%s", m_strUser.c_str(), m_strPwd.c_str(), m_strIP.c_str(), m_nPort, m_strRoot.c_str());
 
         curl_easy_setopt(m_pCurl, CURLOPT_URL, ftpurl);
         // 不下载文件
@@ -709,10 +709,10 @@ int CurlFtp::uploadFile(const char *url, const char *user_pwd, MemoryData *memDa
 
     headerlist = curl_slist_append(headerlist, cmdTmpName.c_str());
     headerlist = curl_slist_append(headerlist, cmdOrgName.c_str());
-    curl_easy_setopt(curl, CURLOPT_UPLOAD, TRUE);
+    curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
     curl_easy_setopt(curl, CURLOPT_URL, strUrl.c_str());
     curl_easy_setopt(curl, CURLOPT_USERPWD, user_pwd);
-    curl_easy_setopt(curl, CURLOPT_FTP_CREATE_MISSING_DIRS, TRUE);
+    curl_easy_setopt(curl, CURLOPT_FTP_CREATE_MISSING_DIRS, 1);
     curl_easy_setopt(curl, CURLOPT_READDATA, memData);
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, UploadFromMemFun);
     /* pass in that last of FTP commands to run after the transfer */
