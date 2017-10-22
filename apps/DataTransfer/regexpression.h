@@ -1,6 +1,6 @@
 ﻿#include <QDialog>
 
-#include "ui_regularexpression.h"
+#include "ui_RegularExpression.h"
 
 class CRegExpDlg :public QDialog
 {

@@ -128,7 +128,7 @@ ADD_EXECUTABLE(${PROJECT_NAME} ${HDRS} ${SRCS} ${MOC_SRCS} ${UI_H} ${ICON_SRCS} 
 #ADD_EXECUTABLE(PROJECT_NAME ${HDRS} ${SRCS} ${MOC_SRCS} ${UI_H} ${ICON_SRCS} ${RESOUCES})
 
 message(STATUS "CURL_LIBRARY == ${CURL_LIBRARY}")
-IF (WIN32)
+
     TARGET_LINK_LIBRARIES(${PROJECT_NAME}
             ${QT_QTMAIN_LIBRARY}
             ${QT_QTCORE_LIBRARY}
@@ -139,29 +139,11 @@ IF (WIN32)
             ctkLogger
             ctkPublicFun
             ctkProtocol
+            ctkPluginManager
             ${VLD_LIB}
             CTKPluginFramework
             ${CURL_LIBRARY}
             )
-
-ELSE (WIN32)
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-            ${QT_QTMAIN_LIBRARY}
-            ${QT_QTCORE_LIBRARY}
-            ${QT_QTGUI_LIBRARY}
-            ${QT_QTUITOOLS_LIBRARY}
-            #${QT_QTQML_LIBRARY}
-            #${QT_QTQUICK_LIBRARY}
-            ctkLogger
-            ctkPublicFun
-            ctkProtocol
-            ctkPluginManager
-            ${VLD_LIB}
-            CTKPluginFramework
-            ${RadarProjectLib}/libcurl.so
-            #${RadarProjectLib}/libboost_serialization.so
-            )
-ENDIF (WIN32)
 
 #TARGET_LINK_LIBRARIES(DataTransfer_DebugInfo
 	#${QT_QTMAIN_LIBRARY}
@@ -193,4 +175,3 @@ INSTALL(TARGETS ${PROJECT_NAME}
 		#${CMAKE_BINARY_DIR}/bin/i18n/FileTransfer_en.qm
 		#DESTINATION bin/i18n
 #		)		
-				
