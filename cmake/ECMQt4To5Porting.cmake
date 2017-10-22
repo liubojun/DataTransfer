@@ -151,7 +151,9 @@ set(QT_INCLUDES
 )
 set(QT_QTGUI_LIBRARY ${QT_QTGUI_LIBRARIES})
 
-set(QT_QTMAIN_LIBRARY Qt5::WinMain)
+IF(WIN32)
+    set(QT_QTMAIN_LIBRARY Qt5::WinMain)
+ENDIF()
 
 set(_qt_modules
   Core
