@@ -96,8 +96,22 @@ public:
      */
     QString getCurlFilePath();
 
+    /**
+     * @brief  从界面配置的URL中解析出路径[基于系统时间]
+     * @return QT_NAMESPACE::QString：返回组装的url
+     */
+    static QString getFinalPathFromUrl(const QString &path);
+
+    /**
+    * @brief  从界面配置的URL中解析出路径[基于文件最后修改时间]
+    * @return QT_NAMESPACE::QString：返回组装的url
+    */
+    static QString getFinalPathFromUrl(const QString &path, QDateTime in_oDt);
+
 protected:
     bool makeBuilderOrRunning();
+
+    static QString parseFromUrl(const QString &url, QDateTime in_oDt);
 
 private:
     // 程序路径

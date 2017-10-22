@@ -7,6 +7,7 @@
 #include "IRadarBaseDataParse.h"
 #include "ctkLog.h"
 #include "toVtbThread.h"
+#include "pathbuilder.h"
 #include <time.h>
 //#ifdef _WIN32
 //#include <WinNetWk.h>
@@ -149,7 +150,7 @@ void SharedDirCollector::getNewFiles()
 
     // E:/workspace/DataTransfer/DataTransfer_code_20170831/vs2013/apps/DataTransfer/%T-1H%t%y/%t%m/%td
     // modified by liubojun. 支持按照特定时间获取数据
-    m_collectSet.rltvPath = getFinalPathFromUrl(m_collectSet.rltvPath);
+    m_collectSet.rltvPath = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
 
     bool bConnect = true;
     // 先测试源路径是否正常
@@ -163,15 +164,6 @@ void SharedDirCollector::getNewFiles()
         emit taskState(m_collectSet, 0, m_nLineState);
         return;
     }
-    // 在测试目标路径是否正常 临时屏蔽
-//     if (m_userInfo.user.sendType == 0)
-//     {
-//         bConnect = testFileConnection(m_userInfo.user.rootPath);
-//     }
-//     else
-//     {
-//         bConnect = testFtpConnection(m_userInfo.user.ip, m_userInfo.user.port, m_userInfo.user.lgUser, m_userInfo.user.lgPass);
-//     }
 
     if (bConnect)
     {
@@ -926,7 +918,7 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
     for (int i=0; i<m_tUser.lstUser.size(); ++i)
     {
         CollectUser &cUser = m_tUser.lstUser[i];
-        QString dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser);
+        QString dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser, fi.lastModified());
         QString dstFilePath = dstFileFullPath;
         tTask.fileName = fi.fileName();
         tTask.srcFileFullPath = fi.filePath();

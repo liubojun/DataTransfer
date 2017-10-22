@@ -90,7 +90,7 @@ void FtpCollector::getNewFiles()
 
     // E:/workspace/DataTransfer/DataTransfer_code_20170831/vs2013/apps/DataTransfer/%T-1H%t%y/%t%m/%td
     // modified by liubojun. 支持按照特定时间获取数据
-    m_collectSet.rltvPath = getFinalPathFromUrl(m_collectSet.rltvPath);
+    m_collectSet.rltvPath = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
 
     m_pCftp->setHostPort(m_collectSet.ip, m_collectSet.port);
     m_pCftp->setUserPwd(m_collectSet.loginUser, m_collectSet.loginPass);
@@ -198,7 +198,7 @@ bool FtpCollector::compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransT
         CollectUser &cUser = m_tUser.lstUser[i];
         QString strFileFullPath = QString::fromLocal8Bit(fi.strFilePath.c_str());
         QString strFileName = QString::fromLocal8Bit(fi.strFileName.c_str());
-        QString dstFileFullPath = getDestFilePath(strFileFullPath, strFileName, cUser);
+        QString dstFileFullPath = getDestFilePath(strFileFullPath, strFileName, cUser, QDateTime::fromString(fi.strMdyTime.c_str(), "yyyyMMddhhmmss"));
         QString dstFilePath = dstFileFullPath;
         tTask.fileName = strFileName;
         tTask.srcFileFullPath = strFileFullPath;

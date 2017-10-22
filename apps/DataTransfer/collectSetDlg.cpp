@@ -1,6 +1,7 @@
 ﻿#include "collectSetDlg.h"
 #include "userItem.h"
 #include "regexpression.h"
+#include "pathbuilder.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
@@ -465,7 +466,7 @@ void CollectSetDlg::onRemoteColTest()
 
     if (ui.radFile->isChecked())
     {
-        QUrl url = QUrl::fromLocalFile(ui.le_RelvPath->text());
+        QUrl url = QUrl::fromLocalFile(CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text()));
         if (url.isLocalFile())
         {
             QDir qdir(ui.le_RelvPath->text());

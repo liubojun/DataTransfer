@@ -11,6 +11,7 @@
 #include <QThread>
 #include "dataclearDlg.h"
 #include "clearItemWidget.h"
+#include "pathbuilder.h"
 //--
 
 MainWindow::MainWindow(ICtkPluginManager *ctk,QMainWindow *parent /*= NULL*/)
@@ -398,13 +399,13 @@ void MainWindow::openSrcPath()
         QString urlPath;
         if (task.collectType == 0)
         {
-            urlPath = task.rltvPath;
+            urlPath = CPathBuilder::getFinalPathFromUrl(task.rltvPath);
             urlPath = QUrl::fromLocalFile(urlPath).toString();
         }
         else
         {
             urlPath = QString("ftp://%1:%2@%3:%4%5").arg(task.loginUser).arg(task.loginPass).arg(task.ip)
-                      .arg(task.port).arg(task.rltvPath);
+                      .arg(task.port).arg(CPathBuilder::getFinalPathFromUrl(task.rltvPath));
         }
 
         // 另一种方式（windows）
@@ -470,13 +471,13 @@ void MainWindow::openDstPath()
     QString urlPath;
     if (cUser.user.sendType == 0)
     {
-        urlPath = cUser.user.rootPath + cUser.rltvPath;
+        urlPath = CPathBuilder::getFinalPathFromUrl(cUser.user.rootPath + cUser.rltvPath);
         urlPath = QUrl::fromLocalFile(urlPath).toString();
     }
     else
     {
         urlPath = QStringLiteral("ftp://%1:%2@%3:%4%5").arg(cUser.user.lgUser).arg(cUser.user.lgPass).arg(cUser.user.ip)
-                  .arg(cUser.user.port).arg(cUser.user.rootPath + cUser.rltvPath);
+                  .arg(cUser.user.port).arg(CPathBuilder::getFinalPathFromUrl(cUser.user.rootPath + cUser.rltvPath));
     }
 
     QDesktopServices::openUrl(QUrl(urlPath));

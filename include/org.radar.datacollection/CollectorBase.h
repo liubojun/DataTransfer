@@ -158,26 +158,6 @@ public:
         m_strTctimePath = path;
     }
 
-// 	void setHistyTime(const string strStart, const string strEnd)
-// 	{
-// 		m_strStartTime = strStart;
-// 		m_strEndTime = strEnd;
-// 		m_bHistory = true;
-// 	}
-    /**
-    * @brief  从界面配置的URL中解析出路径
-    * @param  const QString &path 配置的URL
-    * @return QString：解析出的路径
-    */
-    QString getFinalPathFromUrl(const QString &path);
-
-    /**
-    * @brief  从界面配置的URL中解析出路径
-    * @param  const QString &path 配置的URL
-    * @return QString：解析出的路径
-    */
-    QString parseFromUrl(const QString &url);
-
 
     /**
      * @brief  启动收集
@@ -308,7 +288,7 @@ public:
     bool filterFileName(const QFileInfo &fi, const QString &strFilePath, FileInfo &fileInfo);
 
     // 根据源文件全路径，获取对应的目标文件路径
-    QString getDestFilePath(const QString &srcFileFullPath, const QString &fileName, const CollectUser &cUser);
+    QString getDestFilePath(const QString &srcFileFullPath, const QString &fileName, const CollectUser &cUser, const QDateTime &dt);
 
     /**
      * @brief  简述函数功能
