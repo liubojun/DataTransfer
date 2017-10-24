@@ -116,6 +116,8 @@ CurlFtp::CurlFtp(CollectorBase *pBase)
     m_pSourceCurl = curl_easy_init();
 
     m_pDestCurl = curl_easy_init();
+
+    m_pRemoveDestCurl = curl_easy_init();
 }
 
 CurlFtp::~CurlFtp()
@@ -132,6 +134,12 @@ CurlFtp::~CurlFtp()
     {
         curl_easy_cleanup(m_pDestCurl);
         m_pDestCurl = NULL;
+    }
+
+    if (NULL != m_pRemoveDestCurl)
+    {
+        curl_easy_cleanup(m_pRemoveDestCurl);
+        m_pRemoveDestCurl = NULL;
     }
 }
 
@@ -860,63 +868,24 @@ int CurlFtp::uploadFileToDir(const char *url, const char *user_pwd, const string
 
 int CurlFtp::deleteFtpFile(const char *url, const char *user_pwd, const string &filename)
 {
-    CURL *curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_NOSIGNAL,1L);
-    if (curl == NULL)
-    {
-        QSLOG_ERROR("curl_easy_init error.");
-        return -1;
-    }
+    // 如果远端Ftp服务器上已经存在了该文件，那么需要删除该文件
 
-    // QSharedPointer<CURL> autoRelease(curl, curl_easy_cleanup);
-    string cmdDelt = "DELE " + filename;
-    //QSLOG_INFO(QString::fromLocal8Bit("删除已有文件:%1").arg(QString::fromLocal8Bit(url)));
-
-    CURLcode res = CURLE_OK;
-    string strRemoteFile(url);
-    strRemoteFile.append(filename);
-    res = curl_easy_setopt(curl, CURLOPT_URL, url);
-    //if (CURLE_OK != res)
-    //{
-    //    QSLOG_ERROR(QString("curl_easy_setopt error: errcode = %1, reason = %2").arg(res).arg(curl_easy_strerror(res)));
-    //    curl_easy_cleanup(curl);
-    //    return -1;
-    //}
-
-    res = curl_easy_setopt(curl, CURLOPT_USERPWD, user_pwd);
-    //if (CURLE_OK != res)
-    //{
-    //    QSLOG_ERROR(QString("curl_easy_setopt error: errcode = %1, reason = %2").arg(res).arg(curl_easy_strerror(res)));
-    //    curl_easy_cleanup(curl);
-    //    return -1;
-    //}
+    char szCmd[1024] = "DELE ";
+    strcat(szCmd, filename.c_str());
+    curl_easy_setopt(m_pRemoveDestCurl, CURLOPT_URL, url);
+    curl_easy_setopt(m_pRemoveDestCurl, CURLOPT_USERPWD, user_pwd);
     struct curl_slist *headerlist = NULL;
-    headerlist = curl_slist_append(headerlist, cmdDelt.c_str());
-
-    res = curl_easy_setopt(curl, CURLOPT_QUOTE, headerlist);
-
-    // res = curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, cmdDelt.c_str());
+    headerlist = curl_slist_append(headerlist, szCmd);
+    curl_easy_setopt(m_pRemoveDestCurl, CURLOPT_POSTQUOTE, headerlist);
+    CURLcode res = curl_easy_perform(m_pRemoveDestCurl);
     if (CURLE_OK != res)
     {
-        QSLOG_ERROR(QString("curl_easy_setopt error: errcode = %1, reason = %2").arg(res).arg(curl_easy_strerror(res)));
-        curl_easy_cleanup(curl);
+        /* we failed */
+        QSLOG_ERROR(QString("remote file exists, remove remote file failure.").append(filename.c_str()));
+        curl_slist_free_all(headerlist);
         return -1;
     }
-
-    res = curl_easy_perform(curl);	//不用管结果
-
     curl_slist_free_all(headerlist);
-    if (CURLE_OK != res)
-    {
-        //QSLOG_ERROR(QString("deleteFile error: errcode = %1, reason = %2").arg(res).arg(curl_easy_strerror(res)));
-        curl_easy_cleanup(curl);
-        return -1;
-    }
-
-    QSLOG_INFO(QString::fromLocal8Bit("删除已有文件:%1成功").arg(url));
-    curl_easy_cleanup(curl);
-
-    // curl_easy_cleanup(curl);
     return 0;
 }
 

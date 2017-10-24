@@ -199,6 +199,9 @@ public:
     //CURL *createDestCurl();
 
     CURL *m_pDestCurl;
+
+    // 删除远程文件lincurl对象
+    CURL *m_pRemoveDestCurl;
     /**
     * @brief  从ftp或file下载到文件
     * @param  const char * url

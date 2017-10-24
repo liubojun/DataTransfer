@@ -949,6 +949,7 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
         else
         {
             char ftpUrl[200] = {0};
+            char ftpPath[512] = { 0 };
             char usrPwd[100] = {0};
             string strIp = cUser.user.ip.toStdString();
             int nPort = cUser.user.port;
@@ -959,11 +960,24 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
             sprintf(ftpUrl, "ftp://%s:%d%s", strIp.c_str(), nPort, strPath.c_str());
             sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
 
+            string strDestPath = dstFileFullPath.mid(0, dstFileFullPath.lastIndexOf("/")+1).toLocal8Bit().toStdString();
+            sprintf(ftpPath, "ftp://%s:%d%s", strIp.c_str(), nPort, strDestPath.c_str());
             // CurlFtp m_ftp;
             double dSize = 0;
             if (oCurlFtp.getFileSize(ftpUrl, usrPwd, strName, dSize))
             {
-                continue;
+                if (fi.size() != (long long)dSize)
+                {
+                    if (-1 == oCurlFtp.deleteFtpFile(ftpPath, usrPwd, strName))
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    continue;
+                }
+                //
             }
         }
 
