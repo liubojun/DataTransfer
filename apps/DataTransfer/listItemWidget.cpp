@@ -48,52 +48,52 @@ void MyItemWidget::SetIcon(const ICONTYPE &icon)
     switch (icon)
     {
     case FILE_FILE:
-        pix = QPixmap(":/fileTofile.png");
+        pix = QPixmap(QString(":/fileTofile.png"));
         break;
     case FILE_FTP:
-        pix = QPixmap(":/fileToftp.png");
+        pix = QPixmap(QString(":/fileToftp.png"));
         break;
     case FTP_FILE:
-        pix = QPixmap(":/ftpTofile.png");
+        pix = QPixmap(QString(":/ftpTofile.png"));
         break;
     case FTP_FTP:
-        pix = QPixmap(":/ftpToftp.png");
+        pix = QPixmap(QString(":/ftpToftp.png"));
         break;
     case FILE_FILE_S:
-        pix = QPixmap(":/fileTofile2.png");
+        pix = QPixmap(QString(":/fileTofile2.png"));
         break;
     case FILE_FTP_S:
-        pix = QPixmap(":/fileToftp2.png");
+        pix = QPixmap(QString(":/fileToftp2.png"));
         break;
     case FTP_FILE_S:
-        pix = QPixmap(":/ftpTofile2.png");
+        pix = QPixmap(QString(":/ftpTofile2.png"));
         break;
     case FTP_FTP_S:
-        pix = QPixmap(":/ftpToftp2.png");
+        pix = QPixmap(QString(":/ftpToftp2.png"));
         break;
     case FILE_FILE_E:
-        pix = QPixmap(":/fileTofile3.png");
+        pix = QPixmap(QString(":/fileTofile3.png"));
         break;
     case FILE_FTP_E:
-        pix = QPixmap(":/fileToftp3.png");
+        pix = QPixmap(QString(":/fileToftp3.png"));
         break;
     case FTP_FILE_E:
-        pix = QPixmap(":/ftpTofile3.png");
+        pix = QPixmap(QString(":/ftpTofile3.png"));
         break;
     case FTP_FTP_E:
-        pix = QPixmap(":/ftpToftp3.png");
+        pix = QPixmap(QString(":/ftpToftp3.png"));
         break;
     case FILE_FILE_SE:
-        pix = QPixmap(":/fileTofile4.png");
+        pix = QPixmap(QString(":/fileTofile4.png"));
         break;
     case FILE_FTP_SE:
-        pix = QPixmap(":/fileToftp4.png");
+        pix = QPixmap(QString(":/fileToftp4.png"));
         break;
     case FTP_FILE_SE:
-        pix = QPixmap(":/ftpTofile4.png");
+        pix = QPixmap(QString(":/ftpTofile4.png"));
         break;
     case FTP_FTP_SE:
-        pix = QPixmap(":/ftpToftp4.png");
+        pix = QPixmap(QString(":/ftpToftp4.png"));
         break;
     default:
         break;
