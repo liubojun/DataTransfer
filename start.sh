@@ -1,10 +1,10 @@
 #!/bin/sh
 
 COMDIR=`pwd`
-
+echo $CMDIR
 #source ~/.bashrc
 
-daemonSh=daemon.sh
+daemonSh=protect.sh
 
 
 CallStart()
@@ -29,7 +29,7 @@ CallStop()
 {
 
     echo "正在停止数据传输系统..."
-    killall daemon.sh
+    killall protect.sh
     killall -15 DataTransfer
 
     num=0
