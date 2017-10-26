@@ -204,7 +204,7 @@ INSTALL(DIRECTORY config
 		DESTINATION bin
 )
 
-INSTALL(FILE daemon.sh
+INSTALL(FILE protect.sh
 		DESTINATION bin
 )
 INSTALL(FILE start.sh
