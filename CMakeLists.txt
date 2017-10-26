@@ -204,9 +204,9 @@ INSTALL(DIRECTORY config
 		DESTINATION bin
 )
 
-INSTALL(FILE protect.sh
+INSTALL(FILES ${RadarProject}/protect.sh
 		DESTINATION bin
 )
-INSTALL(FILE start.sh
+INSTALL(FILES ${RadarProject}/start.sh
 		DESTINATION bin
 )
