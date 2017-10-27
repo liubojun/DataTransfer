@@ -16,9 +16,9 @@ QString g_tbDirCol[] = {"DIRID", "DIRNAME", "ENABLE", "COLLECTTYPE", "FTPTRANSFE
                         "IP", "PORT"
                        };
 QString g_tbColUser[] = {"DIRID", "USERID", "RLTVPATH"};
-QString g_tbSendUser[] = {"USERID", "USERNAME", "SENDTYPE", "SENDSUFFIX", "RLTVPATH", "LOGINUSER", "LOGINPASS",
-                          "IP", "PORT", "KEEPDIR", "COMPRESS", "ENCRYPT", "CONPUT", "MAXTRYCOUNS"
-                         };
+//QString g_tbSendUser[] = {"USERID", "USERNAME", "SENDTYPE", "SENDSUFFIX", "RLTVPATH", "LOGINUSER", "LOGINPASS",
+//                          "IP", "PORT", "KEEPDIR", "COMPRESS", "ENCRYPT", "CONPUT", "MAXTRYCOUNS"
+//                         };
 
 DataBase * DataBase::getInstance()
 {
@@ -51,7 +51,7 @@ DataBase::DataBase()
 
     m_strTbCollect = "T_DIR_COL";
     m_strTbColUser = "T_COL_USER";
-    m_strTbSendUser = "T_SEND_USER";
+    //m_strTbSendUser = "T_SEND_USER";
 
     // 判断清理表是否存在，如果不存在则自动创建
     checkTable("T_DIR_CLEAR", "CREATE TABLE T_DIR_CLEAR ("
@@ -96,6 +96,7 @@ DataBase::DataBase()
                "[SENDTYPE] INT, "
                "[SENDSUFFIX] VARCHAR(20) NOT NULL, "
                "[RLTVPATH] VARCHAR(100), "
+               "[TIMEBASEDRULE] INT(1) DEFAULT (0), "
                "[LOGINUSER] VARCHAR(20), "
                "[LOGINPASS] VARCHAR(20), "
                "[IP] VARCHAR(20), "
@@ -267,7 +268,7 @@ bool DataBase::QueryUserInfo(TaskUser &user)
             for (int i=0; i<user.lstUser.size(); ++i)
             {
                 UserInfo &uInfo = user.lstUser[i].user;
-                sql = QString("select * from %1 where %2='%3'").arg(m_strTbSendUser).arg(g_tbSendUser[0]).arg(uInfo.userID);
+                sql = QString("select * from T_SEND_USER where USERID = '%1'").arg(uInfo.userID);
                 res = query.exec(sql);
                 if (res && query.next())
                 {
@@ -309,27 +310,29 @@ bool DataBase::QueryUserInfo(QList<UserInfo> &lstUser)
 
         QSqlQuery query(m_db);
         // 先查收集用户表
-        QString sql = QString("select * from %1").arg(m_strTbSendUser);
+        QString sql = QString("SELECT USERID, USERNAME, SENDTYPE, SENDSUFFIX, RLTVPATH, TIMEBASEDRULE, LOGINUSER, LOGINPASS, IP, PORT, KEEPDIR, COMPRESS, ENCRYPT, CONPUT, MAXTRYCOUNS FROM T_SEND_USER");
         bool res = query.exec(sql);
         if (res)
         {
             while (query.next())
             {
                 UserInfo user;
-                user.userID = query.value(0).toString();
-                user.userName = query.value(1).toString();
-                user.sendType = query.value(2).toInt();
-                user.sendSuffix = query.value(3).toString();
-                user.rootPath = query.value(4).toString();
-                user.lgUser = query.value(5).toString();
-                user.lgPass = query.value(6).toString();
-                user.ip = query.value(7).toString();
-                user.port = query.value(8).toInt();
-                user.keepDir = query.value(9).toInt();
-                user.compress = query.value(10).toInt();
-                user.encrypt = query.value(11).toInt();
-                user.conput = query.value(12).toInt();
-                user.tryCount = query.value(13).toInt();
+                int index = 0;
+                user.userID = query.value(index++).toString();
+                user.userName = query.value(index++).toString();
+                user.sendType = query.value(index++).toInt();
+                user.sendSuffix = query.value(index++).toString();
+                user.rootPath = query.value(index++).toString();
+                user.timebaserule = query.value(index++).toInt();
+                user.lgUser = query.value(index++).toString();
+                user.lgPass = query.value(index++).toString();
+                user.ip = query.value(index++).toString();
+                user.port = query.value(index++).toInt();
+                user.keepDir = query.value(index++).toInt();
+                user.compress = query.value(index++).toInt();
+                user.encrypt = query.value(index++).toInt();
+                user.conput = query.value(index++).toInt();
+                user.tryCount = query.value(index++).toInt();
                 lstUser.push_back(user);
             }
 
@@ -355,26 +358,24 @@ bool DataBase::InsertUserInfo(const UserInfo &user)
 
         QSqlQuery query(m_db);
         // 先查收集用户表
-        QString sql = QString("REPLACE INTO %1(%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13,%14, %15)"
-                              "VALUES(:%2,:%3,:%4,:%5,:%6,:%7,:%8,:%9,:%10,:%11,:%12,:%13,:%14, :%15)").arg(m_strTbSendUser)
-                      .arg(g_tbSendUser[0]).arg(g_tbSendUser[1]).arg(g_tbSendUser[2]).arg(g_tbSendUser[3]).arg(g_tbSendUser[4])
-                      .arg(g_tbSendUser[5]).arg(g_tbSendUser[6]).arg(g_tbSendUser[7]).arg(g_tbSendUser[8]).arg(g_tbSendUser[9])
-                      .arg(g_tbSendUser[10]).arg(g_tbSendUser[11]).arg(g_tbSendUser[12]).arg(g_tbSendUser[13]);
+        QString sql = QString("REPLACE INTO T_SEND_USER(USERID, USERNAME, SENDTYPE, SENDSUFFIX, RLTVPATH, TIMEBASEDRULE, LOGINUSER, LOGINPASS, IP, PORT, KEEPDIR, COMPRESS, ENCRYPT, CONPUT, MAXTRYCOUNS)"
+                              "VALUES(:USERID, :USERNAME, :SENDTYPE, :SENDSUFFIX, :RLTVPATH, :TIMEBASEDRULE, :LOGINUSER, :LOGINPASS, :IP, :PORT, :KEEPDIR, :COMPRESS, :ENCRYPT, :CONPUT, :MAXTRYCOUNS)");
         query.prepare(sql);
-        query.bindValue(":"+g_tbSendUser[0], user.userID);
-        query.bindValue(":"+g_tbSendUser[1], user.userName);
-        query.bindValue(":"+g_tbSendUser[2], user.sendType);
-        query.bindValue(":" + g_tbSendUser[3], user.sendSuffix);
-        query.bindValue(":"+g_tbSendUser[4], user.rootPath);
-        query.bindValue(":"+g_tbSendUser[5], user.lgUser);
-        query.bindValue(":"+g_tbSendUser[6], user.lgPass);
-        query.bindValue(":"+g_tbSendUser[7], user.ip);
-        query.bindValue(":"+g_tbSendUser[8], user.port);
-        query.bindValue(":"+g_tbSendUser[9], user.keepDir);
-        query.bindValue(":"+g_tbSendUser[10], user.compress);
-        query.bindValue(":"+g_tbSendUser[11], user.encrypt);
-        query.bindValue(":"+g_tbSendUser[12], user.conput);
-        query.bindValue(":"+g_tbSendUser[13], user.tryCount);
+        query.bindValue(":USERID", user.userID);
+        query.bindValue(":USERNAME", user.userName);
+        query.bindValue(":SENDTYPE", user.sendType);
+        query.bindValue(":SENDSUFFIX", user.sendSuffix);
+        query.bindValue(":RLTVPATH", user.rootPath);
+        query.bindValue(":TIMEBASEDRULE", user.timebaserule);
+        query.bindValue(":LOGINUSER0", user.lgUser);
+        query.bindValue(":LOGINPASS", user.lgPass);
+        query.bindValue(":IP", user.ip);
+        query.bindValue(":PORT", user.port);
+        query.bindValue(":KEEPDIR", user.keepDir);
+        query.bindValue(":COMPRESS", user.compress);
+        query.bindValue(":ENCRYPT", user.encrypt);
+        query.bindValue(":CONPUT", user.conput);
+        query.bindValue(":MAXTRYCOUNS", user.tryCount);
         bool res = query.exec();
         if (!res)
         {
@@ -403,7 +404,7 @@ bool DataBase::DeleteSendUser(const QString &userID)
         }
 
         QSqlQuery query(m_db);
-        QString sql = QString("delete from %1 where %2='%3'").arg(m_strTbSendUser).arg(g_tbSendUser[0]).arg(userID);
+        QString sql = QString("DELETE FROM T_SEND_USER WHERE USERID = '%1'").arg(userID);
         bool res = query.exec(sql);
         if (!res)
         {
@@ -412,7 +413,7 @@ bool DataBase::DeleteSendUser(const QString &userID)
         }
 
 
-        sql = QString("delete from T_COL_USER where %1='%2'").arg(g_tbColUser[1]).arg(userID);
+        sql = QString("DELETE FROM T_COL_USER WHERE USERID = '%1'").arg(userID);
         res = query.exec(sql);
         if (!res)
         {

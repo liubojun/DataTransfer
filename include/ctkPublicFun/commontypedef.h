@@ -389,6 +389,7 @@ struct UserInfo
     int			sendType;	///< 分发方式：0-FILE，1-FTP
     QString     sendSuffix;	// 传输过程中的临时文件后缀名
     QString		rootPath;
+    int			timebaserule;	///< 时间变量基于的时间规则：0无，1-基于收集目录时间，2-基于文件名时间，3-基于系统时间
     QString		lgUser;
     QString		lgPass;
     QString		ip;

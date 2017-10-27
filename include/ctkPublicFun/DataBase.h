@@ -42,8 +42,8 @@ public:
 
     bool DeleteSendUser(const QString &userID);
 
-	// 删除收集任务中的分发用户
-	bool DeleteCollectSenderUser(const QString &dirId, const QString &userId);
+    // 删除收集任务中的分发用户
+    bool DeleteCollectSenderUser(const QString &dirId, const QString &userId);
 
     /**
      * @brief  查询目录的最后处理时间
@@ -96,7 +96,7 @@ private:
 
     QString m_strTbCollect;		///< 收集配置表
     QString m_strTbColUser;		///< 收集用户表
-    QString	m_strTbSendUser;	///< 分发用户表
+    //QString	m_strTbSendUser;	///< 分发用户表
 
     QMap<QString, QSqlDatabase> m_name2db;	// 数据库地址与数据库实例映射
 };
