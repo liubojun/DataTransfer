@@ -198,7 +198,8 @@ bool FtpCollector::compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransT
         CollectUser &cUser = m_tUser.lstUser[i];
         QString strFileFullPath = QString::fromLocal8Bit(fi.strFilePath.c_str());
         QString strFileName = QString::fromLocal8Bit(fi.strFileName.c_str());
-        QString dstFileFullPath = getDestFilePath(strFileFullPath, strFileName, cUser, QDateTime::fromString(fi.strMdyTime.c_str(), "yyyyMMddhhmmss"));
+        // QString dstFileFullPath = getDestFilePath(strFileFullPath, strFileName, cUser, QDateTime::fromString(fi.strMdyTime.c_str(), "yyyyMMddhhmmss"));
+        QString dstFileFullPath = getDestFilePath(strFileFullPath, strFileName, cUser, QDateTime::currentDateTime());
         QString dstFilePath = dstFileFullPath;
         tTask.fileName = strFileName;
         tTask.srcFileFullPath = strFileFullPath;

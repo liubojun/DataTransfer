@@ -918,7 +918,8 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
     for (int i=0; i<m_tUser.lstUser.size(); ++i)
     {
         CollectUser &cUser = m_tUser.lstUser[i];
-        QString dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser, fi.lastModified());
+        // QString dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser, fi.lastModified());
+        QString dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser, QDateTime::currentDateTime());
         QString dstFilePath = dstFileFullPath;
         tTask.fileName = fi.fileName();
         tTask.srcFileFullPath = fi.filePath();
