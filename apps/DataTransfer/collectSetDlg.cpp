@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <curl/curl.h>
 #include <QDebug>
+//#include "curlftp.h"
 
 CollectSetDlg::CollectSetDlg(int flag, QDialog *parent /*= NULL*/)
     : m_flag(flag)
@@ -57,8 +58,8 @@ void CollectSetDlg::InitUI()
     connect(ui.btn_test, SIGNAL(clicked()), this, SLOT(onRegExpTest()));
     connect(ui.btn_test_2, SIGNAL(clicked()), this, SLOT(onWaitForTest()));
     //connect(ui.btn_test_2, SIGNAL(clicked()), this, SLOT(onRemoteColTest()));
-    connect(this, SIGNAL(testok()), this, SLOT(onTestOk()));
-    connect(this, SIGNAL(testfail()), this, SLOT(onTestFail()));
+    connect(this, SIGNAL(testok(const QString &)), this, SLOT(onTestOk(const QString &)));
+    connect(this, SIGNAL(testfail(const QString &)), this, SLOT(onTestFail(const QString &)));
 
     // 从数据库读取分发用户
     QList<UserInfo> lstUser;
@@ -457,6 +458,44 @@ CollectUser CollectSetDlg::getSendUserInfoFromDirID(const QString &CollectDirId)
 
     return retUser;
 }
+/// 在内存中缓存文件内容（加密压缩需要）
+struct MemoryData
+{
+    char *memdata;		///< 起始地址
+    size_t size;		///< 有效大小
+    size_t capacity;	///< 申请的空间大小
+
+    MemoryData()
+    {
+        memdata = NULL;
+        size = 0;
+        capacity = 0;
+    }
+
+    ~MemoryData()
+    {
+        free(memdata);
+    }
+};
+static size_t WriteInMemoryFun(void *contents, size_t size, size_t nmemb, void *userp)
+{
+    size_t realsize = size * nmemb;		//本次回调获取的数据
+    struct MemoryData *mem = (struct MemoryData *)userp;
+
+    mem->memdata = (char *)realloc(mem->memdata, mem->size + realsize + 1);
+    if (mem->memdata == NULL)
+    {
+        /* out of memory! */
+        printf("not enough memory (realloc returned NULL)\n");
+        return 0;
+    }
+
+    memcpy(&(mem->memdata[mem->size]), contents, realsize);
+    mem->size += realsize;
+    mem->memdata[mem->size] = 0;
+
+    return realsize;
+}
 
 void CollectSetDlg::onRemoteColTest()
 {
@@ -472,12 +511,12 @@ void CollectSetDlg::onRemoteColTest()
             QDir qdir(ui.le_RelvPath->text());
             if (qdir.exists())
             {
-                emit testok();
+                emit testok(qdir.absolutePath());
                 return;
             }
         }
 
-        emit testfail();
+        emit testfail(CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text()));
     }
     else
     {
@@ -501,48 +540,52 @@ void CollectSetDlg::onRemoteColTest()
         }
 
 
-        char url[100] = { 0 };
+        char url[256] = { 0 };
         char usrPwd[100] = { 0 };
-        sprintf(url, "ftp://%s:%d", ui.lineEdit_7->text().toStdString().c_str(), ui.lineEdit_8->text().toInt());
+        sprintf(url, "ftp://%s:%d%s", ui.lineEdit_7->text().toStdString().c_str(), ui.lineEdit_8->text().toInt(), CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text()).toLocal8Bit().data());
         sprintf(usrPwd, "%s:%s", ui.lineEdit_5->text().toStdString().c_str(), ui.lineEdit_6->text().toStdString().c_str());
 
         curl_easy_setopt(curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_USERPWD, usrPwd);
 
-        curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
+        // modified by liubojun @2017-10-28,没有这两句话会出问题
+        struct MemoryData listInfo;
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&listInfo);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
+        //curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
 
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-        curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
+        //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+        //curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
+        //curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
         CURLcode res = curl_easy_perform(curl);
         if (CURLE_OK != res)
         {
-            emit testfail();
+            emit testfail(QString(url));
             curl_easy_cleanup(curl);
             return;
 
         }
         curl_easy_cleanup(curl);
-        emit testok();
+        emit testok(QString(url));
     }
 
 }
 
-void CollectSetDlg::onTestOk()
+void CollectSetDlg::onTestOk(const QString &url)
 {
     QPalette pal;
     pal.setColor(QPalette::WindowText, Qt::green);
     ui.label_result->setPalette(pal);
-    ui.label_result->setText(QStringLiteral("连接成功"));
+    ui.label_result->setText(QStringLiteral("连接[") + url + QStringLiteral("]成功"));
     QTimer::singleShot(3000, this, SLOT(onTestResultTimeout()));
 }
 
-void CollectSetDlg::onTestFail()
+void CollectSetDlg::onTestFail(const QString &url)
 {
     QPalette pal;
     pal.setColor(QPalette::WindowText, Qt::red);
     ui.label_result->setPalette(pal);
-    ui.label_result->setText(QStringLiteral("连接失败"));
+    ui.label_result->setText(QStringLiteral("连接[") + url + QStringLiteral("]失败"));
     QTimer::singleShot(3000, this, SLOT(onTestResultTimeout()));
 }
 

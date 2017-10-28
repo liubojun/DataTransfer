@@ -252,15 +252,15 @@ bool DataBase::QueryUserInfo(TaskUser &user)
 
         QSqlQuery query(m_db);
         // 先查收集用户表
-        QString sql = QString("select * from T_COL_USER where DIRID = '%1'").arg(user.taskID);
+        QString sql = QString("SELECT USERID, RLTVPATH FROM T_COL_USER WHERE DIRID = '%1'").arg(user.taskID);
         bool res = query.exec(sql);
         if (res)
         {
             while (query.next())
             {
                 CollectUser cUser;
-                cUser.user.userID = query.value(1).toString();
-                cUser.rltvPath = query.value(2).toString();
+                cUser.user.userID = query.value(0).toString();
+                cUser.rltvPath = query.value(1).toString();
                 user.lstUser.append(cUser);
             }
 
@@ -268,23 +268,25 @@ bool DataBase::QueryUserInfo(TaskUser &user)
             for (int i=0; i<user.lstUser.size(); ++i)
             {
                 UserInfo &uInfo = user.lstUser[i].user;
-                sql = QString("select * from T_SEND_USER where USERID = '%1'").arg(uInfo.userID);
+                sql = QString("SELECT USERID, USERNAME, SENDTYPE, SENDSUFFIX, RLTVPATH, TIMEBASEDRULE, LOGINUSER, LOGINPASS, IP, PORT, KEEPDIR, COMPRESS, ENCRYPT, CONPUT, MAXTRYCOUNS FROM T_SEND_USER WHERE USERID = '%1'").arg(uInfo.userID);
                 res = query.exec(sql);
                 if (res && query.next())
                 {
-                    uInfo.userName = query.value(1).toString();
-                    uInfo.sendType = query.value(2).toInt();
-                    uInfo.sendSuffix = query.value(3).toString();
-                    uInfo.rootPath = query.value(4).toString();
-                    uInfo.lgUser = query.value(5).toString();
-                    uInfo.lgPass = query.value(6).toString();
-                    uInfo.ip = query.value(7).toString();
-                    uInfo.port = query.value(8).toInt();
-                    uInfo.keepDir = query.value(9).toInt();
-                    uInfo.compress = query.value(10).toInt();
-                    uInfo.encrypt = query.value(11).toInt();
-                    uInfo.conput = query.value(12).toInt();
-                    uInfo.tryCount = query.value(13).toInt();
+                    int index = 1;
+                    uInfo.userName = query.value(index++).toString();
+                    uInfo.sendType = query.value(index++).toInt();
+                    uInfo.sendSuffix = query.value(index++).toString();
+                    uInfo.rootPath = query.value(index++).toString();
+                    uInfo.timebaserule = query.value(index++).toInt();
+                    uInfo.lgUser = query.value(index++).toString();
+                    uInfo.lgPass = query.value(index++).toString();
+                    uInfo.ip = query.value(index++).toString();
+                    uInfo.port = query.value(index++).toInt();
+                    uInfo.keepDir = query.value(index++).toInt();
+                    uInfo.compress = query.value(index++).toInt();
+                    uInfo.encrypt = query.value(index++).toInt();
+                    uInfo.conput = query.value(index++).toInt();
+                    uInfo.tryCount = query.value(index++).toInt();
                 }
             }
 
@@ -367,7 +369,7 @@ bool DataBase::InsertUserInfo(const UserInfo &user)
         query.bindValue(":SENDSUFFIX", user.sendSuffix);
         query.bindValue(":RLTVPATH", user.rootPath);
         query.bindValue(":TIMEBASEDRULE", user.timebaserule);
-        query.bindValue(":LOGINUSER0", user.lgUser);
+        query.bindValue(":LOGINUSER", user.lgUser);
         query.bindValue(":LOGINPASS", user.lgPass);
         query.bindValue(":IP", user.ip);
         query.bindValue(":PORT", user.port);

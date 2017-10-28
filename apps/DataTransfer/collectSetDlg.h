@@ -38,10 +38,10 @@ private slots:
     void onRemoteColTest();
 
     // 测试收集路径成功
-    void onTestOk();
+    void onTestOk(const QString &url);
 
     // 测试收集路径失败
-    void onTestFail();
+    void onTestFail(const QString &url);
 
     // 测试结果超时
     void onTestResultTimeout();
@@ -53,10 +53,10 @@ signals:
     void commit(const CollectTask &task);
 
     // 测试收集路径成功
-    void testok();
+    void testok(const QString &url);
 
     // 测试收集路径失败
-    void testfail();
+    void testfail(const QString &url);
 
 private:
     void InitUI();

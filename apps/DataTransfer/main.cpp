@@ -53,6 +53,7 @@
 #include <ImageHlp.h>
 #include <stdlib.h>
 #pragma comment(lib, "dbghelp.lib")
+#pragma comment(lib, "WS2_32")
 #endif
 //----
 
@@ -232,10 +233,10 @@ void RunCrashHandler()
 
 int main(int argc, char **argv)
 {
-    #ifdef _WIN32
+#ifdef _WIN32
     RunCrashHandler();
-    #endif
-	Q_TRY_BEGIN  
+#endif
+    Q_TRY_BEGIN
 
     QApplication app(argc, argv);
 

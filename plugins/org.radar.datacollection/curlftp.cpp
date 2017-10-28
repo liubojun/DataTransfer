@@ -2,6 +2,10 @@
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QUrl>
+
+#ifdef _WIN32
+#pragma comment(lib, "WS2_32")
+#endif
 //#include "ftpdownload.h"
 #pragma warning(disable:4996)
 
@@ -255,6 +259,12 @@ bool CurlFtp::connectToHost(const char *url, const char *user_pwd)
     //curl_easy_setopt(m_pCurl, CURLOPT_FTP_CREATE_MISSING_DIRS, TRUE);
     curl_easy_setopt(m_pCurl, CURLOPT_VERBOSE, 1L);
     curl_easy_setopt(m_pCurl, CURLOPT_NOSIGNAL,1L);
+
+    // modified by liubojun @2017-10-28,没有这两句话会出问题
+    struct MemoryData listInfo;
+    curl_easy_setopt(m_pCurl, CURLOPT_WRITEDATA, (void *)&listInfo);
+    curl_easy_setopt(m_pCurl, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
+
     CURLcode res = curl_easy_perform(m_pCurl);
     if (CURLE_OK != res)
     {
@@ -924,6 +934,10 @@ bool CurlFtp::getFileSize(const char *url, const char *user_pwd, const string &f
     //curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, throw_away);
     //curl_easy_setopt(curl, CURLOPT_HEADER, TRUE);
     //------
+    // modified by liubojun @2017-10-28,没有这两句话,不在控制台下面运行会出问题
+    struct MemoryData listInfo;
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&listInfo);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
     CURLcode res = curl_easy_perform(curl);
     if (res == CURLE_OK)
     {
@@ -1083,10 +1097,10 @@ int CurlFtp::conputFileToDir(const char *url, const char *user_pwd, const string
 
 int CurlFtp::conputFileToFtp(const char *url, const char *user_pwd, const string &filename, const char *localPath, const char *sendsuffix)
 {
-    if (!connectToHost(url, user_pwd))
-    {
-        return -1;
-    }
+    //if (!connectToHost(url, user_pwd))
+    //{
+    //    return -1;
+    //}
 
     double dHasSend = 0.0;
     string strTmpName = filename + sendsuffix;
