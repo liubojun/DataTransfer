@@ -288,7 +288,7 @@ public:
     bool filterFileName(const QFileInfo &fi, const QString &strFilePath, FileInfo &fileInfo);
 
     // 根据源文件全路径，获取对应的目标文件路径
-    QString getDestFilePath(const QString &srcFileFullPath, const QString &fileName, const CollectUser &cUser, const QDateTime &dt);
+    QString getDestFilePath(const QString &srcFileFullPath, const QString &fileName, const CollectUser &cUser, const QDateTime &dt, bool enableTimeRule);
 
     /**
      * @brief  简述函数功能

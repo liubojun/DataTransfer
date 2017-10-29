@@ -399,13 +399,14 @@ void MainWindow::openSrcPath()
         QString urlPath;
         if (task.collectType == 0)
         {
-            urlPath = CPathBuilder::getFinalPathFromUrl(task.rltvPath);
+
+            urlPath = CPathBuilder::getFinalPathFromUrl(task.rltvPath).at(0);
             urlPath = QUrl::fromLocalFile(urlPath).toString();
         }
         else
         {
             urlPath = QString("ftp://%1:%2@%3:%4%5").arg(task.loginUser).arg(task.loginPass).arg(task.ip)
-                      .arg(task.port).arg(CPathBuilder::getFinalPathFromUrl(task.rltvPath));
+                      .arg(task.port).arg(CPathBuilder::getFinalPathFromUrl(task.rltvPath).at(0));
         }
 
         // 另一种方式（windows）
@@ -471,13 +472,14 @@ void MainWindow::openDstPath()
     QString urlPath;
     if (cUser.user.sendType == 0)
     {
-        urlPath = CPathBuilder::getFinalPathFromUrl(cUser.user.rootPath + cUser.rltvPath);
+        QStringList lstPaths = CPathBuilder::getFinalPathFromUrl(cUser.user.rootPath + cUser.rltvPath);
+        urlPath = lstPaths.at(0);
         urlPath = QUrl::fromLocalFile(urlPath).toString();
     }
     else
     {
         urlPath = QStringLiteral("ftp://%1:%2@%3:%4%5").arg(cUser.user.lgUser).arg(cUser.user.lgPass).arg(cUser.user.ip)
-                  .arg(cUser.user.port).arg(CPathBuilder::getFinalPathFromUrl(cUser.user.rootPath + cUser.rltvPath));
+                  .arg(cUser.user.port).arg(CPathBuilder::getFinalPathFromUrl(cUser.user.rootPath + cUser.rltvPath).at(0));
     }
 
     QDesktopServices::openUrl(QUrl(urlPath));

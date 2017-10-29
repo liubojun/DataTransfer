@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <curl/curl.h>
 #include <QDebug>
+#include <QThread>
 //#include "curlftp.h"
 
 CollectSetDlg::CollectSetDlg(int flag, QDialog *parent /*= NULL*/)
@@ -505,7 +506,7 @@ void CollectSetDlg::onRemoteColTest()
 
     if (ui.radFile->isChecked())
     {
-        QUrl url = QUrl::fromLocalFile(CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text()));
+        QUrl url;// = QUrl::fromLocalFile(CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text()));
         if (url.isLocalFile())
         {
             QDir qdir(ui.le_RelvPath->text());
@@ -516,57 +517,61 @@ void CollectSetDlg::onRemoteColTest()
             }
         }
 
-        emit testfail(CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text()));
+        //emit testfail(CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text()));
     }
     else
     {
 
         CURL *curl = curl_easy_init();
-
-        if (1 == ui.comboBox_bin->currentIndex())
+        QStringList retUrls = CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text());
+        for (int i = 0; i < retUrls.size(); ++i)
         {
-            // 使用ascii
-            curl_easy_setopt(curl, CURLOPT_TRANSFERTEXT, 1L);
-        }
-        else
-        {
-            curl_easy_setopt(curl, CURLOPT_TRANSFERTEXT, 0);
-        }
+            if (1 == ui.comboBox_bin->currentIndex())
+            {
+                // 使用ascii
+                curl_easy_setopt(curl, CURLOPT_TRANSFERTEXT, 1L);
+            }
+            else
+            {
+                curl_easy_setopt(curl, CURLOPT_TRANSFERTEXT, 0);
+            }
 
-        // 使用主动，默认为被动
-        if (1 == ui.comboBox_passive->currentIndex())
-        {
-            curl_easy_setopt(curl, CURLOPT_FTPPORT, "-");
-        }
+            // 使用主动，默认为被动
+            if (1 == ui.comboBox_passive->currentIndex())
+            {
+                curl_easy_setopt(curl, CURLOPT_FTPPORT, "-");
+            }
 
 
-        char url[256] = { 0 };
-        char usrPwd[100] = { 0 };
-        sprintf(url, "ftp://%s:%d%s", ui.lineEdit_7->text().toStdString().c_str(), ui.lineEdit_8->text().toInt(), CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text()).toLocal8Bit().data());
-        sprintf(usrPwd, "%s:%s", ui.lineEdit_5->text().toStdString().c_str(), ui.lineEdit_6->text().toStdString().c_str());
+            char url[256] = { 0 };
+            char usrPwd[100] = { 0 };
+            sprintf(url, "ftp://%s:%d%s", ui.lineEdit_7->text().toStdString().c_str(), ui.lineEdit_8->text().toInt(), retUrls.at(i).toLocal8Bit().data());
+            sprintf(usrPwd, "%s:%s", ui.lineEdit_5->text().toStdString().c_str(), ui.lineEdit_6->text().toStdString().c_str());
 
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_USERPWD, usrPwd);
+            curl_easy_setopt(curl, CURLOPT_URL, url);
+            curl_easy_setopt(curl, CURLOPT_USERPWD, usrPwd);
 
-        // modified by liubojun @2017-10-28,没有这两句话会出问题
-        struct MemoryData listInfo;
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&listInfo);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
-        //curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
+            // modified by liubojun @2017-10-28,没有这两句话会出问题
+            struct MemoryData listInfo;
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&listInfo);
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
+            //curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
 
-        //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-        //curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
-        //curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
-        CURLcode res = curl_easy_perform(curl);
-        if (CURLE_OK != res)
-        {
-            emit testfail(QString(url));
-            curl_easy_cleanup(curl);
-            return;
+            //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+            //curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
+            //curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
+            CURLcode res = curl_easy_perform(curl);
+            if (CURLE_OK != res)
+            {
+                emit testfail(QString(url));
+            }
+            else
+            {
+                emit testok(QString(url));
+            }
 
         }
         curl_easy_cleanup(curl);
-        emit testok(QString(url));
     }
 
 }

@@ -150,7 +150,8 @@ void SharedDirCollector::getNewFiles()
 
     // E:/workspace/DataTransfer/DataTransfer_code_20170831/vs2013/apps/DataTransfer/%T-1H%t%y/%t%m/%td
     // modified by liubojun. 支持按照特定时间获取数据
-    m_collectSet.rltvPath = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
+    QStringList finalDirs = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
+    //m_collectSet.rltvPath =
 
     bool bConnect = true;
     // 先测试源路径是否正常
@@ -919,7 +920,7 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
     {
         CollectUser &cUser = m_tUser.lstUser[i];
         // QString dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser, fi.lastModified());
-        QString dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser, QDateTime::currentDateTime());
+        QString dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser, QDateTime::currentDateTime(), cUser.user.timebaserule);
         QString dstFilePath = dstFileFullPath;
         tTask.fileName = fi.fileName();
         tTask.srcFileFullPath = fi.filePath();

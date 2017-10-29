@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>381</height>
+    <width>570</width>
+    <height>345</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>分发用户管理</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_9">
+  <layout class="QHBoxLayout" name="horizontalLayout_8">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
@@ -217,32 +217,49 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <widget class="QRadioButton" name="radioButton_non">
+           <widget class="QLabel" name="label_10">
             <property name="text">
-             <string>无</string>
+             <string>时间规则：</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="radioButton_col_dirtime_based">
+           <widget class="QComboBox" name="cb_timebaserule">
+            <item>
+             <property name="text">
+              <string>无</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>基于收集目录时间</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>基于文件名时间</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>基于系统时间</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox">
             <property name="text">
-             <string>基于收集目录时间</string>
+             <string>压缩</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="radioButton_fntime_based">
+           <widget class="QCheckBox" name="checkBox_3">
             <property name="text">
-             <string>基于文件名时间</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="radioButton_systime_based">
-            <property name="text">
-             <string>基于系统时间</string>
+             <string>保持原目录结构</string>
             </property>
            </widget>
           </item>
@@ -258,24 +275,6 @@
              </size>
             </property>
            </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
-          <item>
-           <widget class="QCheckBox" name="checkBox">
-            <property name="text">
-             <string>压缩</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="checkBox_3">
-            <property name="text">
-             <string>保持原目录结构</string>
-            </property>
-           </widget>
           </item>
          </layout>
         </item>

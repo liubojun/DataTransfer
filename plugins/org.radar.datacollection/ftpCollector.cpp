@@ -90,53 +90,47 @@ void FtpCollector::getNewFiles()
 
     // E:/workspace/DataTransfer/DataTransfer_code_20170831/vs2013/apps/DataTransfer/%T-1H%t%y/%t%m/%td
     // modified by liubojun. 支持按照特定时间获取数据
-    m_collectSet.rltvPath = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
-
-    m_pCftp->setHostPort(m_collectSet.ip, m_collectSet.port);
-    m_pCftp->setUserPwd(m_collectSet.loginUser, m_collectSet.loginPass);
-    m_pCftp->setRootPath(m_collectSet.rltvPath);
-    m_pCftp->setFtpTransferMode(m_collectSet.ftp_transferMode);
-    m_pCftp->setFtpConnectMode(m_collectSet.ftp_connectMode);
-    m_pCftp->setSubDirFlag(m_collectSet.subdirFlag);
-
-    emit print(QStringLiteral("[%1]: 开始收集任务 %2[%3]").arg(QDateTime::currentDateTime().toString(Qt::ISODate)).arg(m_collectSet.dirName)
-               .arg(m_collectSet.rltvPath));
-
-    bool bConnect = true;
-    // 先测试源路径是否正常
-    bConnect = testFtpConnection(m_collectSet.ip, m_collectSet.port, m_collectSet.loginUser, m_collectSet.loginPass, m_collectSet.ftp_transferMode, m_collectSet.ftp_connectMode);
-
-    if (!bConnect)
+    QStringList rootPaths = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
+    for (int i = 0; i < rootPaths.size(); ++i)
     {
-        m_nLineState = 1;
-        emit taskState(m_collectSet, 0, m_nLineState);
-        return;
-    }
-    // 在测试目标路径是否正常 临时屏蔽
-//     if (m_userInfo.user.sendType == 0)
-//     {
-//         bConnect = testFileConnection(m_userInfo.user.rootPath);
-//     }
-//     else
-//     {
-//         bConnect = testFtpConnection(m_userInfo.user.ip, m_userInfo.user.port, m_userInfo.user.lgUser, m_userInfo.user.lgPass);
-//     }
+        m_collectSet.rltvPath = rootPaths.at(i);
+        m_pCftp->setHostPort(m_collectSet.ip, m_collectSet.port);
+        m_pCftp->setUserPwd(m_collectSet.loginUser, m_collectSet.loginPass);
+        m_pCftp->setRootPath(m_collectSet.rltvPath);
+        m_pCftp->setFtpTransferMode(m_collectSet.ftp_transferMode);
+        m_pCftp->setFtpConnectMode(m_collectSet.ftp_connectMode);
+        m_pCftp->setSubDirFlag(m_collectSet.subdirFlag);
 
-    if (bConnect)
-    {
-        m_nLineState = 0;
-        emit taskState(m_collectSet, 0, m_nLineState);
-        emit startGif(m_collectSet.dirID, true);
-        m_bFinish = false;
-        m_fileList.clear();	//清空新文件列表
+        emit print(QStringLiteral("[%1]: 开始收集任务 %2[%3]").arg(QDateTime::currentDateTime().toString(Qt::ISODate)).arg(m_collectSet.dirName)
+                   .arg(m_collectSet.rltvPath));
 
-        m_pCftp->getNewFiles(m_fileList);
-        emit startGif(m_collectSet.dirID, false);
-    }
-    else
-    {
-        m_nLineState = 1;
-        emit taskState(m_collectSet, 0, m_nLineState);
+        bool bConnect = true;
+        // 先测试源路径是否正常
+        bConnect = testFtpConnection(m_collectSet.ip, m_collectSet.port, m_collectSet.loginUser, m_collectSet.loginPass, m_collectSet.ftp_transferMode, m_collectSet.ftp_connectMode);
+
+        if (!bConnect)
+        {
+            m_nLineState = 1;
+            emit taskState(m_collectSet, 0, m_nLineState);
+            return;
+        }
+
+        if (bConnect)
+        {
+            m_nLineState = 0;
+            emit taskState(m_collectSet, 0, m_nLineState);
+            emit startGif(m_collectSet.dirID, true);
+            m_bFinish = false;
+            m_fileList.clear();	//清空新文件列表
+
+            m_pCftp->getNewFiles(m_fileList);
+            emit startGif(m_collectSet.dirID, false);
+        }
+        else
+        {
+            m_nLineState = 1;
+            emit taskState(m_collectSet, 0, m_nLineState);
+        }
     }
 }
 
@@ -199,7 +193,27 @@ bool FtpCollector::compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransT
         QString strFileFullPath = QString::fromLocal8Bit(fi.strFilePath.c_str());
         QString strFileName = QString::fromLocal8Bit(fi.strFileName.c_str());
         // QString dstFileFullPath = getDestFilePath(strFileFullPath, strFileName, cUser, QDateTime::fromString(fi.strMdyTime.c_str(), "yyyyMMddhhmmss"));
-        QString dstFileFullPath = getDestFilePath(strFileFullPath, strFileName, cUser, QDateTime::currentDateTime());
+
+        // modified by liubojun @20171029
+        int iTmBaseRule = cUser.user.timebaserule;
+
+        QString dstFileFullPath;
+
+        // 如果基于收集目录时间，需要准确判断当前的日期，因为收集有可能是配置的时间范围
+        ///360Downloads/rcv/2017/201710/%T-[0,1]d%t%Y%t%m%t%d <===> /360Downloads/rcv/2017/201710/20171029/123
+        if (1 == iTmBaseRule) // 基于收集目录时间
+        {
+            QStringList rootPaths = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
+            CPathBuilder::getDateTimeFrom2Urls(m_tUser.colTaskInfo.rltvPath, fi.strFilePath.c_str());
+        }
+        else if (2 == iTmBaseRule) // 基于文件名时间
+        {
+            //dstFileFullPath = getDestFilePath(strFileFullPath, strFileName, cUser, QDateTime::fromString(fi.strMdyTime.c_str(), "yyyyMMddhhmmss"), iTmBaseRule);
+        }
+        else   // 基于系统时间 + 不基于任何时间
+        {
+            dstFileFullPath = getDestFilePath(strFileFullPath, strFileName, cUser, QDateTime::currentDateTime(), iTmBaseRule);
+        }
         QString dstFilePath = dstFileFullPath;
         tTask.fileName = strFileName;
         tTask.srcFileFullPath = strFileFullPath;

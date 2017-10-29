@@ -36,6 +36,7 @@ bool UserManageDlg::onApply()
     user.sendType = ui.radioButton->isChecked() ? 0 : 1;
     user.sendSuffix = ui.lineEdit_sendSuffix->text();
     user.rootPath = ui.lineEdit_2->text();
+    user.timebaserule = ui.cb_timebaserule->currentIndex();
     user.ip = ui.lineEdit_3->text();
     user.port = ui.lineEdit_4->text().toInt();
     user.lgUser = ui.lineEdit_5->text();
@@ -227,6 +228,7 @@ void UserManageDlg::onSelectUser(int nRow)
         ui.lineEdit_5->setText(it->lgUser);
         ui.lineEdit_6->setText(it->lgPass);
         ui.checkBox->setChecked(it->compress);
+        ui.cb_timebaserule->setCurrentIndex(it->timebaserule);
         // ui.checkBox_2->setChecked(it->encrypt);
         ui.checkBox_3->setChecked(it->keepDir);
     }

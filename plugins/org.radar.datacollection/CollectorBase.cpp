@@ -134,7 +134,7 @@ void CollectorBase::emitLog(const QString &info, int infoType)
     // QThread::msleep(20);
 }
 
-QString CollectorBase::getDestFilePath(const QString &srcFileFullPath, const QString &fileName, const CollectUser &cUser, const QDateTime &dt)
+QString CollectorBase::getDestFilePath(const QString &srcFileFullPath, const QString &fileName, const CollectUser &cUser, const QDateTime &dt, bool enableTimeRule)
 {
     QString destPath = cUser.user.rootPath + cUser.rltvPath;
     if (destPath.right(1) != "/")
@@ -166,7 +166,11 @@ QString CollectorBase::getDestFilePath(const QString &srcFileFullPath, const QSt
         destPath += subPath;
     }
 
-    destPath = CPathBuilder::getFinalPathFromUrl(destPath, dt);
+    if (enableTimeRule)
+    {
+        destPath = CPathBuilder::getFinalPathFromUrl(destPath, dt).at(0);
+    }
+
     if (destPath.right(1) != "/")
     {
         destPath += "/";
@@ -231,6 +235,7 @@ bool CollectorBase::readSet()
         return false;
     }
     m_tUser.taskID = m_collectSet.dirID;
+    m_tUser.colTaskInfo = m_collectSet;
     // 读取分发用户设置
     if (!DataBase::getInstance()->QueryUserInfo(m_tUser))
     {

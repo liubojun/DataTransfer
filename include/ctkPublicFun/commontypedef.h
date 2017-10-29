@@ -415,12 +415,6 @@ struct CollectUser
 
 Q_DECLARE_METATYPE(CollectUser)
 
-struct TaskUser
-{
-    QString				taskID;
-    QList<CollectUser>	lstUser;
-};
-
 struct CollectTask
 {
     QString dirID;
@@ -446,6 +440,15 @@ struct CollectTask
         enable = 1;
     }
 };
+
+struct TaskUser
+{
+    QString				taskID;
+    CollectTask			colTaskInfo;
+    QList<CollectUser>	lstUser;
+};
+
+
 
 struct TransTask
 {

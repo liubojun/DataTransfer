@@ -4,6 +4,7 @@
 #include <QStringList>
 #include <QDir>
 #include <iostream>
+#include <QDebug>
 #include "pathbuilder.h"
 
 
@@ -210,16 +211,23 @@ QString CPathBuilder::getCurlFilePath()
     return strFilePath;
 }
 
-QString CPathBuilder::getFinalPathFromUrl(const QString &path)
+QStringList CPathBuilder::getFinalPathFromUrl(const QString &path)
 {
     QString strNewUrl;
 
     // %T-1H %T表示当前的系统时间 -1H表示基于当前系统时间的增减量，还支持天d、分钟M、秒s
     // %T-1H%t%y/%t%m/%t%d/%t%H/%t%M/%t%s, %t后接时间，%y%m%d%H%M%s分别表示年月日时分秒
+    // modified by liubojun @210171029,添加时间增减量的支持
+    // %T-[0,1]d ,表示基于当前系统时间，获取当前的天以及前一天
     //QUrl oUrl(path);
     QString strUrl = path;//oUrl.path();
 
-    QString strFinalUrl;
+    QStringList retUrls;
+    // 先插入一个元素
+    retUrls.append("");
+
+    QString &strFinalUrl = retUrls[0];
+
     QStringList urlList = strUrl.split("/");
 
     //
@@ -237,15 +245,32 @@ QString CPathBuilder::getFinalPathFromUrl(const QString &path)
         {
             continue;
         }
-        strFinalUrl.append(parseFromUrl(str, QDateTime::currentDateTime()));
+        QStringList allUrls = parseFromUrl(str, QDateTime::currentDateTime());
+
+        // 如果返回了多条记录，原有URL需要进行复制
+        int size = allUrls.size();
+        for (int i = 0; i < size - 1; ++i)
+        {
+            retUrls.append(retUrls);
+        }
+
+        for (int i = 0; i < retUrls.size(); ++i)
+        {
+            QString &refUrl = retUrls[i];
+            refUrl.append(allUrls[i % size]);
+        }
+
+        // strFinalUrl.append(parseFromUrl(str, QDateTime::currentDateTime()));
     }
 
     //QSLOG_DEBUG("final url = " + strFinalUrl);
-    return strFinalUrl;
+    return retUrls;
+    // strFinalUrl;
 }
 
-QString CPathBuilder::getFinalPathFromUrl(const QString &path, QDateTime in_oDt)
+QStringList CPathBuilder::getFinalPathFromUrl(const QString &path, QDateTime in_oDt)
 {
+    QStringList retUrls;
     QString strNewUrl;
 
     // %T-1H %T表示当前的系统时间 -1H表示基于当前系统时间的增减量，还支持天d、分钟M、秒s
@@ -257,35 +282,36 @@ QString CPathBuilder::getFinalPathFromUrl(const QString &path, QDateTime in_oDt)
     QStringList urlList = strUrl.split("/");
 
     //
-    for (int i = 0; i != path.length(); ++i)
-    {
-        if ('/' != path.at(i))
-        {
-            break;
-        }
-        strFinalUrl.append(path.at(i));
-    }
-    foreach(QString str, urlList)
-    {
-        if (str.isEmpty())
-        {
-            continue;
-        }
-        strFinalUrl.append(parseFromUrl(str, in_oDt));
-    }
+    //for (int i = 0; i != path.length(); ++i)
+    //{
+    //    if ('/' != path.at(i))
+    //    {
+    //        break;
+    //    }
+    //    strFinalUrl.append(path.at(i));
+    //}
+    //foreach(QString str, urlList)
+    //{
+    //    if (str.isEmpty())
+    //    {
+    //        continue;
+    //    }
+    //    QStringList allUrls = parseFromUrl(str, in_oDt);
+    //    // strFinalUrl.append(parseFromUrl(str, in_oDt));
+    //}
 
     //QSLOG_DEBUG("final url = " + strFinalUrl);
-    return strFinalUrl;
+    return retUrls;// strFinalUrl;
 }
 
-QString CPathBuilder::parseFromUrl(const QString &url, QDateTime in_oDt)
+QStringList CPathBuilder::parseFromUrl(const QString &url, QDateTime in_oDt)
 {
     // 最终的时间
 
     QDateTime finalDateTime = in_oDt;
 
-    QString strNewUrl("");
-    QString strFinalUrl;
+    QStringList strNewUrl;
+    QStringList strFinalUrl;
     QString strUrl = url;
 
     int index0 = 0;
@@ -303,6 +329,10 @@ QString CPathBuilder::parseFromUrl(const QString &url, QDateTime in_oDt)
             //QSLOG_ERROR("check url format error, should be with t after T");
             return strNewUrl;
         }
+
+        //
+        QList<QDateTime> oDateTimeLists;
+
         // 截断之间的内容
         QString valueRange = strUrl.mid(index1 + 2, index2 - index1 - 2);
 
@@ -320,34 +350,58 @@ QString CPathBuilder::parseFromUrl(const QString &url, QDateTime in_oDt)
             // 再计算后面的时间内容
             // 确定valueRange的最后一个字符
             QChar lastc = valueRange.at(valueRange.length() - 1);
-            int iTime = valueRange.mid(1, valueRange.length() - 2).toInt() * addorsub;
 
-            int step = 0;
-            if ('H' == lastc)
+            // valueRange = -[0,1]d
+            QString midValue = valueRange.mid(1, valueRange.length() - 2);
+            QStringList strTimeLists;
+
+            // 出现多个时间增减量
+            if (midValue.length() > 1 && midValue[0] == '[' && midValue[midValue.length() - 1] == ']')
             {
-                finalDateTime = finalDateTime.addSecs(iTime * 3600);
-                //QSLOG_DEBUG(QString("%1 H").arg(iTime));
+                strTimeLists = midValue.mid(1, midValue.length() - 2).split(",");
+                qDebug() << strTimeLists;
             }
-            else if ('d' == lastc)
+            else // 单一时间
             {
-                finalDateTime = finalDateTime.addDays(iTime);
-                //QSLOG_DEBUG(QString("%1 d").arg(iTime));
+                strTimeLists.append(valueRange.mid(1, valueRange.length() - 2));
             }
-            else if ('M' == lastc)
+
+            foreach (const QString &strTimePart , strTimeLists)
             {
-                finalDateTime = finalDateTime.addSecs(iTime * 60);
-                //QSLOG_DEBUG(QString("%1 M").arg(iTime));
+                // int iTime = valueRange.mid(1, valueRange.length() - 2).toInt() * addorsub;
+                int iTime = strTimePart.toInt() * addorsub;
+
+                QDateTime tmpFinalDateTime = finalDateTime;
+                int step = 0;
+                if ('H' == lastc)
+                {
+                    tmpFinalDateTime = tmpFinalDateTime.addSecs(iTime * 3600);
+                    //QSLOG_DEBUG(QString("%1 H").arg(iTime));
+                }
+                else if ('d' == lastc)
+                {
+                    tmpFinalDateTime = tmpFinalDateTime.addDays(iTime);
+                    //QSLOG_DEBUG(QString("%1 d").arg(iTime));
+                }
+                else if ('M' == lastc)
+                {
+                    tmpFinalDateTime = tmpFinalDateTime.addSecs(iTime * 60);
+                    //QSLOG_DEBUG(QString("%1 M").arg(iTime));
+                }
+                else if ('s' == lastc)
+                {
+                    tmpFinalDateTime = tmpFinalDateTime.addSecs(iTime);
+                    //QSLOG_DEBUG(QString("%1 s").arg(iTime));
+                }
+                else
+                {
+                    //QSLOG_ERROR("check unsupport character after %T should be H / d / M / s");
+                    return strNewUrl;
+                }
+
+                oDateTimeLists.append(tmpFinalDateTime);
             }
-            else if ('s' == lastc)
-            {
-                finalDateTime = finalDateTime.addSecs(iTime);
-                //QSLOG_DEBUG(QString("%1 s").arg(iTime));
-            }
-            else
-            {
-                //QSLOG_ERROR("check unsupport character after %T should be H / d / M / s");
-                return strNewUrl;
-            }
+
         }
         else
         {
@@ -395,7 +449,11 @@ QString CPathBuilder::parseFromUrl(const QString &url, QDateTime in_oDt)
             }
         }
 
-        strFinalUrl.append(finalDateTime.toString(strDateTimeFormat));
+        foreach(const QDateTime &tmpDt , oDateTimeLists)
+        {
+            strFinalUrl.append(tmpDt.toString(strDateTimeFormat) + "/");
+        }
+
 
     }
     else if (-1 != (index1 = strUrl.indexOf("%t")))
@@ -441,13 +499,254 @@ QString CPathBuilder::parseFromUrl(const QString &url, QDateTime in_oDt)
             }
         }
 
-        strFinalUrl.append(finalDateTime.toString(strDateTimeFormat));
+        strFinalUrl.append(finalDateTime.toString(strDateTimeFormat) + "/");
     }
     else
     {
-        strFinalUrl.append(url);
+        strFinalUrl.append(url + "/");
     }
 
-    return strFinalUrl + "/";
+    // return strFinalUrl + "/";
+    return strFinalUrl;
+}
+
+QDateTime CPathBuilder::getDateTimeFrom2Urls(const QString &rule, const QString &path)
+{
+    QDateTime retDt = QDateTime::currentDateTime();
+
+    QStringList ruleParts = rule.split("/");
+
+    QStringList pathParts = path.split("/");
+
+    QMap<QString, int> timeunit2flag;
+    timeunit2flag.insert("year", 0);
+    timeunit2flag.insert("month", 0);
+    timeunit2flag.insert("day", 0);
+    timeunit2flag.insert("hour", 0);
+    timeunit2flag.insert("min", 0);
+    timeunit2flag.insert("sec", 0);
+
+    for (int i = 0; i < ruleParts.size(); ++i)
+    {
+        // 最终的时间
+
+        QDateTime finalDateTime = retDt;
+
+        QStringList strNewUrl;
+        QStringList strFinalUrl;
+        QString strUrl = ruleParts.at(i);
+
+        if (strUrl.trimmed().isEmpty())
+        {
+            continue;
+        }
+
+        int index0 = 0;
+        int index1 = 0;
+
+        if (-1 != (index1 = strUrl.indexOf("%T")))
+        {
+            //QSLOG_DEBUG(QString("find add or sub character"));
+            // 找到%T与%t之间的内容
+
+            int index2 = strUrl.indexOf("%t", index1);
+
+            if (-1 == index2)
+            {
+                //QSLOG_ERROR("check url format error, should be with t after T");
+                return retDt;
+            }
+
+            //
+            QList<QDateTime> oDateTimeLists;
+
+            // 截断之间的内容
+            QString valueRange = strUrl.mid(index1 + 2, index2 - index1 - 2);
+
+            // 分析第一个是+号还是-号
+            QChar c = valueRange.at(0);
+            if ('-' == c || '+' == c)
+            {
+                // 计算当前时间的增减量
+                int addorsub = 1;
+                if ('-' == c)
+                {
+                    addorsub = -1;
+                }
+
+                // 再计算后面的时间内容
+                // 确定valueRange的最后一个字符
+                QChar lastc = valueRange.at(valueRange.length() - 1);
+
+                // valueRange = -[0,1]d
+                QString midValue = valueRange.mid(1, valueRange.length() - 2);
+                QStringList strTimeLists;
+
+                // 出现多个时间增减量
+                if (midValue.length() > 1 && midValue[0] == '[' && midValue[midValue.length() - 1] == ']')
+                {
+                    strTimeLists = midValue.mid(1, midValue.length() - 2).split(",");
+                    qDebug() << strTimeLists;
+                }
+                else // 单一时间
+                {
+                    strTimeLists.append(valueRange.mid(1, valueRange.length() - 2));
+                }
+
+                foreach(const QString &strTimePart, strTimeLists)
+                {
+                    // int iTime = valueRange.mid(1, valueRange.length() - 2).toInt() * addorsub;
+                    int iTime = strTimePart.toInt() * addorsub;
+
+                    QDateTime tmpFinalDateTime = finalDateTime;
+                    int step = 0;
+                    if ('H' == lastc)
+                    {
+                        tmpFinalDateTime = tmpFinalDateTime.addSecs(iTime * 3600);
+                        //QSLOG_DEBUG(QString("%1 H").arg(iTime));
+                    }
+                    else if ('d' == lastc)
+                    {
+                        tmpFinalDateTime = tmpFinalDateTime.addDays(iTime);
+                        //QSLOG_DEBUG(QString("%1 d").arg(iTime));
+                    }
+                    else if ('M' == lastc)
+                    {
+                        tmpFinalDateTime = tmpFinalDateTime.addSecs(iTime * 60);
+                        //QSLOG_DEBUG(QString("%1 M").arg(iTime));
+                    }
+                    else if ('s' == lastc)
+                    {
+                        tmpFinalDateTime = tmpFinalDateTime.addSecs(iTime);
+                        //QSLOG_DEBUG(QString("%1 s").arg(iTime));
+                    }
+                    else
+                    {
+                        //QSLOG_ERROR("check unsupport character after %T should be H / d / M / s");
+                        return retDt;
+                    }
+
+                    oDateTimeLists.append(tmpFinalDateTime);
+                }
+
+            }
+            else
+            {
+                // QSLOG_ERROR("The character after %T is incorrect, should be + or -");
+                return retDt;
+            }
+
+            QStringList strTimeBody = strUrl.mid(index2).split("%t");
+            QString strDateTimeFormat;
+            foreach(QString strBody, strTimeBody)
+            {
+                if (strBody.isEmpty())
+                {
+                    continue;
+                }
+                // %y%m%d%H%M%s
+                if ("%Y" == strBody)
+                {
+                    strDateTimeFormat.append("yyyy");
+                    timeunit2flag["year"] = pathParts.at(i).mid(0, 4).toInt();
+                }
+                else if ("%m" == strBody)
+                {
+                    strDateTimeFormat.append("MM");
+                    timeunit2flag["month"] = true;
+                }
+                else if ("%d" == strBody)
+                {
+                    strDateTimeFormat.append("dd");
+                    timeunit2flag["day"] = true;
+                }
+                else if ("%H" == strBody)
+                {
+                    strDateTimeFormat.append("hh");
+                    timeunit2flag["hour"] = true;
+                }
+                else if ("%M" == strBody)
+                {
+                    strDateTimeFormat.append("mm");
+                    timeunit2flag["min"] = true;
+                }
+                else if ("%S" == strBody)
+                {
+                    strDateTimeFormat.append("ss");
+                    timeunit2flag["sec"] = true;
+                }
+                else
+                {
+                    //QSLOG_ERROR("The character after %t is incorrect, should be ymdHMs ");
+                    return retDt;
+                }
+            }
+
+            foreach(const QDateTime &tmpDt, oDateTimeLists)
+            {
+                if (tmpDt.toString(strDateTimeFormat) == pathParts.at(i))
+                {
+                    // 有效Dt
+                    // break;
+                }
+                // strFinalUrl.append(tmpDt.toString(strDateTimeFormat) + "/");
+            }
+
+
+        }
+        else if (-1 != (index1 = strUrl.indexOf("%t")))
+        {
+            // QSLOG_DEBUG(QString("find time character"));
+            QStringList strTimeBody = strUrl.split("%t");
+            QString strDateTimeFormat;
+            foreach(QString strBody, strTimeBody)
+            {
+                if (strBody.isEmpty())
+                {
+                    continue;
+                }
+                // %y%m%d%H%M%s
+                if ("%Y" == strBody)
+                {
+                    strDateTimeFormat.append("yyyy");
+                }
+                else if ("%m" == strBody)
+                {
+                    strDateTimeFormat.append("MM");
+                }
+                else if ("%d" == strBody)
+                {
+                    strDateTimeFormat.append("dd");
+                }
+                else if ("%H" == strBody)
+                {
+                    strDateTimeFormat.append("hh");
+                }
+                else if ("%M" == strBody)
+                {
+                    strDateTimeFormat.append("mm");
+                }
+                else if ("%S" == strBody)
+                {
+                    strDateTimeFormat.append("ss");
+                }
+                else
+                {
+                    // QSLOG_ERROR("The character after %t is incorrect, should be ymdHMs");
+                    return retDt;
+                }
+            }
+
+            strFinalUrl.append(finalDateTime.toString(strDateTimeFormat) + "/");
+        }
+        else
+        {
+            //strFinalUrl.append(url + "/");
+        }
+
+        // return strFinalUrl + "/";
+        //return retDt;
+    }
+    return retDt;
 }
 

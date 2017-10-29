@@ -100,18 +100,24 @@ public:
      * @brief  从界面配置的URL中解析出路径[基于系统时间]
      * @return QT_NAMESPACE::QString：返回组装的url
      */
-    static QString getFinalPathFromUrl(const QString &path);
+    static QStringList getFinalPathFromUrl(const QString &path);
 
     /**
     * @brief  从界面配置的URL中解析出路径[基于文件最后修改时间]
     * @return QT_NAMESPACE::QString：返回组装的url
     */
-    static QString getFinalPathFromUrl(const QString &path, QDateTime in_oDt);
+    static QStringList getFinalPathFromUrl(const QString &path, QDateTime in_oDt);
+
+    /**
+     * @brief  从URL以及文件目录中获取时间
+     * @return QT_NAMESPACE::QString：返回获取的时间
+     */
+    static QDateTime getDateTimeFrom2Urls(const QString &rule, const QString &path);
 
 protected:
     bool makeBuilderOrRunning();
 
-    static QString parseFromUrl(const QString &url, QDateTime in_oDt);
+    static QStringList parseFromUrl(const QString &url, QDateTime in_oDt);
 
 private:
     // 程序路径
