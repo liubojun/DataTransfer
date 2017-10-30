@@ -203,8 +203,8 @@ bool FtpCollector::compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransT
         ///360Downloads/rcv/2017/201710/%T-[0,1]d%t%Y%t%m%t%d <===> /360Downloads/rcv/2017/201710/20171029/123
         if (1 == iTmBaseRule) // 基于收集目录时间
         {
-            QStringList rootPaths = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
-            CPathBuilder::getDateTimeFrom2Urls(m_tUser.colTaskInfo.rltvPath, fi.strFilePath.c_str());
+            QDateTime oDt = CPathBuilder::getDateTimeFrom2Urls(m_tUser.colTaskInfo.rltvPath, fi.strFilePath.c_str());
+            dstFileFullPath = getDestFilePath(strFileFullPath, strFileName, cUser, oDt, iTmBaseRule);
         }
         else if (2 == iTmBaseRule) // 基于文件名时间
         {
