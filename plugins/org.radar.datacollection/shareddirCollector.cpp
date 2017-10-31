@@ -928,19 +928,21 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
 
         // 如果基于收集目录时间，需要准确判断当前的日期，因为收集有可能是配置的时间范围
         ///360Downloads/rcv/2017/201710/%T-[0,1]d%t%Y%t%m%t%d <===> /360Downloads/rcv/2017/201710/20171029/123
+        QDateTime oDt;
         if (1 == iTmBaseRule) // 基于收集目录时间
         {
-            QDateTime oDt = CPathBuilder::getDateTimeFrom2Urls(m_tUser.colTaskInfo.rltvPath, fi.filePath().toLocal8Bit().toStdString().c_str());
-            dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser, oDt, iTmBaseRule);
+            oDt = CPathBuilder::getDateTimeFrom2Urls(m_tUser.colTaskInfo.rltvPath, fi.filePath().toLocal8Bit().toStdString().c_str());
         }
         else if (2 == iTmBaseRule) // 基于文件名时间
         {
-            //dstFileFullPath = getDestFilePath(strFileFullPath, strFileName, cUser, QDateTime::fromString(fi.strMdyTime.c_str(), "yyyyMMddhhmmss"), iTmBaseRule);
+            oDt = CPathBuilder::getDateTimeFromFileName(m_tUser.colTaskInfo.fileTemplate, fi.fileName().toLocal8Bit().toStdString().c_str());
         }
         else   // 基于系统时间 + 不基于任何时间
         {
-            dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser, QDateTime::currentDateTime(), iTmBaseRule);
+            oDt = QDateTime::currentDateTime();
         }
+
+        dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser, oDt, iTmBaseRule);
 
         // QString dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser, QDateTime::currentDateTime(), cUser.user.timebaserule);
         QString dstFilePath = dstFileFullPath;
