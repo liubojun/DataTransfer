@@ -69,6 +69,7 @@ bool UserManageDlg::onApply()
     else
     {
         QListWidgetItem *pItem = ui.listWidget->currentItem();
+
         if (m_ItemUser.contains(pItem))
         {
             user.userID = m_ItemUser[pItem].userID;
@@ -77,6 +78,7 @@ bool UserManageDlg::onApply()
         {
             return false;
         }
+        m_ItemUser[pItem] = user;
     }
     m_nFlag = 0;
     return true;

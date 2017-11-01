@@ -215,7 +215,7 @@ bool CollectorBase::testFileConnection(QString strUrl)
 bool CollectorBase::testFtpConnection(QString ip, int port, QString lgUser, QString lgPass, int transfermode, int connectmode)
 {
     CurlFtp cFtp(this);
-    char url[100] = {0};
+    char url[512] = {0};
     char usrPwd[100] = {0};
     sprintf(url, "ftp://%s:%d", ip.toStdString().c_str(), port);
     // sprintf(url, "sftp://%s", ip.toStdString().c_str(), port);

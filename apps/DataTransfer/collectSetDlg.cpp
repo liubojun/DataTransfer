@@ -10,6 +10,7 @@
 #include <curl/curl.h>
 #include <QDebug>
 #include <QThread>
+#include "QsLog/ctkLog.h"
 //#include "curlftp.h"
 
 CollectSetDlg::CollectSetDlg(int flag, QDialog *parent /*= NULL*/)
@@ -506,18 +507,30 @@ void CollectSetDlg::onRemoteColTest()
 
     if (ui.radFile->isChecked())
     {
-        QUrl url;// = QUrl::fromLocalFile(CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text()));
-        if (url.isLocalFile())
+        QStringList retUrls = CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text());
+        foreach(QString strUrl, retUrls)
         {
-            QDir qdir(ui.le_RelvPath->text());
-            if (qdir.exists())
+            //QSLOG_DEBUG(strUrl);
+            QUrl url = QUrl::fromLocalFile(strUrl);
+            if (url.isLocalFile())
             {
-                emit testok(qdir.absolutePath());
-                return;
+                //QSLOG_DEBUG("==============");
+                QDir qdir(ui.le_RelvPath->text());
+                if (qdir.exists())
+                {
+                    emit testok(strUrl);
+                    //QSLOG_DEBUG("==============111111111111");
+                    //return;
+                }
+                else
+                {
+                    emit testfail(strUrl);
+                    //QSLOG_DEBUG("==============22222222222");
+                }
             }
         }
 
-        //emit testfail(CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text()));
+
     }
     else
     {
