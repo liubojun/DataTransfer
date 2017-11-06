@@ -4,7 +4,7 @@
 set _interval=5
 
 ::需要守护的进程名称
-set _processName=DataTransfer.exe
+set _processName=DataTransfer
 
 ::需要守护的进程启动命令
 set _processCmd=DataTransfer.exe
@@ -16,7 +16,7 @@ set _processTimeout=10
 set _port=8080
 
 ::进程用户名，一般是Administrator
-set _username=C 
+set _username=Administrator
 
 :LOOP
 set /a isAlive=false
