@@ -110,9 +110,19 @@ public:
 
     /**
      * @brief  从URL以及文件目录中获取时间
-     * @return QT_NAMESPACE::QString：返回获取的时间
+     * @param[in]  const QString &rule 规则
+     * @param[in]  const QString &path 路径
+     * @return QT_NAMESPACE::QDateTime：返回获取的时间
      */
     static QDateTime getDateTimeFrom2Urls(const QString &rule, const QString &path);
+
+    /**
+     * @brief  从文件名中根据正则表达式获取时间
+     * @param[in]  const QString &rule 规则
+     * @param[in]  const QString &filename 文件名
+     * @return QT_NAMESPACE::QDateTime：返回获取的时间
+     */
+    static QDateTime getDateTimeFromFileName(const QString &rule, const QString &filename);
 
 protected:
     bool makeBuilderOrRunning();

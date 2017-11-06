@@ -170,7 +170,7 @@ int CurlFtp::setCommOpt()
 int CurlFtp::getNewFiles(FileInfoList &fileList)
 {
     // 每次都去连接
-    char url[100] = {0};
+    char url[512] = {0};
     char usrpwd[100] = {0};
     sprintf(url, "ftp://%s:%d%s/", m_strIP.c_str(), m_nPort, m_strRoot.c_str());
     QSLOG_DEBUG("WE WILL LOOK FOR:" + QString(url));

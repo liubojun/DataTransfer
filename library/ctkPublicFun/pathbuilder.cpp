@@ -647,3 +647,42 @@ QDateTime CPathBuilder::getDateTimeFrom2Urls(const QString &rule, const QString 
     return retDt;
 }
 
+QDateTime CPathBuilder::getDateTimeFromFileName(const QString &rule, const QString &filename)
+{
+    QDateTime oRetDt;
+    QRegExp oReg(rule);
+    if (-1 != oReg.indexIn(filename))
+    {
+        QString strDateTime = oReg.cap(1);
+        switch (strDateTime.length())
+        {
+        case 4:
+            oRetDt = QDateTime::fromString(strDateTime, "yyyy");
+            break;
+        case 6:
+            oRetDt = QDateTime::fromString(strDateTime, "yyyyMM");
+            break;
+        case 8:
+            oRetDt = QDateTime::fromString(strDateTime, "yyyyMMdd");
+            break;
+        case 10:
+            oRetDt = QDateTime::fromString(strDateTime, "yyyyMMddhh");
+            break;
+        case 12:
+            oRetDt = QDateTime::fromString(strDateTime, "yyyyMMddhhmm");
+            break;
+        case 14:
+            oRetDt = QDateTime::fromString(strDateTime, "yyyyMMddhhmmss");
+            break;
+        default:
+            break;
+        }
+
+        if (!oRetDt.isValid())
+        {
+            qDebug() << "DateTime is invalid";
+        }
+    }
+    return oRetDt;
+}
+
