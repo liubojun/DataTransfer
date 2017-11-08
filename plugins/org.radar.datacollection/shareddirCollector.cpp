@@ -758,8 +758,8 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
     QString strDBPath = qApp->applicationDirPath() + "/work/record/" + m_collectSet.dirID + "/record.index";
 
     // 当前目录的最新时间列表
-    QString strFileListPath = qApp->applicationDirPath() + "/work/record/" + m_collectSet.dirID + "/latestFileList.xml";
-    list<string> t_oLatestFileList = initilizeLatestFileLists(strFileListPath);
+    //QString strFileListPath = qApp->applicationDirPath() + "/work/record/" + m_collectSet.dirID + "/latestFileList.xml";
+    //list<string> t_oLatestFileList = initilizeLatestFileLists(strFileListPath);
 
     // 当前目录数据库中记录的最后处理时间
     int iLatestTime = -9999;
@@ -795,8 +795,8 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
     time_t iRecordMaxTime = iLatestTime;
 
     // 新的最新文件列表
-    list<string> t_oNewLatestFiles = t_oLatestFileList;
-    bool listUpdate = false;
+    //list<string> t_oNewLatestFiles = t_oLatestFileList;
+    //bool listUpdate = false;
 
     CurlFtp m_ftp;
     for (int i=0; i<qfileList.size(); ++i)
@@ -819,37 +819,37 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
                 // 新增加判断条件（记录目录最后修改时间，此处需要判断当前文件时间是否大于等于当前目录的保存上次处理最后修改时间，如果小于则不对该文件进行处理）
                 if (m_collectSet.recordLatestTime)
                 {
-                    if (!bHasFileUpdate)
-                    {
-                        continue;
-                    }
+                    /*                if (!bHasFileUpdate)
+                    				{
+                    				continue;
+                    				}*/
 
                     time_t ifiletime_t = qf.lastModified().toTime_t();
                     if (iLatestTime != -9999 && ifiletime_t < iLatestTime)
                     {
                         continue;
                     }
-                    else if (ifiletime_t == iLatestTime)
-                    {
-                        // 需要判断当前的文件名是否在记录的latestFileList.xml列表中
-                        if (containsFile(t_oLatestFileList, qf.absoluteFilePath()))
-                        {
-                            continue;
-                        }
-                    }
+                    //else if (ifiletime_t == iLatestTime)
+                    //{
+                    //    // 需要判断当前的文件名是否在记录的latestFileList.xml列表中
+                    //    if (containsFile(t_oLatestFileList, qf.absoluteFilePath()))
+                    //    {
+                    //        continue;
+                    //    }
+                    //}
 
-                    if (ifiletime_t > iRecordMaxTime)
-                    {
-                        iRecordMaxTime = ifiletime_t;
-                        t_oNewLatestFiles.clear();
-                        t_oNewLatestFiles.push_back(qf.absoluteFilePath().toLocal8Bit().toStdString());
-                        listUpdate = true;
-                    }
-                    else if (ifiletime_t == iRecordMaxTime)
-                    {
-                        t_oNewLatestFiles.push_back(qf.absoluteFilePath().toLocal8Bit().toStdString());
-                        listUpdate = true;
-                    }
+                    //if (ifiletime_t > iRecordMaxTime)
+                    //{
+                    //    iRecordMaxTime = ifiletime_t;
+                    //    t_oNewLatestFiles.clear();
+                    //    t_oNewLatestFiles.push_back(qf.absoluteFilePath().toLocal8Bit().toStdString());
+                    //    listUpdate = true;
+                    //}
+                    //else if (ifiletime_t == iRecordMaxTime)
+                    //{
+                    //    t_oNewLatestFiles.push_back(qf.absoluteFilePath().toLocal8Bit().toStdString());
+                    //    listUpdate = true;
+                    //}
                 }
 
                 // 必须大于设置的时间范围才收集
@@ -893,10 +893,10 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
             updateLatestTime(strDBPath, strDir, (int)iRecordMaxTime);
         }
 
-        if (listUpdate)
-        {
-            updateLatestFileLists(strFileListPath, t_oNewLatestFiles);
-        }
+        //if (listUpdate)
+        //{
+        //    updateLatestFileLists(strFileListPath, t_oNewLatestFiles);
+        //}
     }
 
     // 入库

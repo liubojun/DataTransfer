@@ -372,13 +372,13 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
 int CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringList &dirList, int iLatestTime, bool bFtpSupportMSDL)
 {
     // 当前目录的最新时间列表
-    QString strFileListPath = qApp->applicationDirPath() + "/work/record/" + m_pCoBase->m_collectSet.dirID + "/latestFileList.xml";
-    list<string> t_oLatestFileList = m_pCoBase->initilizeLatestFileLists(strFileListPath);
+    //QString strFileListPath = qApp->applicationDirPath() + "/work/record/" + m_pCoBase->m_collectSet.dirID + "/latestFileList.xml";
+    //list<string> t_oLatestFileList = m_pCoBase->initilizeLatestFileLists(strFileListPath);
     // 新的最新文件列表
-    list<string> t_oNewLatestFiles = t_oLatestFileList;
+    //list<string> t_oNewLatestFiles = t_oLatestFileList;
     bool listUpdate = false;
     // modified by liubojun @20170606
-    time_t iRecordMaxTime = iLatestTime;
+    //time_t iRecordMaxTime = iLatestTime;
 
 
 
@@ -491,37 +491,37 @@ int CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringL
             if (m_pCoBase->m_collectSet.recordLatestTime)
             {
 
-                //if (iLatestTime != -9999 && nMdfyTime <= (uint)iLatestTime)
-                //{
-                //    continue;
-                //}
-
-                time_t ifiletime_t = nMdfyTime;
-                if (iLatestTime != -9999 && ifiletime_t < iLatestTime)
+                if (iLatestTime != -9999 && nMdfyTime <= (uint)iLatestTime)
                 {
                     continue;
                 }
-                else if (ifiletime_t == iLatestTime)
-                {
-                    // 需要判断当前的文件名是否在记录的latestFileList.xml列表中
-                    if (m_pCoBase->containsFile(t_oLatestFileList, oneInfo.strFileName))
-                    {
-                        continue;
-                    }
-                }
 
-                if (ifiletime_t > iRecordMaxTime)
-                {
-                    iRecordMaxTime = ifiletime_t;
-                    t_oNewLatestFiles.clear();
-                    t_oNewLatestFiles.push_back(oneInfo.strFileName.toLocal8Bit().toStdString());
-                    listUpdate = true;
-                }
-                else if (ifiletime_t == iRecordMaxTime)
-                {
-                    t_oNewLatestFiles.push_back(oneInfo.strFileName.toLocal8Bit().toStdString());
-                    listUpdate = true;
-                }
+                //time_t ifiletime_t = nMdfyTime;
+                //if (iLatestTime != -9999 && ifiletime_t < iLatestTime)
+                //{
+                //    continue;
+                //}
+                //else if (ifiletime_t == iLatestTime)
+                //{
+                //    // 需要判断当前的文件名是否在记录的latestFileList.xml列表中
+                //    if (m_pCoBase->containsFile(t_oLatestFileList, oneInfo.strFileName))
+                //    {
+                //        continue;
+                //    }
+                //}
+
+                //if (ifiletime_t > iRecordMaxTime)
+                //{
+                //    iRecordMaxTime = ifiletime_t;
+                //    t_oNewLatestFiles.clear();
+                //    t_oNewLatestFiles.push_back(oneInfo.strFileName.toLocal8Bit().toStdString());
+                //    listUpdate = true;
+                //}
+                //else if (ifiletime_t == iRecordMaxTime)
+                //{
+                //    t_oNewLatestFiles.push_back(oneInfo.strFileName.toLocal8Bit().toStdString());
+                //    listUpdate = true;
+                //}
             }
 
             // 必须大于设置的时间范围才收集
@@ -557,13 +557,13 @@ int CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringL
         }
     }
 
-    if (m_pCoBase->m_collectSet.recordLatestTime)
-    {
-        if (listUpdate)
-        {
-            m_pCoBase->updateLatestFileLists(strFileListPath, t_oNewLatestFiles);
-        }
-    }
+    //if (m_pCoBase->m_collectSet.recordLatestTime)
+    //{
+    //    if (listUpdate)
+    //    {
+    //        m_pCoBase->updateLatestFileLists(strFileListPath, t_oNewLatestFiles);
+    //    }
+    //}
 
     return iLastModifiedTime;
 }
