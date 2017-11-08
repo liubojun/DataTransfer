@@ -343,18 +343,20 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
     // 当前目录数据库中记录的最后处理时间
     int iLatestTime = -9999;
 
-    //QSLOG_DEBUG(QString::fromLocal8Bit("开始处理目录:%1， 收集时间范围:%2, 目录最后处理时间记录标识:%3").arg(QString::fromLocal8Bit(strDir.c_str())).arg(m_pCoBase->m_collectSet.col_timerange).arg(m_pCoBase->m_collectSet.recordLatestTime));
+    QSLOG_DEBUG(QString::fromLocal8Bit("开始处理目录:%1， 收集时间范围:%2, 目录最后处理时间记录标识:%3").arg(QString::fromLocal8Bit(strDir.c_str())).arg(m_pCoBase->m_collectSet.col_timerange).arg(m_pCoBase->m_collectSet.recordLatestTime));
 
     bool bHasFileUpdate = false;
     if (m_pCoBase->m_collectSet.recordLatestTime)
     {
         m_pCoBase->recordLatestTime(strDBPath, QString::fromLocal8Bit(strDir.c_str()), iLatestTime);
+        QSLOG_DEBUG(QString::fromLocal8Bit("目录:%1最后修改时间为:%2").arg(QString::fromLocal8Bit(strDir.c_str())).arg(iLatestTime));
     }
 
-    int nMdfTime = parseMlsdInfo(strInfo, fileList, m_lstDirs, iLatestTime, bFtpSupportMLSD);
+    qint64 nMdfTime = parseMlsdInfo(strInfo, fileList, m_lstDirs, iLatestTime, bFtpSupportMLSD);
 
     if (m_pCoBase->m_collectSet.recordLatestTime)
     {
+        QSLOG_DEBUG(QString::fromLocal8Bit("目录最后修改时间:%1").arg(nMdfTime));
         if (nMdfTime > iLatestTime)
         {
             m_pCoBase->updateLatestTime(strDBPath, QString::fromLocal8Bit(strDir.c_str()), nMdfTime);
@@ -362,14 +364,14 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
     }
 
 
-//     if (m_strCurDirNewTime > m_strCurDirLastTime)
-//     {
-//         QDateTime time = QDateTime::fromString(QString::fromStdString(m_strCurDirNewTime), "yyyyMMddhhmmss");
-//         m_pCoBase->m_pTsctTime->mapDirTime[m_strCurDir.toStdString()] = time.toTime_t();	//转为整形
+    //     if (m_strCurDirNewTime > m_strCurDirLastTime)
+    //     {
+    //         QDateTime time = QDateTime::fromString(QString::fromStdString(m_strCurDirNewTime), "yyyyMMddhhmmss");
+    //         m_pCoBase->m_pTsctTime->mapDirTime[m_strCurDir.toStdString()] = time.toTime_t();	//转为整形
     //}
 }
 
-int CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringList &dirList, int iLatestTime, bool bFtpSupportMSDL)
+qint64 CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringList &dirList, int iLatestTime, bool bFtpSupportMSDL)
 {
     // 当前目录的最新时间列表
     //QString strFileListPath = qApp->applicationDirPath() + "/work/record/" + m_pCoBase->m_collectSet.dirID + "/latestFileList.xml";
@@ -382,7 +384,7 @@ int CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringL
 
 
 
-    int iLastModifiedTime = 0;
+    qint64 iLastModifiedTime = 0;
 
     // QStringList lstLines = info.split("\r\n");
     QStringList lstLines = info.split("\n");
@@ -543,10 +545,10 @@ int CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringL
                 fInfo.nFileSize = oneInfo.nFileSize;
                 fileList.push_back(fInfo);
 
-//                 if (m_strCurDirNewTime < fInfo.strMdyTime)
-//                 {
-//                     m_strCurDirNewTime = fInfo.strMdyTime;
-//                 }
+                //                 if (m_strCurDirNewTime < fInfo.strMdyTime)
+                //                 {
+                //                     m_strCurDirNewTime = fInfo.strMdyTime;
+                //                 }
             }
         }
         else if (oneInfo.nType == 2 && m_subDirFlag)
@@ -656,11 +658,11 @@ int CurlFtp::downloadFile(const char *url, const char *user_pwd, FileData *fileD
     curl_easy_setopt(curl, CURLOPT_NOSIGNAL,1L);
 
     /* QUrl ourl(QString::fromLocal8Bit(url));
-     QString strFile = ourl.toLocalFile();
-     QFile f(strFile);
-     qint64 size = f.size();
-     QSLOG_DEBUG(QString("%1").arg(f.size()));
-     curl_easy_setopt(curl, CURLOPT_RESUME_FROM_LARGE, 0);*/
+    QString strFile = ourl.toLocalFile();
+    QFile f(strFile);
+    qint64 size = f.size();
+    QSLOG_DEBUG(QString("%1").arg(f.size()));
+    curl_easy_setopt(curl, CURLOPT_RESUME_FROM_LARGE, 0);*/
     //--进度条功能--
     //struct myprogress prog;
     //prog.lastruntime = 0;
@@ -853,12 +855,12 @@ int CurlFtp::uploadFileToDir(const char *url, const char *user_pwd, const string
 
     QSLOG_INFO(QString::fromLocal8Bit("开始上传文件:%1").arg(QString::fromLocal8Bit(strUrl.c_str())));
     //--进度条功能--
-//     struct myprogress prog;
-//     prog.lastruntime = 0;
-//     prog.curl = m_pCurl;
-//     curl_easy_setopt(m_pCurl, CURLOPT_XFERINFOFUNCTION, progressFun);
-//     curl_easy_setopt(m_pCurl, CURLOPT_XFERINFODATA, &prog);
-//     curl_easy_setopt(m_pCurl, CURLOPT_NOPROGRESS, FALSE);
+    //     struct myprogress prog;
+    //     prog.lastruntime = 0;
+    //     prog.curl = m_pCurl;
+    //     curl_easy_setopt(m_pCurl, CURLOPT_XFERINFOFUNCTION, progressFun);
+    //     curl_easy_setopt(m_pCurl, CURLOPT_XFERINFODATA, &prog);
+    //     curl_easy_setopt(m_pCurl, CURLOPT_NOPROGRESS, FALSE);
     //------------
     res = curl_easy_perform(pCurl);
 
@@ -1008,12 +1010,12 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
     curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)fsize);
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     //--进度条功能--
-// 	struct myprogress prog;
-// 	prog.lastruntime = 0;
-// 	prog.curl = curl;
-// 	curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progressFun);
-// 	curl_easy_setopt(curl, CURLOPT_XFERINFODATA, &prog);
-// 	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, FALSE);
+    // 	struct myprogress prog;
+    // 	prog.lastruntime = 0;
+    // 	prog.curl = curl;
+    // 	curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progressFun);
+    // 	curl_easy_setopt(curl, CURLOPT_XFERINFODATA, &prog);
+    // 	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, FALSE);
     //------------
     res = curl_easy_perform(curl);
     curl_slist_free_all(headerlist);
