@@ -211,3 +211,10 @@ INSTALL(FILES ${RadarProject}/protect.sh
 INSTALL(FILES ${RadarProject}/start.sh
 		DESTINATION bin
 )
+
+INSTALL(FILES ${RadarProject}/daemon.vbs
+		DESTINATION bin
+)
+INSTALL(FILES ${RadarProject}/guard.bat
+		DESTINATION bin
+)
