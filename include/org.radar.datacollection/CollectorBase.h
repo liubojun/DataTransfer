@@ -310,19 +310,19 @@ public:
      * @brief  查询目录的最后处理时间
      * @param  const QString & dburl 记录文件所在的地址
      * @param  const QString & dir 目录
-     * @param  int &latesttime 最后处理时间
+     * @param  QString &latesttime 最后处理时间
      * @return void：无
      */
-    void recordLatestTime(const QString &dburl, const QString &dir, int &latesttime);
+    void recordLatestTime(const QString &dburl, const QString &dir, QString &latesttime);
 
     /**
      * @brief  记录目录的最后处理时间
      * @param  const QString & dburl 记录文件所在的地址
      * @param  const QString & dir 目录
-     * @param  int latesttime 最后处理时间
+     * @param  const QString & latesttime 最后处理时间
      * @return void：描述返回值
      */
-    void updateLatestTime(const QString &dburl, const QString &dir, int latesttime);
+    void updateLatestTime(const QString &dburl, const QString &dir, const QString & latesttime);
 
     /**
      * @brief  判断是否为历史文件

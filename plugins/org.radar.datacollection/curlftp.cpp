@@ -317,14 +317,14 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
     curl_easy_setopt(m_pCurl, CURLOPT_URL, url);
 
     // list当前目录
-    curl_easy_setopt(m_pCurl, CURLOPT_CUSTOMREQUEST, "MLSD");
-    res = curl_easy_perform(m_pCurl);
+    //curl_easy_setopt(m_pCurl, CURLOPT_CUSTOMREQUEST, "MLSD");
+    //res = curl_easy_perform(m_pCurl);
     bool bFtpSupportMLSD = true;
-    if (res != CURLE_OK)
+    //if (res != CURLE_OK)
     {
         bFtpSupportMLSD = false;
         //QSLOG_ERROR(QString("MLSD error: %1, list dir: %2").arg(curl_easy_strerror(res)).arg(QString::fromLocal8Bit(strCmd.c_str())));
-        QSLOG_DEBUG(QString::fromLocal8Bit("使用MLSD命名返回错误,尝试使用LIST命名"));
+        //QSLOG_DEBUG(QString::fromLocal8Bit("使用MLSD命名返回错误,尝试使用LIST命名"));
         curl_easy_setopt(m_pCurl, CURLOPT_CUSTOMREQUEST, "LIST");
         res = curl_easy_perform(m_pCurl);
         if (res != CURLE_OK)
@@ -341,7 +341,7 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
     QString strDBPath = qApp->applicationDirPath()+ "/work/record/" + m_pCoBase->m_collectSet.dirID + "/record.index";
 
     // 当前目录数据库中记录的最后处理时间
-    int iLatestTime = -9999;
+    QString iLatestTime("");
 
     QSLOG_DEBUG(QString::fromLocal8Bit("开始处理目录:%1， 收集时间范围:%2, 目录最后处理时间记录标识:%3").arg(QString::fromLocal8Bit(strDir.c_str())).arg(m_pCoBase->m_collectSet.col_timerange).arg(m_pCoBase->m_collectSet.recordLatestTime));
 
@@ -352,7 +352,7 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
         QSLOG_DEBUG(QString::fromLocal8Bit("目录:%1最后修改时间为:%2").arg(QString::fromLocal8Bit(strDir.c_str())).arg(iLatestTime));
     }
 
-    qint64 nMdfTime = parseMlsdInfo(strInfo, fileList, m_lstDirs, iLatestTime, bFtpSupportMLSD);
+    QString nMdfTime = parseMlsdInfo(strInfo, fileList, m_lstDirs, iLatestTime, bFtpSupportMLSD);
 
     if (m_pCoBase->m_collectSet.recordLatestTime)
     {
@@ -371,7 +371,7 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
     //}
 }
 
-qint64 CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringList &dirList, int iLatestTime, bool bFtpSupportMSDL)
+QString CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringList &dirList, const QString & iLatestTime, bool bFtpSupportMSDL)
 {
     // 当前目录的最新时间列表
     //QString strFileListPath = qApp->applicationDirPath() + "/work/record/" + m_pCoBase->m_collectSet.dirID + "/latestFileList.xml";
@@ -384,7 +384,7 @@ qint64 CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStri
 
 
 
-    qint64 iLastModifiedTime = 0;
+    QString iLastModifiedTime("");
 
     // QStringList lstLines = info.split("\r\n");
     QStringList lstLines = info.split("\n");
@@ -472,7 +472,8 @@ qint64 CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStri
 
         }
 
-        time_t nMdfyTime = QDateTime::fromString(oneInfo.strMdfyTime.mid(0, 14), "yyyyMMddhhmmss").toTime_t();
+        QString nMdfyTime = oneInfo.strMdfyTime.mid(0, 14);// QDateTime::fromString(oneInfo.strMdfyTime.mid(0, 14), "yyyyMMddhhmmss").toTime_t();
+        // LIST命令只能获取到分钟，所以出现分钟一样的文件，应该与目标目录下进行比较
         if (nMdfyTime > iLastModifiedTime)
         {
             iLastModifiedTime = nMdfyTime;
@@ -493,7 +494,7 @@ qint64 CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStri
             if (m_pCoBase->m_collectSet.recordLatestTime)
             {
 
-                if (iLatestTime != -9999 && nMdfyTime <= (uint)iLatestTime)
+                if (!iLatestTime.isEmpty() && nMdfyTime <= iLatestTime)
                 {
                     continue;
                 }
@@ -531,7 +532,7 @@ qint64 CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStri
             if (m_pCoBase->m_collectSet.col_timerange != -1)
             {
                 // 分钟转秒
-                if (nMdfyTime < QDateTime::currentDateTime().addSecs(-m_pCoBase->m_collectSet.col_timerange*60).toTime_t())
+                if (nMdfyTime < QDateTime::currentDateTime().addSecs(-m_pCoBase->m_collectSet.col_timerange*60).toString("yyyyMMddhhmmss"))
                 {
                     continue;
                 }

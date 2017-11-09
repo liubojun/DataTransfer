@@ -49,10 +49,10 @@ public:
      * @brief  查询目录的最后处理时间
      * @param  const QString & db 数据库地址
      * @param  const QString & dir 最后处理时间
-     * @param  int & latesttime 目录最后处理时间
+     * @param  QString & latesttime 目录最后处理时间
      * @return bool：处理成功返回true,失败返回false
      */
-    bool queryDirLatestTime(const QString &db, const QString &dir, int &latesttime);
+    bool queryDirLatestTime(const QString &db, const QString &dir, QString &latesttime);
 
     bool queryClearTask(QList<ClearTask> &name);
 
@@ -69,10 +69,10 @@ public:
     * @brief  更新目录的最后处理时间
     * @param  const QString & db 数据库地址
     * @param  const QString & dir 最后处理时间
-    * @param  int latesttime 目录最后处理时间
+    * @param  const QString & latesttime 目录最后处理时间
     * @return bool：处理成功返回true,失败返回false
     */
-    bool updateDirLatestTime(const QString &db, const QString &dir, int latesttime);
+    bool updateDirLatestTime(const QString &db, const QString &dir, const QString &latesttime);
 
 
     /**

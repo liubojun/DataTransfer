@@ -597,7 +597,7 @@ bool DataBase::DeltCollectTask(const QString &dirID)
 }
 
 
-bool DataBase::queryDirLatestTime(const QString &db, const QString &dir, int &latesttime)
+bool DataBase::queryDirLatestTime(const QString &db, const QString &dir, QString &latesttime)
 {
     if (!init(db))
     {
@@ -614,7 +614,7 @@ bool DataBase::queryDirLatestTime(const QString &db, const QString &dir, int &la
     {
         if (query.next())
         {
-            latesttime = query.value(0).toInt();
+            latesttime = query.value(0).toString();
         }
         else
         {
@@ -663,7 +663,7 @@ bool DataBase::init(const QString &db)
                     //QSLOG_INFO(QStringLiteral("%1").arg(iCount));
                     if (iCount == 0)
                     {
-                        sql = "CREATE TABLE TB_DIR_RECORD ([DIR] VHARCHAR(512) NOT NULL, [LATESTTIME] INT NOT NULL,  CONSTRAINT [sqlite_autoindex_TB_DIR_RECORD] PRIMARY KEY ([DIR]))";
+                        sql = "CREATE TABLE TB_DIR_RECORD ([DIR] VHARCHAR(512) NOT NULL, [LATESTTIME] VHARCHAR(14) NOT NULL,  CONSTRAINT [sqlite_autoindex_TB_DIR_RECORD] PRIMARY KEY ([DIR]))";
                         res = query.exec(sql);
                         if (!res)
                         {
@@ -694,7 +694,7 @@ bool DataBase::init(const QString &db)
     return true;
 }
 
-bool DataBase::updateDirLatestTime(const QString &db, const QString &dir, int latesttime)
+bool DataBase::updateDirLatestTime(const QString &db, const QString &dir, const QString &latesttime)
 {
     if (!init(db))
     {

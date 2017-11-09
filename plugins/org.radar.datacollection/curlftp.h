@@ -141,7 +141,7 @@ public:
     int getNewFiles(FileInfoList &fileList);
 
     void listFiles(const string &strDir, FileInfoList &fileList);
-    qint64 parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringList &dirList, int iLatestTime, bool bFtpSupportMSDL);
+    QString parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringList &dirList, const QString & iLatestTime, bool bFtpSupportMSDL);
 
     bool connectToHost(const char *url, const char *user_pwd);
 

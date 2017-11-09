@@ -246,12 +246,12 @@ bool CollectorBase::readSet()
     return true;
 }
 
-void CollectorBase::recordLatestTime(const QString &dburl, const QString &dir, int &latesttime)
+void CollectorBase::recordLatestTime(const QString &dburl, const QString &dir, QString &latesttime)
 {
     DataBase::getInstance()->queryDirLatestTime(dburl, dir, latesttime);
 }
 
-void CollectorBase::updateLatestTime(const QString &dburl, const QString &dir, int latesttime)
+void CollectorBase::updateLatestTime(const QString &dburl, const QString &dir, const QString &latesttime)
 {
     DataBase::getInstance()->updateDirLatestTime(dburl, dir, latesttime);
 }

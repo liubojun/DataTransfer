@@ -762,7 +762,7 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
     //list<string> t_oLatestFileList = initilizeLatestFileLists(strFileListPath);
 
     // 当前目录数据库中记录的最后处理时间
-    int iLatestTime = -9999;
+    QString iLatestTime("");
 
     QSLOG_DEBUG(QStringLiteral("开始处理目录:%1， 收集时间范围:%2, 目录最后处理时间记录标识:%3").arg(strDir).arg(m_collectSet.col_timerange).arg(m_collectSet.recordLatestTime));
 
@@ -771,10 +771,10 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
     {
         recordLatestTime(strDBPath, strDir, iLatestTime);
 
-        time_t iMaxtime = QFileInfo(strDir).lastModified().toTime_t();
+        QString iMaxtime = QFileInfo(strDir).lastModified().toString("yyyyMMddhhmmss");
 
         QSLOG_DEBUG(QStringLiteral("当前处理目录最后修改时间:time_t[%1], datetime[%2],数据库记录最后修改时间:time_t[%3], datetime[%4]").arg(iMaxtime).
-                    arg(QDateTime::fromTime_t(iMaxtime).toString("yyyyMMddhhmmss")).arg(iLatestTime).arg(QDateTime::fromTime_t(iMaxtime).toString("yyyyMMddhhmmss")));
+                    arg(iMaxtime).arg(iLatestTime).arg(iMaxtime));
         if (iMaxtime <= iLatestTime)
         {
             QSLOG_DEBUG(QStringLiteral("当前目录[%1]下没有文件更新").arg(strDir));
@@ -792,7 +792,7 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
     QDateTime qdtCollect = QDateTime::currentDateTime().addSecs(-m_collectSet.col_timerange*60);
 
     // modified by liubojun @20170604
-    time_t iRecordMaxTime = iLatestTime;
+    QString iRecordMaxTime = iLatestTime;
 
     // 新的最新文件列表
     //list<string> t_oNewLatestFiles = t_oLatestFileList;
@@ -824,8 +824,8 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
                     				continue;
                     				}*/
 
-                    time_t ifiletime_t = qf.lastModified().toTime_t();
-                    if (iLatestTime != -9999 && ifiletime_t < iLatestTime)
+                    QString ifiletime_t = qf.lastModified().toString("yyyyMMddhhmmss");
+                    if (!iRecordMaxTime.isEmpty() && ifiletime_t < iLatestTime)
                     {
                         continue;
                     }
@@ -890,7 +890,7 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
         //if (iMaxtime > iLatestTime)
         if (iRecordMaxTime > iLatestTime)
         {
-            updateLatestTime(strDBPath, strDir, (int)iRecordMaxTime);
+            updateLatestTime(strDBPath, strDir, iRecordMaxTime);
         }
 
         //if (listUpdate)
