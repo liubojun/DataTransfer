@@ -52,6 +52,9 @@ void CRenameDlg::onSave()
 
     file.close();
     CChangeName::init_rename_rules(renamerulefile.toStdString().c_str());
+
+
+    // 需要实时通知tab2的测试的下拉框以及收集面板中的下拉框
 }
 
 void CRenameDlg::onCancel()

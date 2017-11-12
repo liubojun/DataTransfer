@@ -813,7 +813,7 @@ std::string CChangeName::change_name(const char *orig_file_name, const char *pru
     if (index < 0)
     {
         QSLOG_ERROR("rename.rule is not correct config!");
-        return "";
+        return orig_file_name;
     }
     char newfilename[512] = { 0 };
     char oriname[512] = { 0 };
