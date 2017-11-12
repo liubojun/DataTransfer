@@ -49,6 +49,9 @@ private slots:
     // 检测网络状况
     void onWaitForTest();
 
+    // 编辑换名规则
+    void onRenameRuleEdit();
+
 signals:
     void commit(const CollectTask &task);
 

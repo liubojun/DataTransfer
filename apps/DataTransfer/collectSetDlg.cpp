@@ -11,6 +11,8 @@
 #include <QDebug>
 #include <QThread>
 #include "QsLog/ctkLog.h"
+#include "renameDlg.h"
+#include "change_name.h"
 //#include "curlftp.h"
 
 CollectSetDlg::CollectSetDlg(int flag, QDialog *parent /*= NULL*/)
@@ -62,6 +64,15 @@ void CollectSetDlg::InitUI()
     //connect(ui.btn_test_2, SIGNAL(clicked()), this, SLOT(onRemoteColTest()));
     connect(this, SIGNAL(testok(const QString &)), this, SLOT(onTestOk(const QString &)));
     connect(this, SIGNAL(testfail(const QString &)), this, SLOT(onTestFail(const QString &)));
+    connect(ui.btn_rename_edit, SIGNAL(clicked()), this, SLOT(onRenameRuleEdit()));
+
+    // added by liubojun @20171112,支持分发换名
+    std::vector<std::string> rules = CChangeName::get_rules();
+
+    for (size_t i = 0; i < rules.size(); ++i)
+    {
+        ui.comboBox_rename->addItem(QString::fromLocal8Bit(rules[i].c_str()));
+    }
 
     // 从数据库读取分发用户
     QList<UserInfo> lstUser;
@@ -229,7 +240,11 @@ bool CollectSetDlg::onApply()
 
     //UserItem *pUserItem = (UserItem *) ui.listWidget->itemWidget(ui.listWidget->item(0));
 
-    m_selUser.lstUser.append(getSendUserInfoFromName(ui.comboBox_sendUser->currentText()));
+    CollectUser oSendUser = getSendUserInfoFromName(ui.comboBox_sendUser->currentText());
+    oSendUser.rename_rule = ui.comboBox_rename->currentText();
+    m_selUser.lstUser.append(oSendUser);
+
+
     //// 临时屏蔽
     //// 更新收集用户表
     m_selUser.taskID = cSet.dirID;
@@ -318,6 +333,8 @@ void CollectSetDlg::showTask(const CollectTask &task)
     ui.checkBox_2->setChecked(task.subdirFlag);
 //    ui.checkBox_6->setChecked(task.moveFlag);
 
+
+
     // 0:所有，1:30分钟，2：1小时，3：2小时，4：3小时，5：6小时，6：12小时，7：1天，8：2天，9：3天
     int index = 0;
     bool enterUserDefineItem = false;
@@ -381,7 +398,9 @@ void CollectSetDlg::showTask(const CollectTask &task)
 //     pItem = new QTableWidgetItem(m_selUser.rltvPath);
 //     ui.tableWidget->setItem(0, 2, pItem);
 
-    ui.comboBox_sendUser->setCurrentText(getSendUserInfoFromDirID(task.dirID).user.userName);
+    CollectUser sendUser = getSendUserInfoFromDirID(task.dirID);
+    ui.comboBox_sendUser->setCurrentText(sendUser.user.userName);
+    ui.comboBox_rename->setCurrentText(sendUser.rename_rule);
 
 
     //for (int i=0; i<tUser.lstUser.size(); ++i)
@@ -625,4 +644,10 @@ QString CollectSetDlg::getSendUserNameFromDirID(const QString &CollectDirId)
 {
     CollectUser oUser = getSendUserInfoFromDirID(CollectDirId);
     return oUser.user.userName;
+}
+
+void CollectSetDlg::onRenameRuleEdit()
+{
+    CRenameDlg rdg;
+    rdg.exec();
 }

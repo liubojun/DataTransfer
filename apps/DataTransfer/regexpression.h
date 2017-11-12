@@ -1,4 +1,7 @@
-﻿#include <QDialog>
+﻿#ifndef regexpression_h__
+#define regexpression_h__
+
+#include <QDialog>
 
 #include "ui_RegularExpression.h"
 
@@ -15,3 +18,7 @@ protected slots:
 private:
     Ui::RegularExpression ui;
 };
+
+
+
+#endif // regexpression_h__

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>421</width>
-    <height>398</height>
+    <width>469</width>
+    <height>447</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -459,9 +459,43 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <item>
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>换名策略</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_rename"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_rename_edit">
+          <property name="text">
+           <string>编辑</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
          <widget class="QLabel" name="label_11">
           <property name="text">
-           <string>选择分发用户</string>
+           <string>分发用户</string>
           </property>
          </widget>
         </item>
@@ -511,7 +545,7 @@
      <item>
       <widget class="QLabel" name="label_result">
        <property name="text">
-        <string>    </string>
+        <string/>
        </property>
       </widget>
      </item>

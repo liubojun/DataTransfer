@@ -22,6 +22,7 @@ SET(SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/dataclearDlg.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/clearItemWidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/regexpression.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/renameDlg.cpp
 )
 
 # .h文件
@@ -38,6 +39,7 @@ SET(HDRS
   ${CMAKE_CURRENT_SOURCE_DIR}/dataclearDlg.h
   ${CMAKE_CURRENT_SOURCE_DIR}/clearItemWidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/regexpression.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/renameDlg.h
 )
 
 SET(MOC_HDRS
@@ -62,6 +64,7 @@ SET(MOC_HDRS
 	${CMAKE_CURRENT_SOURCE_DIR}/dataclearDlg.h
 	${CMAKE_CURRENT_SOURCE_DIR}/clearItemWidget.h
 	${CMAKE_CURRENT_SOURCE_DIR}/regexpression.h
+	${CMAKE_CURRENT_SOURCE_DIR}/renameDlg.h
 )
 
 SET(UI
@@ -74,6 +77,7 @@ SET(UI
 	${CMAKE_CURRENT_SOURCE_DIR}/ui/dataclear.ui
 	${CMAKE_CURRENT_SOURCE_DIR}/ui/clearItemWidget.ui
 	${CMAKE_CURRENT_SOURCE_DIR}/ui/RegularExpression.ui
+	${CMAKE_CURRENT_SOURCE_DIR}/ui/renameDlg.ui
 	)
 
 SET (ICON_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/Transfer.rc)

@@ -16,6 +16,7 @@
 #include "ICtkPluginManager.h"
 #include "pathbuilder.h"
 #include "mainwindow.h"
+#include "change_name.h"
 
 #include <iostream>
 //Qt5通过以下来支持中文显示
@@ -238,7 +239,11 @@ int main(int argc, char **argv)
 #endif
     Q_TRY_BEGIN
 
+
     QApplication app(argc, argv);
+    CChangeName::init_rename_rules((app.applicationDirPath() + "/config/rename.rule").toStdString().c_str());
+    // CChangeName::change_name("H08_B03_R030_20171112_1700.AWX", "KuiHua");
+
 
     QSLOG_INFO("START DATA TRANSFER PROGRAM");
     std::cout << "START DATA TRANSFER PROGRAM" << std::endl;

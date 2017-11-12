@@ -890,6 +890,12 @@ int CurlFtp::deleteFtpFile(const char *url, const char *user_pwd, const string &
     struct curl_slist *headerlist = NULL;
     headerlist = curl_slist_append(headerlist, szCmd);
     curl_easy_setopt(m_pRemoveDestCurl, CURLOPT_POSTQUOTE, headerlist);
+
+    // modified by liubojun @2017-10-28,没有这两句话会出问题
+    struct MemoryData listInfo;
+    curl_easy_setopt(m_pRemoveDestCurl, CURLOPT_WRITEDATA, (void *)&listInfo);
+    curl_easy_setopt(m_pRemoveDestCurl, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
+
     CURLcode res = curl_easy_perform(m_pRemoveDestCurl);
     if (CURLE_OK != res)
     {

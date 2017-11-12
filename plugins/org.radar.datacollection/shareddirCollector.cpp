@@ -19,7 +19,7 @@
 #include <QDesktopServices>
 #include "publicthread.h"
 #include "DistributeFile.h"
-
+#include "change_name.h"
 
 bool _olderThen(const FileInfo &f1, const FileInfo &f2)
 {
@@ -948,7 +948,9 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
         QString dstFilePath = dstFileFullPath;
         tTask.fileName = fi.fileName();
         tTask.srcFileFullPath = fi.filePath();
-        dstFileFullPath += fi.fileName();
+        // dstFileFullPath += fi.fileName();
+        tTask.strDestFileName = CChangeName::change_name(fi.fileName().toLocal8Bit().toStdString().c_str(), cUser.rename_rule.toLocal8Bit().toStdString().c_str()).c_str();
+        dstFileFullPath += tTask.strDestFileName;
 
         // 分发到目录
         if (cUser.user.sendType == 0)
@@ -980,7 +982,7 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
             string strIp = cUser.user.ip.toStdString();
             int nPort = cUser.user.port;
             string strPath = dstFileFullPath.toLocal8Bit().data();
-            string strName = tTask.fileName.toLocal8Bit().data();
+            string strName = tTask.strDestFileName.toLocal8Bit().data();
             string strUsr = cUser.user.lgUser.toLocal8Bit().data();
             string strPwd = cUser.user.lgPass.toLocal8Bit().data();
             sprintf(ftpUrl, "ftp://%s:%d%s", strIp.c_str(), nPort, strPath.c_str());

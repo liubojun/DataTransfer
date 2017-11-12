@@ -9,6 +9,8 @@ SET(SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/ginformation.cpp	
 	${CMAKE_CURRENT_SOURCE_DIR}/dllloader.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/DataBase.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/change_name.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/get_rename_rules.cpp
 )
 
 # 工程头文件
@@ -22,6 +24,7 @@ SET(HDRS
 	${RadarProjectInclude}/ctkPublicFun/event_macro.h
 	${RadarProjectInclude}/ctkPublicFun/pupdata.h  
 	${RadarProjectInclude}/ctkPublicFun/DataBase.h
+	${RadarProjectInclude}/ctkPublicFun/change_name.h
 )
 
 #设置MOC相关变量

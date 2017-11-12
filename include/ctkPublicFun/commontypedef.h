@@ -411,6 +411,7 @@ struct CollectUser
 {
     QString		rltvPath;
     UserInfo	user;
+    QString     rename_rule;	// 换名规则
 };
 
 Q_DECLARE_METATYPE(CollectUser)
@@ -457,6 +458,7 @@ struct TransTask
     QList<QString> dstFilePath;
     QString fileName;
     QString srcFileFullPath;
+    QString strDestFileName; // 目标目录下的文件有可能经过重命名了
 };
 
 enum TaskState

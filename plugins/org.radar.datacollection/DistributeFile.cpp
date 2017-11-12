@@ -245,7 +245,8 @@ bool DistributeFile::sendToDir(const char *fullPath, KeyIv &keyiv, TransTask &ta
     }
 
     // 目标文件路径
-    QString strFullPath = strSendPath + taskInfo.fileName;
+    // QString strFullPath = strSendPath + taskInfo.fileName;
+    QString strFullPath = strSendPath + taskInfo.strDestFileName;
     // 目标临时文件路径
     QString strTmpName = strFullPath + taskInfo.userInfo.at(userIndex).sendSuffix;
 
@@ -265,11 +266,11 @@ bool DistributeFile::sendToDir(const char *fullPath, KeyIv &keyiv, TransTask &ta
     int bRet = -1;
     if (taskInfo.userInfo.at(userIndex).conput)	// 断点续传
     {
-        bRet = m_oCurlFtp.conputFileToDir(url, NULL, taskInfo.fileName.toLocal8Bit().data(), fullPath, taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
+        bRet = m_oCurlFtp.conputFileToDir(url, NULL, taskInfo.strDestFileName.toLocal8Bit().data(), fullPath, taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
     }
     else
     {
-        bRet = m_oCurlFtp.uploadFileToDir(url, NULL, taskInfo.fileName.toLocal8Bit().data(), fullPath, taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
+        bRet = m_oCurlFtp.uploadFileToDir(url, NULL, taskInfo.strDestFileName.toLocal8Bit().data(), fullPath, taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
     }
     if (bRet != 0)
     {
@@ -357,11 +358,11 @@ bool DistributeFile::sendToFtp(const char *fullPath, KeyIv &keyiv, TransTask &ta
     int bRet = -1;
     if (task.userInfo.at(userIndex).conput)	// 断点续传
     {
-        bRet = m_oCurlFtp.conputFileToFtp(ftpUrl, usrPwd, task.fileName.toLocal8Bit().data(), fullPath, task.userInfo.at(userIndex).sendSuffix.toAscii().data());
+        bRet = m_oCurlFtp.conputFileToFtp(ftpUrl, usrPwd, task.strDestFileName.toLocal8Bit().data(), fullPath, task.userInfo.at(userIndex).sendSuffix.toAscii().data());
     }
     else
     {
-        bRet = m_oCurlFtp.uploadFileToFtp(ftpUrl, usrPwd, task.fileName.toLocal8Bit().data(), fullPath, task.userInfo.at(userIndex).sendSuffix.toAscii().data());
+        bRet = m_oCurlFtp.uploadFileToFtp(ftpUrl, usrPwd, task.strDestFileName.toLocal8Bit().data(), fullPath, task.userInfo.at(userIndex).sendSuffix.toAscii().data());
     }
     if (bRet != 0)
     {

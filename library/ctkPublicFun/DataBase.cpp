@@ -15,7 +15,7 @@ QString g_tbDirCol[] = {"DIRID", "DIRNAME", "ENABLE", "COLLECTTYPE", "FTPTRANSFE
                         "FILETEMPLATE", "SUBDIRCHECK", "MOVEFLAG", "COLTIMERANGE", "RECORDLATESTTIME", "LOGINUSER", "LOGINPASS",
                         "IP", "PORT"
                        };
-QString g_tbColUser[] = {"DIRID", "USERID", "RLTVPATH"};
+//QString g_tbColUser[] = {"DIRID", "USERID", "RLTVPATH"};
 //QString g_tbSendUser[] = {"USERID", "USERNAME", "SENDTYPE", "SENDSUFFIX", "RLTVPATH", "LOGINUSER", "LOGINPASS",
 //                          "IP", "PORT", "KEEPDIR", "COMPRESS", "ENCRYPT", "CONPUT", "MAXTRYCOUNS"
 //                         };
@@ -50,7 +50,7 @@ DataBase::DataBase()
     }
 
     m_strTbCollect = "T_DIR_COL";
-    m_strTbColUser = "T_COL_USER";
+    // m_strTbColUser = "T_COL_USER";
     //m_strTbSendUser = "T_SEND_USER";
 
     // 判断清理表是否存在，如果不存在则自动创建
@@ -68,6 +68,7 @@ DataBase::DataBase()
                "[DIRID] VARCHAR(20) NOT NULL, "
                "[USERID] VARCHAR(20), "
                "[RLTVPATH] VARCHAR(100),"
+               "[RENAME_RULE] VARCHAR(20),"
                "CONSTRAINT [] PRIMARY KEY ([DIRID]))");
 
     checkTable("T_DIR_COL", "CREATE TABLE [T_DIR_COL] ("
@@ -252,7 +253,7 @@ bool DataBase::QueryUserInfo(TaskUser &user)
 
         QSqlQuery query(m_db);
         // 先查收集用户表
-        QString sql = QString("SELECT USERID, RLTVPATH FROM T_COL_USER WHERE DIRID = '%1'").arg(user.taskID);
+        QString sql = QString("SELECT USERID, RLTVPATH, RENAME_RULE FROM T_COL_USER WHERE DIRID = '%1'").arg(user.taskID);
         bool res = query.exec(sql);
         if (res)
         {
@@ -261,6 +262,7 @@ bool DataBase::QueryUserInfo(TaskUser &user)
                 CollectUser cUser;
                 cUser.user.userID = query.value(0).toString();
                 cUser.rltvPath = query.value(1).toString();
+                cUser.rename_rule = query.value(2).toString();
                 user.lstUser.append(cUser);
             }
 
@@ -449,13 +451,13 @@ bool DataBase::InsertCollectUser(const TaskUser &user)
         //QString sql;
         for (int i=0; i<user.lstUser.size(); i++)
         {
-            QString sql = QString("REPLACE INTO T_COL_USER (DIRID, USERID, RLTVPATH) "
-                                  "VALUES(:DIRID, :USERID, :RLTVPATH)");
+            QString sql = QString("REPLACE INTO T_COL_USER (DIRID, USERID, RLTVPATH, RENAME_RULE) "
+                                  "VALUES(:DIRID, :USERID, :RLTVPATH, :RENAME_RULE)");
             query.prepare(sql);
             query.bindValue(":DIRID", user.taskID);
             query.bindValue(":USERID", user.lstUser.at(i).user.userID);
             query.bindValue(":RLTVPATH", user.lstUser.at(i).rltvPath);
-
+            query.bindValue(":RENAME_RULE", user.lstUser.at(i).rename_rule);
             if (!query.exec())
             {
                 QSLOG_ERROR(QString("Err: %1").arg(query.lastError().text()));
@@ -485,8 +487,7 @@ bool DataBase::DeleteCollectSenderUser(const QString &dirId, const QString &user
         //QString sql;
         // for (int i=0; i<user.lstUser.size(); i++)
         {
-            QString sql = QString("DELETE FROM %1 WHERE %2 = '%3' AND %4 = '%5' ").arg(m_strTbColUser)
-                          .arg(g_tbColUser[0]).arg(dirId).arg(g_tbColUser[1]).arg(userId);
+            QString sql = QString("DELETE FROM T_COL_USER WHERE DIRID = '%1' AND USERID = '%2' ").arg(dirId).arg(userId);
             // query.prepare(sql);
             //query.bindValue(":"+g_tbColUser[0], user.taskID);
             //query.bindValue(":"+g_tbColUser[1], user.lstUser.at(i).user.userID);
@@ -578,7 +579,7 @@ bool DataBase::DeltCollectTask(const QString &dirID)
         if (res)
         {
             // 再删除收集用户表
-            sql = QString("delete from %1 where %2='%3'").arg(m_strTbColUser).arg(g_tbColUser[0]).arg(dirID);
+            sql = QString("delete from T_COL_USER where DIRID = '%3'").arg(dirID);
             res = query.exec(sql);
             if (res)
             {
