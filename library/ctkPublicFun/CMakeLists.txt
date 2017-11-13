@@ -66,7 +66,6 @@ IF (WIN32)
 		${VLD_LIB}	#VLD内存泄露检查
 		CTKPluginFramework
 		ctkLogger
-		ctkProtocol
 		Mpr
 	)
 ELSE (WIN32)

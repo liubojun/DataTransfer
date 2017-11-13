@@ -346,11 +346,7 @@ public:
      */
     bool ReadLastTime();
     volatile bool m_bRun;								///< 运行标识
-    /**
-     * @brief  删除本传输收集目录的收集时间
-     * @return void：无
-     */
-    void DeleteTcTime();
+
 
     bool testFileConnection(QString strUrl);
 

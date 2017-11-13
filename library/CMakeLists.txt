@@ -1,5 +1,5 @@
 ﻿ADD_SUBDIRECTORY(ctkLogger)
-ADD_SUBDIRECTORY(ctkProtocol)
+#ADD_SUBDIRECTORY(ctkProtocol)
 ADD_SUBDIRECTORY(ctkPublicFun)
 ADD_SUBDIRECTORY(ctkPluginManager)
 

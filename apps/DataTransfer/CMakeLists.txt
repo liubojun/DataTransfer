@@ -142,7 +142,6 @@ message(STATUS "CURL_LIBRARY == ${CURL_LIBRARY}")
             ${QT_QTQUICK_LIBRARY}
             ctkLogger
             ctkPublicFun
-            ctkProtocol
             ctkPluginManager
             ${VLD_LIB}
             CTKPluginFramework

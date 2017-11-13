@@ -69,7 +69,7 @@ ctkMacroBuildPlugin(
 )
 
 INSTALL(TARGETS ${PROJECT_NAME}
-		RUNTIME DESTINATION bin/plugins/org.common.quartz_v1.0
-		LIBRARY DESTINATION bin/plugins/org.common.quartz_v1.0)
+		RUNTIME DESTINATION bin/plugins
+		LIBRARY DESTINATION bin/plugins)
 
 

@@ -25,12 +25,8 @@ public:
     CollectManager(ICtkPluginManager *pCtkManager, QWaitCondition &in_oCond, QMutex &in_oLocker, int &logsize);
     virtual ~CollectManager();
 
-    bool readLastTime();
-    bool writeLastTime();
-    bool readCollectSet();
     bool readThreadNum();
 
-    void setXmlPath(const QString &collectSetPath, const QString &lastTimePath);
     bool addCollect(const CollectSet &set);
     void delCollect(const string &strID);
     void mdfyCollect(const CollectSet &set);
@@ -51,15 +47,6 @@ public:
     virtual bool addSyncTransfer(const CollectTask &set);
     virtual bool mdfySyncTransfer(const CollectTask &set);
     virtual bool deltSyncTransfer(const QString &dirID);
-
-
-    /**
-    * @brief  读取数据收集配置文件
-    * @param  TransferSetList & allSets：返回所有的设置
-    * @param  QString & strPath：配置文件的路径
-    * @return bool：读取成功返回ture，否则返回false
-    */
-    virtual bool ReadTransferSet(TransferSetList &allSets, QString &strPath);
 
     /**
     * @brief  收集测试连接

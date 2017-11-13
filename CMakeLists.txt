@@ -45,25 +45,25 @@ ADD_DEFINITIONS("-DBOOST_ALL_NO_LIB")
 #output窗口中输出链接boost库版本以及链接顺序。
 ADD_DEFINITIONS("-DBOOST_LIB_DIAGNOSTIC")
 
-if(WIN32)
-    set(Boost_USE_STATIC_LIBS ON)
-endif()
+#if(WIN32)
+#    set(Boost_USE_STATIC_LIBS ON)
+#endif()
 
-set(Boost_USE_MULTITHREAD ON)
-find_package(Boost REQUIRED COMPONENTS serialization)
+#set(Boost_USE_MULTITHREAD ON)
+#find_package(Boost REQUIRED COMPONENTS serialization)
 
 
 
 #Boost相关的三个变量 
-MESSAGE(STATUS "${Boost_INCLUDE_DIR}\n" 
-"Boost_LIBRARY_DIR = ${Boost_LIBRARY_DIR}"
-"${Boost_LIBRARY_DIR_DEBUG}\n"
-"${Boost_LIBRARY_DIR_RELEASE}\n"
-"${Boost_SERIALIZATION_LIBRARY_DEBUG}\n"
-"${Boost_SERIALIZATION_LIBRARY_RELEASE}")
+#MESSAGE(STATUS "${Boost_INCLUDE_DIR}\n" 
+#"Boost_LIBRARY_DIR = ${Boost_LIBRARY_DIR}"
+#"${Boost_LIBRARY_DIR_DEBUG}\n"
+#"${Boost_LIBRARY_DIR_RELEASE}\n"
+#"${Boost_SERIALIZATION_LIBRARY_DEBUG}\n"
+#"${Boost_SERIALIZATION_LIBRARY_RELEASE}")
 
-SET(Boost_LIBRARY_DIR ${Boost_SERIALIZATION_LIBRARY_DEBUG})
-MESSAGE(STATUS ">>>>>>>>${Boost_LIBRARY_DIR}<<<<<<<<<<<<")
+#SET(Boost_LIBRARY_DIR ${Boost_SERIALIZATION_LIBRARY_DEBUG})
+#MESSAGE(STATUS ">>>>>>>>${Boost_LIBRARY_DIR}<<<<<<<<<<<<")
 
 find_package(CURL REQUIRED)
 

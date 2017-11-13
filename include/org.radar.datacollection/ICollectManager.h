@@ -17,15 +17,10 @@ class ICollectManager : public ILogPrint
     Q_OBJECT
 public:
 
-	// ICollectManager(QWaitCondition &in_oCondition, QMutex &in_oLocker);
+    // ICollectManager(QWaitCondition &in_oCondition, QMutex &in_oLocker);
 
     virtual ~ICollectManager() {}
 
-    virtual bool readLastTime() = 0;
-    virtual bool writeLastTime() = 0;
-    virtual bool readCollectSet() = 0;
-
-    virtual void setXmlPath(const QString &collectSetPath, const QString &lastTimePath) = 0;
     virtual bool addCollect(const CollectSet &set) = 0;
     virtual void delCollect(const string &strID) = 0;
     virtual void mdfyCollect(const CollectSet &set) = 0;
@@ -56,17 +51,9 @@ public:
 
     virtual bool addSyncTransfer(const CollectTask &set) = 0;
 
-	
+
     virtual bool mdfySyncTransfer(const CollectTask &set) = 0;
     virtual bool deltSyncTransfer(const QString &dirID) = 0;
-
-    /**
-    * @brief  读取数据收集配置文件
-    * @param  TransferSetList & allSets：返回所有的设置
-    * @param  QString & strPath：配置文件的路径
-    * @return bool：读取成功返回ture，否则返回false
-    */
-    virtual bool ReadTransferSet(TransferSetList &allSets, QString &strPath) = 0;
 
     /**
     * @brief  测试收集连接

@@ -35,13 +35,6 @@ CollectManager::~CollectManager()
     QSLOG_INFO("~CollectManager()");
 }
 
-void CollectManager::setXmlPath(const QString &collectSetPath, const QString &lastTimePath)
-{
-    m_strCollectXmlPath = collectSetPath;
-    m_strTimeXmlPath = lastTimePath;
-    readCollectSet();
-    readLastTime();
-}
 
 // QSharedPointer<CollectorBase> CollectManager::creatCollector(collection_type type)
 CollectorBase *CollectManager::creatCollector(collection_type type)
@@ -141,53 +134,6 @@ void CollectManager::mdfyCollect(const CollectSet &set)
 //     addCollect(set);
 }
 
-bool CollectManager::delLastTime(string strID)
-{
-    std::map<string, CollectTime>::iterator it = m_lastTimeList.id_last.find(strID);
-    if (it == m_lastTimeList.id_last.end())
-    {
-        return false;
-    }
-    m_lastTimeList.id_last.erase(it);
-
-    return writeLastTime();
-}
-
-bool CollectManager::readCollectSet()
-{
-    m_lstCollectSet.lsSets.clear();
-    if (!XmlToCollectSet(m_strCollectXmlPath.toLocal8Bit().data(), m_lstCollectSet))
-    {
-        return false;
-    }
-
-    return true;
-}
-
-bool CollectManager::readLastTime()
-{
-    m_lastTimeList.id_last.clear();
-    if (!XmlToCollectTime(m_strTimeXmlPath.toStdString(), m_lastTimeList))
-    {
-        QSLOG_ERROR("Fail to readLastTime.");
-        return false;
-    }
-    return true;
-}
-
-bool CollectManager::writeLastTime()
-{
-    if (m_lastTimeList.id_last.size() > 1)
-    {
-        int a = 0;
-    }
-    if (!CollectTimeToXml(m_strTimeXmlPath.toLocal8Bit().data(), m_lastTimeList))
-    {
-        QSLOG_ERROR("Fail to writeLastTime.");
-        return false;
-    }
-    return true;
-}
 
 void CollectManager::ToFileTable(const std::map<string, NameMatchRule > &mapTypeRegs, FILENAME_TABLE &fileTable)
 {
@@ -418,19 +364,6 @@ void CollectManager::mdfyTransCollect(const TransferSet &set)
 //     }
 }
 
-bool CollectManager::ReadTransferSet(TransferSetList &allSets, QString &strPath)
-{
-    m_strCollectXmlPath = strPath;
-    m_lstTransSet.lsSets.clear();
-    if (!XmlToTransferSet(strPath.toLocal8Bit().data(), m_lstTransSet))
-    {
-        QSLOG_ERROR("Fail to ReadTransferSet.");
-        return false;
-    }
-    allSets = m_lstTransSet;
-
-    return true;
-}
 
 void CollectManager::onMsgResp()
 {

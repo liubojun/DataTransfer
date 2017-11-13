@@ -63,25 +63,25 @@ public:
      * @param  QString & strPath：配置文件路径
      * @return bool：成功返回true，失败返回false
      */
-    virtual bool ReadClearSet(DataClearSetList &allsets, QString &strPath) = 0;
+    //virtual bool ReadClearSet(DataClearSetList &allsets, QString &strPath) = 0;
     /**
      * @brief  添加一个数据清除任务
      * @param  const DataClearSet & set：数据清除设置
      * @return void：无
      */
-    virtual void AddClearSet(const DataClearSet &set) = 0;
+    //virtual void AddClearSet(const DataClearSet &set) = 0;
     /**
      * @brief  删除一个数据清除任务
      * @param  const string & strPath：清除的路径
      * @return void：无
      */
-    virtual void DelClearSet(const string &strPath) = 0;
+    //virtual void DelClearSet(const string &strPath) = 0;
     /**
      * @brief  修改一个数据清除任务
      * @param  const DataClearSet & set：数据清除设置
      * @return void：无
      */
-    virtual void MdyClearSet(const DataClearSet &set) = 0;
+    //virtual void MdyClearSet(const DataClearSet &set) = 0;
 
 signals:
     void taskBegin(const QString &dir);

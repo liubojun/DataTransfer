@@ -119,99 +119,99 @@ const QList<BaseDatas> & DataClear::get()
     return m_oBaseDatas;
 }
 
-bool DataClear::ReadClearSet(DataClearSetList &allsets, QString &strPath)
-{
-    m_strClearCfgPath = strPath;
-    QFileInfo qfInfo(m_strClearCfgPath);
-    if (!qfInfo.isFile() || !qfInfo.exists())
-    {
-        QSLOG_ERROR(QString("[%1] is not a existed file.").arg(m_strClearCfgPath));
-        return false;
-    }
+//bool DataClear::ReadClearSet(DataClearSetList &allsets, QString &strPath)
+//{
+//    m_strClearCfgPath = strPath;
+//    QFileInfo qfInfo(m_strClearCfgPath);
+//    if (!qfInfo.isFile() || !qfInfo.exists())
+//    {
+//        QSLOG_ERROR(QString("[%1] is not a existed file.").arg(m_strClearCfgPath));
+//        return false;
+//    }
+//
+//    try
+//    {
+//        m_lstClearSet.lst.clear();
+//        XmlToDataClearSet(strPath.toStdString(), m_lstClearSet);
+//        allsets = m_lstClearSet;
+//    }
+//    catch (std::exception &e)
+//    {
+//        QSLOG_ERROR(QString(e.what()));
+//        return false;
+//    }
+//
+//    return true;
+//}
 
-    try
-    {
-        m_lstClearSet.lst.clear();
-        XmlToDataClearSet(strPath.toStdString(), m_lstClearSet);
-        allsets = m_lstClearSet;
-    }
-    catch (std::exception &e)
-    {
-        QSLOG_ERROR(QString(e.what()));
-        return false;
-    }
+//void DataClear::AddClearSet(const DataClearSet &set)
+//{
+//    QString strPath = QString::fromStdString(set.strPath);
+//    QFileInfo qfInfo(strPath);
+//    if (!qfInfo.isDir())
+//    {
+//        QSLOG_ERROR(QString("AddCollectSet::[%1] is not a dir.").arg(strPath));
+//        return;
+//    }
+//
+//    if (m_mapDispatchers.find(strPath) != m_mapDispatchers.end())
+//    {
+//        QSLOG_ERROR(QString("The dir [%1] has be added.").arg(strPath));
+//        return;
+//    }
+//
+//    BaseDatas base;
+//    base.m_fullPath = strPath;
+//    base.m_DDrule = QString::fromStdString(set.strDrule);
+//    foreach (string reg, set.reges)
+//    {
+//        base.m_regex.append(QString::fromStdString(reg));
+//    }
+//    base.m_style = QString::number(set.nStyle);
+//    base.m_freeSize = QString::number(set.nSize);
+//    base.m_time = set.nTime;
+//    //启动数据清除线程
+//    start(base);
+//    //记录到xml文件
+//    try
+//    {
+//        m_lstClearSet.lst.push_back(set);
+//        DataClearSetToXml(m_strClearCfgPath.toStdString(), m_lstClearSet);
+//    }
+//    catch (std::exception &e)
+//    {
+//        QSLOG_ERROR(QString(e.what()));
+//    }
+//}
 
-    return true;
-}
+//void DataClear::DelClearSet(const string &strPath)
+//{
+//    QString qsPath = QString::fromStdString(strPath);
+//    foreach (DataClearSet set, m_lstClearSet.lst)
+//    {
+//        if (set.strPath == strPath)
+//        {
+//            BaseDatas base;
+//            base.m_fullPath = qsPath;
+//            stop(base);
+//
+//            m_lstClearSet.lst.remove(set);
+//            DataClearSetToXml(m_strClearCfgPath.toStdString(), m_lstClearSet);
+//
+//            break;
+//        }
+//    }
+//}
 
-void DataClear::AddClearSet(const DataClearSet &set)
-{
-    QString strPath = QString::fromStdString(set.strPath);
-    QFileInfo qfInfo(strPath);
-    if (!qfInfo.isDir())
-    {
-        QSLOG_ERROR(QString("AddCollectSet::[%1] is not a dir.").arg(strPath));
-        return;
-    }
-
-    if (m_mapDispatchers.find(strPath) != m_mapDispatchers.end())
-    {
-        QSLOG_ERROR(QString("The dir [%1] has be added.").arg(strPath));
-        return;
-    }
-
-    BaseDatas base;
-    base.m_fullPath = strPath;
-    base.m_DDrule = QString::fromStdString(set.strDrule);
-    foreach (string reg, set.reges)
-    {
-        base.m_regex.append(QString::fromStdString(reg));
-    }
-    base.m_style = QString::number(set.nStyle);
-    base.m_freeSize = QString::number(set.nSize);
-    base.m_time = set.nTime;
-    //启动数据清除线程
-    start(base);
-    //记录到xml文件
-    try
-    {
-        m_lstClearSet.lst.push_back(set);
-        DataClearSetToXml(m_strClearCfgPath.toStdString(), m_lstClearSet);
-    }
-    catch (std::exception &e)
-    {
-        QSLOG_ERROR(QString(e.what()));
-    }
-}
-
-void DataClear::DelClearSet(const string &strPath)
-{
-    QString qsPath = QString::fromStdString(strPath);
-    foreach (DataClearSet set, m_lstClearSet.lst)
-    {
-        if (set.strPath == strPath)
-        {
-            BaseDatas base;
-            base.m_fullPath = qsPath;
-            stop(base);
-
-            m_lstClearSet.lst.remove(set);
-            DataClearSetToXml(m_strClearCfgPath.toStdString(), m_lstClearSet);
-
-            break;
-        }
-    }
-}
-
-void DataClear::MdyClearSet(const DataClearSet &set)
-{
-    BaseDatas base;
-    base.m_fullPath = QString::fromStdString(set.strPath);
-    stop(base);
-    m_lstClearSet.lst.remove(set);
-
-    AddClearSet(set);
-}
+//void DataClear::MdyClearSet(const DataClearSet &set)
+//{
+//    BaseDatas base;
+//    base.m_fullPath = QString::fromStdString(set.strPath);
+//    stop(base);
+//    m_lstClearSet.lst.remove(set);
+//
+//    AddClearSet(set);
+//}
 
 void DataClear::doNow(const QString &dir)
 {
@@ -222,10 +222,10 @@ void DataClear::doNow(const QString &dir)
     bool flag = true;
 
     QSharedPointer<CDispatch> m_pDispatch = m_mapDispatchers[dir];
-	if (!m_pDispatch.isNull())
-	{
-		m_pDispatch->doNow();
-	}
+    if (!m_pDispatch.isNull())
+    {
+        m_pDispatch->doNow();
+    }
 }
 
 

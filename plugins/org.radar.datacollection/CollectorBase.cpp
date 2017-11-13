@@ -105,15 +105,6 @@ bool CollectorBase::ReadLastTime()
     return true;
 }
 
-void CollectorBase::DeleteTcTime()
-{
-    QMutexLocker locker(&m_mutexTime);
-    if (m_pTsctTime != NULL)
-    {
-        m_lstTCtime.lsts.remove(*m_pTsctTime);
-        TransCollectTimeToXml(m_strTctimePath.toLocal8Bit().data(), m_lstTCtime);
-    }
-}
 
 void CollectorBase::showMsg(const QString &str)
 {
@@ -256,15 +247,6 @@ void CollectorBase::updateLatestTime(const QString &dburl, const QString &dir, c
     DataBase::getInstance()->updateDirLatestTime(dburl, dir, latesttime);
 }
 
-list<string> CollectorBase::initilizeLatestFileLists(const QString &dir)
-{
-    LatestFileList t_oFileLists;
-    if (!XmlToLatestFileList(dir.toLocal8Bit().toStdString(), t_oFileLists))
-    {
-        QSLOG_ERROR(dir + " XmlToLatestFileList failure");
-    }
-    return t_oFileLists.m_files;
-}
 
 bool CollectorBase::containsFile(list<string> &files, const QString &file)
 {
@@ -280,15 +262,6 @@ bool CollectorBase::containsFile(list<string> &files, const QString &file)
     }
 }
 
-void CollectorBase::updateLatestFileLists(const QString &dir, const list<string> &files)
-{
-    LatestFileList t_oFileLists;
-    t_oFileLists.m_files = files;
-    if (!LatestFileListToXml(dir.toLocal8Bit().toStdString(), t_oFileLists))
-    {
-        QSLOG_ERROR(dir + " LatestFileListToXml failure");
-    }
-}
 
 // void CollectorBase::setEnable(bool bFlag)
 // {

@@ -126,7 +126,6 @@ ctkMacroBuildPlugin(
   TARGET_LIBRARIES ${PLUGIN_target_libraries} ${VLD_LIB}
   ctkLogger
   ctkPublicFun
-  ctkProtocol
   ${QT_QTCORE_LIBRARY}
   ${QT_QTGUI_LIBRARY}
   #Mpr.lib
@@ -135,8 +134,8 @@ ctkMacroBuildPlugin(
 
 
 INSTALL(TARGETS ${PROJECT_NAME}
-		RUNTIME DESTINATION bin/plugins/org.radar.datacollection_v1.0
-		LIBRARY DESTINATION bin/plugins/org.radar.datacollection_v1.0)
+		RUNTIME DESTINATION bin/plugins
+		LIBRARY DESTINATION bin/plugins)
 
 #INSTALL(FILES
 		#${RadarProjectRunTimeLib}/libcurl.dll

@@ -30,10 +30,10 @@ public:
 
     virtual const QList<BaseDatas> &get();
 
-    virtual bool ReadClearSet(DataClearSetList &allsets, QString &strPath);
-    virtual void AddClearSet(const DataClearSet &set);
-    virtual void DelClearSet(const string &strPath);
-    virtual void MdyClearSet(const DataClearSet &set);
+    //virtual bool ReadClearSet(DataClearSetList &allsets, QString &strPath);
+    //virtual void AddClearSet(const DataClearSet &set);
+    //virtual void DelClearSet(const string &strPath);
+    //virtual void MdyClearSet(const DataClearSet &set);
 
 public slots:
     virtual void doNow(const QString &dir);
