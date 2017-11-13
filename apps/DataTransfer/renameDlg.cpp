@@ -22,15 +22,9 @@ void CRenameDlg::init()
 
     ui.fileContent->setText(stream.readAll());
 
-    std::vector<std::string> rules = CChangeName::get_rules();
-    for (size_t i = 0; i < rules.size(); ++i)
-    {
-        ui.comboBox_rule->addItem(QString::fromLocal8Bit(rules[i].c_str()));
-    }
-
     connect(ui.btn_save, SIGNAL(clicked()), this, SLOT(onSave()));
     connect(ui.btn_cancel, SIGNAL(clicked()), this, SLOT(onCancel()));
-    //connect(ui.lineEdit_rule, SIGNAL(textChanged(const  QString &)), this, SLOT(onlineEdit_rule_Change(const QString &)));
+    connect(ui.lineEdit_rule, SIGNAL(textChanged(const  QString &)), this, SLOT(onlineEdit_rule_Change(const QString &)));
     connect(ui.textEdit_ori_name, SIGNAL(textChanged()), this, SLOT(onTextEdit_ori_name_Change()));
     connect(ui.btn_change, SIGNAL(clicked()), this, SLOT(onChangeTest()));
 
@@ -64,7 +58,7 @@ void CRenameDlg::onCancel()
 
 void CRenameDlg::onTextEdit_ori_name_Change()
 {
-    if ( !ui.textEdit_ori_name->toPlainText().isEmpty())
+    if (!ui.textEdit_ori_name->toPlainText().isEmpty() && !ui.lineEdit_rule->text().isEmpty())
     {
         ui.btn_change->setDisabled(false);
     }
@@ -75,9 +69,23 @@ void CRenameDlg::onTextEdit_ori_name_Change()
 }
 
 
+void CRenameDlg::onlineEdit_rule_Change(const QString &rule)
+{
+    if (!ui.textEdit_ori_name->toPlainText().isEmpty() && !ui.lineEdit_rule->text().isEmpty())
+    {
+        ui.btn_change->setDisabled(false);
+    }
+    else
+    {
+        ui.btn_change->setDisabled(true);
+    }
+}
+
+
+
 void CRenameDlg::onChangeTest()
 {
-    std::string strnewName = CChangeName::change_name(ui.textEdit_ori_name->toPlainText().toAscii().data(), ui.comboBox_rule->currentText().toAscii().data());
+    std::string strnewName = CChangeName::change_name_by_name(ui.textEdit_ori_name->toPlainText().toAscii().data(), ui.lineEdit_rule->text().toAscii().data());
 
     if (strnewName.empty())
     {

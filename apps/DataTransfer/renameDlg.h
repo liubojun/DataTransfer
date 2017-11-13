@@ -31,7 +31,7 @@ protected slots:
     void onTextEdit_ori_name_Change();
 
     // 输入框变化事件
-    //void onlineEdit_rule_Change(const QString &rule);
+    void onlineEdit_rule_Change(const QString &rule);
 
 private:
     Ui::renameDlg ui;

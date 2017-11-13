@@ -174,7 +174,9 @@ public:
     // 必须首先调用该方法完成初始化
     static void init_rename_rules(const char *rule_file);
 
-    static std::string change_name(const char *orig_file_name, const char *rule);
+    static std::string change_name_by_name(const char *orig_file_name, const char *rule);
+
+    static std::string change_name_by_id(const char *orig_file_name, const char *ruleID);
 
     // 从文件中获取所有换名规则
     static std::vector<std::string> get_rules();

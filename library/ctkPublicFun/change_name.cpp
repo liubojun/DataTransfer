@@ -737,6 +737,11 @@ void CChangeName::cts_change_name(char         *orig_file_name,
 
 void CChangeName::init_rename_rules(const char *rule_file)
 {
+    for (size_t i = 0; i < rule.size(); ++i)
+    {
+        FREE_RT_ARRAY(rule[i].filter);
+        FREE_RT_ARRAY(rule[i].rename_to);
+    }
     rule.clear();
     QFile file(rule_file);
     if (!file.open(QIODevice::ReadOnly))
@@ -794,7 +799,43 @@ void CChangeName::init_rename_rules(const char *rule_file)
 }
 
 
-std::string CChangeName::change_name(const char *orig_file_name, const char *prule)
+std::string CChangeName::change_name_by_name(const char *orig_file_name, const char *prule)
+{
+
+    if (orig_file_name == NULL || prule == NULL)
+    {
+        QSLOG_ERROR("input orig_file_name or rule is not correct");
+        return orig_file_name;
+    }
+    //if (QString::fromLocal8Bit(prule) == QString::fromLocal8Bit("нч"))
+    //{
+    //    return orig_file_name;
+    //}
+
+
+    //int index = get_rule(wanted_rule, rule.size());
+    //if (index < 0)
+    //{
+    //    //QSLOG_ERROR("rename.rule is not correct config!");
+    //    return orig_file_name;
+    //}
+    char wanted_rule[512] = { 0 };
+    strcpy(wanted_rule, prule);
+
+    char newfilename[512] = { 0 };
+
+    char filter[5] = { 0 };
+    strcpy(filter, "*");
+
+    char oriname[512] = { 0 };
+    strcpy(oriname, orig_file_name);
+
+    int iFd = 0;
+    cts_change_name(oriname, filter, wanted_rule, newfilename, &iFd, 0);
+    return newfilename;
+}
+
+std::string CChangeName::change_name_by_id(const char *orig_file_name, const char *prule)
 {
 
     if (orig_file_name == NULL || prule == NULL)
@@ -812,7 +853,7 @@ std::string CChangeName::change_name(const char *orig_file_name, const char *pru
     int index = get_rule(wanted_rule, rule.size());
     if (index < 0)
     {
-        QSLOG_ERROR("rename.rule is not correct config!");
+        //QSLOG_ERROR("rename.rule is not correct config!");
         return orig_file_name;
     }
     char newfilename[512] = { 0 };

@@ -115,9 +115,6 @@
           </spacer>
          </item>
          <item>
-          <widget class="QComboBox" name="comboBox_rule"/>
-         </item>
-         <item>
           <widget class="QPushButton" name="btn_change">
            <property name="text">
             <string>换名</string>
@@ -125,6 +122,9 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_rule"/>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4">

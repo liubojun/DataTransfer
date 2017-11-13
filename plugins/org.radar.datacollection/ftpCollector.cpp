@@ -221,7 +221,7 @@ bool FtpCollector::compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransT
         QString dstFilePath = dstFileFullPath;
         tTask.fileName = strFileName;
         tTask.srcFileFullPath = strFileFullPath;
-        tTask.strDestFileName = CChangeName::change_name(fi.strFileName.c_str(), cUser.rename_rule.toLocal8Bit().toStdString().c_str()).c_str();
+        tTask.strDestFileName = CChangeName::change_name_by_id(fi.strFileName.c_str(), cUser.rename_rule.toLocal8Bit().toStdString().c_str()).c_str();
 
         dstFileFullPath += tTask.strDestFileName;
         // 分发到目录

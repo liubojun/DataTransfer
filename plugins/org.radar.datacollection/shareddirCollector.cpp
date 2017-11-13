@@ -797,7 +797,7 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
     // 新的最新文件列表
     //list<string> t_oNewLatestFiles = t_oLatestFileList;
     //bool listUpdate = false;
-
+    //QSLOG_DEBUG("scan dir");
     CurlFtp m_ftp;
     for (int i=0; i<qfileList.size(); ++i)
     {
@@ -915,6 +915,7 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
     {
         return true;
     }
+    //QSLOG_DEBUG("compare with dest");
 
     for (int i=0; i<m_tUser.lstUser.size(); ++i)
     {
@@ -943,14 +944,16 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
         }
 
         dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser, oDt, iTmBaseRule);
-
+        //QSLOG_DEBUG("get dest path");
         // QString dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser, QDateTime::currentDateTime(), cUser.user.timebaserule);
         QString dstFilePath = dstFileFullPath;
         tTask.fileName = fi.fileName();
         tTask.srcFileFullPath = fi.filePath();
         // dstFileFullPath += fi.fileName();
-        tTask.strDestFileName = CChangeName::change_name(fi.fileName().toLocal8Bit().toStdString().c_str(), cUser.rename_rule.toLocal8Bit().toStdString().c_str()).c_str();
+        //QSLOG_DEBUG(QString("name = %1, rule = %2").arg(fi.fileName()).arg(cUser.rename_rule));
+        tTask.strDestFileName = CChangeName::change_name_by_id(fi.fileName().toLocal8Bit().toStdString().c_str(), cUser.rename_rule.toLocal8Bit().toStdString().c_str()).c_str();
         dstFileFullPath += tTask.strDestFileName;
+        //QSLOG_DEBUG("get dest name");
 
         // 分发到目录
         if (cUser.user.sendType == 0)
@@ -976,6 +979,7 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
         // 分发到FTP
         else
         {
+            QSLOG_DEBUG("SEND TO FTP");
             char ftpUrl[200] = {0};
             char ftpPath[512] = { 0 };
             char usrPwd[100] = {0};
