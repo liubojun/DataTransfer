@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.11)
 
 #指定项目名
-project(RadarProject)
+project(DataTransfer)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(EXTERNAL_PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmakeExternals)
@@ -77,22 +77,22 @@ FIND_PROGRAM(QT_LRELEASE_EXECUTABLE
     )
 
 # 编译版本设置
-IF (NOT CMAKE_BUILD_TYPE)
-  message(STATUS "Setting build type to 'Debug' as none was specified.")
-  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
-  # mark_as_advanced(CMAKE_BUILD_TYPE)
-  # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
-endif()
+# IF (NOT CMAKE_BUILD_TYPE)
+  # message(STATUS "Setting build type to 'Debug' as none was specified.")
+  # set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+  # # mark_as_advanced(CMAKE_BUILD_TYPE)
+  # # Set the possible values of build type for cmake-gui
+  # set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+# endif()
 
 #SET (BUILD_TYPE_DEBUG TRUE CACHE BOOL "Determines build version")
-IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	SET(DEST_BUILD_VERSION Debug)
-	SET(QT_SUFFIX d)
-ELSE (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	SET(DEST_BUILD_VERSION Release)
-	SET(QT_SUFFIX )
-ENDIF()
+# IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	# SET(DEST_BUILD_VERSION Debug)
+	# SET(QT_SUFFIX d)
+# ELSE (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	# SET(DEST_BUILD_VERSION Release)
+	# SET(QT_SUFFIX )
+# ENDIF()
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
@@ -130,7 +130,7 @@ ENDIF (WITH_CHECK_MEM_LEAK)
 #设置工程变量
 SET(RadarProject ${CMAKE_SOURCE_DIR})
 SET(RadarProjectInclude ${RadarProject}/include)
-SET(RadarProjectQml ${RadarProject}/qml)
+#SET(RadarProjectQml ${RadarProject}/qml)
 SET(RadarProjectRunTimeLib ${RadarProject}/3dpart/${QT_VERSIONS}/bin/${DEST_BUILD_VERSION})
 SET(RadarProjectLib ${RadarProject}/3dpart/${QT_VERSIONS}/lib/${DEST_BUILD_VERSION})
 #SET(GisPluginDir ${RadarProject}/gisplugins/${DEST_BUILD_VERSION})

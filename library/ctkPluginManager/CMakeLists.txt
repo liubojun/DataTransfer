@@ -81,15 +81,10 @@ ENDIF (WIN32)
 
 
 #将生成文件输出到指定的目录中
-IF (WIN32)
-    INSTALL(TARGETS ${PROJECT_NAME}
-            RUNTIME DESTINATION bin/plugins/ctkPluginManager
-            LIBRARY DESTINATION bin/plugins/ctkPluginManager)
-ELSE (WIN32)
-    INSTALL(TARGETS ${PROJECT_NAME}
-            RUNTIME DESTINATION bin
-            LIBRARY DESTINATION bin)
-ENDIF (WIN32)
+INSTALL(TARGETS ${PROJECT_NAME}
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION bin)
+
 
 		
 # 输出头文件

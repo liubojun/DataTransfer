@@ -66,12 +66,13 @@ QString CPathBuilder::getPluginManagerPath()
     }
     else
     {
-#ifdef _WIN32
-        std::cout << (qApp->applicationDirPath() + "/plugins/ctkPluginManager").toStdString() << std::endl;
-        return qApp->applicationDirPath() + "/plugins/ctkPluginManager";
-#else
         return qApp->applicationDirPath();
-#endif
+//#ifdef _WIN32
+//        std::cout << (qApp->applicationDirPath() + "/plugins/ctkPluginManager").toStdString() << std::endl;
+//        return qApp->applicationDirPath() + "/plugins/ctkPluginManager";
+//#else
+//        return qApp->applicationDirPath();
+//#endif
         // return m_strProgramPath;
     }
 }
