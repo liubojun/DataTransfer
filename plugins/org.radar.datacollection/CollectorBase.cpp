@@ -203,7 +203,7 @@ bool CollectorBase::testFileConnection(QString strUrl)
     return false;
 }
 
-bool CollectorBase::testFtpConnection(QString ip, int port, QString lgUser, QString lgPass, int transfermode, int connectmode)
+bool CollectorBase::testFtpConnection(const QString & ip, int port, const QString & lgUser, const QString & lgPass, int transfermode, int connectmode)
 {
     CurlFtp cFtp(this);
     char url[512] = {0};
@@ -214,7 +214,7 @@ bool CollectorBase::testFtpConnection(QString ip, int port, QString lgUser, QStr
     cFtp.setFtpTransferMode(m_collectSet.ftp_transferMode);
     cFtp.setFtpConnectMode(m_collectSet.ftp_connectMode);
 
-    return cFtp.connectToHost(url, usrPwd);
+    return cFtp.connectToHost(url, usrPwd, 5);
 }
 
 bool CollectorBase::readSet()

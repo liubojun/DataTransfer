@@ -49,7 +49,7 @@ DataBase::DataBase()
         InitDB();
     }
 
-    m_strTbCollect = "T_DIR_COL";
+    //m_strTbCollect = "T_DIR_COL";
     // m_strTbColUser = "T_COL_USER";
     //m_strTbSendUser = "T_SEND_USER";
 
@@ -159,7 +159,7 @@ void DataBase::QueryCollectTask(QList<CollectTask> &colTasks)
         }
 
         QSqlQuery query(m_db);
-        QString sql = "select * from " + m_strTbCollect;
+        QString sql = "SELECT * FROM T_DIR_COL ORDER BY DIRNAME";
         bool res = query.exec(sql);
         if (res)
         {
@@ -204,7 +204,7 @@ bool DataBase::QueryCollectTask(CollectTask &task)
         }
 
         QSqlQuery query(m_db);
-        QString sql = QString("select * from %1 where %2='%3'").arg(m_strTbCollect).arg(g_tbDirCol[0]).arg(task.dirID);
+        QString sql = QString("select * from T_DIR_COL where %1='%2'").arg(g_tbDirCol[0]).arg(task.dirID);
         bool res = query.exec(sql);
         if (!res)
         {
@@ -518,8 +518,8 @@ bool DataBase::InsertCollectTask(const CollectTask &task)
         }
 
         QSqlQuery query(m_db);
-        QString sql = QString("REPLACE INTO %1(%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13,%14,%15, %16, %17, %18)"
-                              "VALUES(:%2,:%3,:%4,:%5,:%6,:%7,:%8,:%9,:%10,:%11,:%12,:%13,:%14, :%15, :%16, :%17, :%18)").arg(m_strTbCollect)
+        QString sql = QString("REPLACE INTO T_DIR_COL(%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13,%14, %15, %16, %17)"
+                              "VALUES(:%1,:%2,:%3,:%4,:%5,:%6,:%7,:%8,:%9,:%10,:%11,:%12,:%13, :%14, :%15, :%16, :%17)")
                       .arg(g_tbDirCol[0]).arg(g_tbDirCol[1]).arg(g_tbDirCol[2]).arg(g_tbDirCol[3]).arg(g_tbDirCol[4])
                       .arg(g_tbDirCol[5]).arg(g_tbDirCol[6]).arg(g_tbDirCol[7]).arg(g_tbDirCol[8]).arg(g_tbDirCol[9])
                       .arg(g_tbDirCol[10]).arg(g_tbDirCol[11]).arg(g_tbDirCol[12]).arg(g_tbDirCol[13]).arg(g_tbDirCol[14])
@@ -574,7 +574,7 @@ bool DataBase::DeltCollectTask(const QString &dirID)
         QString sql;
         bool res;
         // 先删除收集任务表
-        sql = QString("delete from %1 where %2='%3'").arg(m_strTbCollect).arg(g_tbDirCol[0]).arg(dirID);
+        sql = QString("delete from T_DIR_COL where %1='%2'").arg(g_tbDirCol[0]).arg(dirID);
         res = query.exec(sql);
         if (res)
         {

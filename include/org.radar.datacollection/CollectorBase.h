@@ -350,7 +350,7 @@ public:
 
     bool testFileConnection(QString strUrl);
 
-    bool testFtpConnection(QString ip, int port, QString lgUser, QString lgPass, int transfermode, int connectmode);
+    bool testFtpConnection(const QString &ip, int port, const QString & lgUser, const QString & lgPass, int transfermode, int connectmode);
 
     /**
      * @brief  获取指定目录的最新目录列表

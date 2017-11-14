@@ -365,9 +365,10 @@ int main(int argc, char **argv)
     //int *a = 0;
     //*a = 0;
     int ret=app.exec();
-
+    //wnd->close();
+    // 等待所有子线程结束
     delete wnd;
-
+    QThread::sleep(5);
 //卸载所有插件
     plugin->uninit();
 

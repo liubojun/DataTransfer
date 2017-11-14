@@ -207,7 +207,7 @@ int CurlFtp::getNewFiles(FileInfoList &fileList)
     return 0;
 }
 
-bool CurlFtp::connectToHost(const char *url, const char *user_pwd)
+bool CurlFtp::connectToHost(const char *url, const char *user_pwd, int timeout)
 {
     if (m_pCurl == NULL)
     {
@@ -249,7 +249,11 @@ bool CurlFtp::connectToHost(const char *url, const char *user_pwd)
     curl_easy_setopt(m_pCurl, CURLOPT_USERPWD, user_pwd);
     // modified by liubojun.
     // 20170828,ftp大目录，轮询速度较慢
-    //curl_easy_setopt(m_pCurl, CURLOPT_TIMEOUT, 5);
+    if (-1 != timeout)
+    {
+        curl_easy_setopt(m_pCurl, CURLOPT_TIMEOUT, timeout);
+    }
+
     curl_easy_setopt(m_pCurl, CURLOPT_NOSIGNAL,1L);
     // curl_easy_setopt(m_pCurl, CURLOPT_FTP_FILEMETHOD, CURLFTPMETHOD_DEFAULT);
 //#ifndef DISABLE_SSH_AGENT
@@ -269,14 +273,14 @@ bool CurlFtp::connectToHost(const char *url, const char *user_pwd)
     if (CURLE_OK != res)
     {
         // modified by liubojun,发起两次链接，针对sftp，第一次失败，第二次成功，原因未知
-        res = curl_easy_perform(m_pCurl);
-        if (CURLE_OK != res)
-        {
-            QString strLogInfo(QString("connectToHost error: %1").arg(curl_easy_strerror(res)));
-            QSLOG_ERROR(strLogInfo);
-            emit emitLog(strLogInfo, FAIL);
-            return false;
-        }
+        //res = curl_easy_perform(m_pCurl);
+        //if (CURLE_OK != res)
+        //{
+        QString strLogInfo(QString("connectToHost error: %1").arg(curl_easy_strerror(res)));
+        QSLOG_ERROR(strLogInfo);
+        emit emitLog(strLogInfo, FAIL);
+        return false;
+        //}
     }
     //curl_slist_free_all(headerlist);
 

@@ -143,7 +143,14 @@ public:
     void listFiles(const string &strDir, FileInfoList &fileList);
     QString parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringList &dirList, const QString & iLatestTime, bool bFtpSupportMSDL);
 
-    bool connectToHost(const char *url, const char *user_pwd);
+    /**
+     * @brief 连接远程目录
+     * @param  const char * url 远程地址
+     * @param  const char * user_pwd 访问的用户名密码
+     * @param  const char * timeout 超时时间，默认使用系统自带超时
+     * @return bool：连接成功返回true,失败返回false
+     */
+    bool connectToHost(const char *url, const char *user_pwd, int timeout = -1);
 
     bool TestConnection(const char *url, const char *user_pwd);
 

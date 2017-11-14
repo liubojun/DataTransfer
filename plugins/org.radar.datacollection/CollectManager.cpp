@@ -18,20 +18,20 @@ CollectManager::CollectManager(ICtkPluginManager *pCtkManager, QWaitCondition &i
     m_bFirstReadTcXml = true;
     //connectMsgServer();		//连接消息服务器
 
-    m_pThread = QSharedPointer<QThread>(new QThread(this));
+    //m_pThread = QSharedPointer<QThread>(new QThread(this));
     QObject::connect(m_pThread.data(), SIGNAL(finished()), m_pThread.data(), SLOT(deleteLater()));
-    m_pThread->start();
+    //m_pThread->start();
 
-    readThreadNum();
+    //readThreadNum();
 
-    QThreadPool::globalInstance()->setMaxThreadCount(8);
+    //QThreadPool::globalInstance()->setMaxThreadCount(8);
 }
 
 CollectManager::~CollectManager()
 {
     stopAllCollection();
-    m_pThread->quit();
-    m_pThread->wait();
+    //m_pThread->quit();
+    //m_pThread->wait();
     QSLOG_INFO("~CollectManager()");
 }
 
