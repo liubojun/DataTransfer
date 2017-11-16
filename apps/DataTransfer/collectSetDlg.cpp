@@ -65,7 +65,8 @@ void CollectSetDlg::InitUI()
     connect(this, SIGNAL(testok(const QString &)), this, SLOT(onTestOk(const QString &)));
     connect(this, SIGNAL(testfail(const QString &)), this, SLOT(onTestFail(const QString &)));
     connect(ui.btn_rename_edit, SIGNAL(clicked()), this, SLOT(onRenameRuleEdit()));
-
+    connect(ui.comboBox_sendUser, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(onSendUserChange(const QString &)));
+    connect(ui.compare_content, SIGNAL(stateChanged(int)), this, SLOT(onCompareContent(int)));
     // added by liubojun @20171112,支持分发换名
     std::vector<std::string> rules = CChangeName::get_rules();
 
@@ -168,49 +169,13 @@ bool CollectSetDlg::onApply()
 
 
 
-
-    /*switch (ui.col_time_range->currentIndex())
-    {
-    case 0:
-    tmin = -1;
-    break;
-    case 1:
-    tmin = 30;
-    break;
-    case 2:
-    tmin = 60;
-    break;
-    case 3:
-    tmin = 60*2;
-    break;
-    case 4:
-    tmin = 60*3;
-    break;
-    case 5:
-    tmin = 60*6;
-    break;
-    case 6:
-    tmin = 60*12;
-    break;
-    case 7:
-    tmin = 60*24;
-    break;
-    case 8:
-    tmin = 60*48;
-    break;
-    case 9:
-    tmin = 60*72;
-    break;
-    default:
-    break;
-    }*/
     cSet.col_timerange = tmin;
     cSet.loginUser = ui.lineEdit_5->text();
     cSet.loginPass = ui.lineEdit_6->text();
     cSet.ip = ui.lineEdit_7->text();
     cSet.port = ui.lineEdit_8->text().toInt();
     cSet.recordLatestTime = ui.recordLatestTime->isChecked() ? 1 : 0;
-
+    cSet.compareContent = ui.compare_content->isChecked() ? 1 : 0;
     QMessageBox box(QMessageBox::Critical, QStringLiteral("提示"), "");
     box.setStandardButtons(QMessageBox::Ok);
     box.setButtonText(QMessageBox::Ok, QStringLiteral("确定"));
@@ -294,6 +259,17 @@ void CollectSetDlg::onSelFile(bool bFile)
     ui.lineEdit_6->setEnabled(!bFile);
     ui.lineEdit_7->setEnabled(!bFile);
     ui.lineEdit_8->setEnabled(!bFile);
+
+    CollectUser oSendUser = getSendUserInfoFromName(ui.comboBox_sendUser->currentText());
+    // 当收集目录以及分发地址均是使用文件目录时，启用文件比对功能
+    if (FILE_TYPE == oSendUser.user.sendType && bFile)
+    {
+        ui.compare_content->setVisible(true);
+    }
+    else
+    {
+        ui.compare_content->setVisible(false);
+    }
 }
 
 void CollectSetDlg::showTask(const CollectTask &task)
@@ -332,6 +308,7 @@ void CollectSetDlg::showTask(const CollectTask &task)
     ui.lineEdit_6->setText(task.loginPass);
     ui.checkBox_2->setChecked(task.subdirFlag);
 //    ui.checkBox_6->setChecked(task.moveFlag);
+
 
 
 
@@ -402,7 +379,7 @@ void CollectSetDlg::showTask(const CollectTask &task)
     ui.comboBox_sendUser->setCurrentText(sendUser.user.userName);
     ui.comboBox_rename->setCurrentText(sendUser.rename_rule);
 
-
+    ui.compare_content->setChecked(task.compareContent);
     //for (int i=0; i<tUser.lstUser.size(); ++i)
     //{
     //    const CollectUser &cUser = tUser.lstUser.at(i);
@@ -650,4 +627,32 @@ void CollectSetDlg::onRenameRuleEdit()
 {
     CRenameDlg rdg;
     rdg.exec();
+}
+
+void CollectSetDlg::onSendUserChange(const QString &userName)
+{
+    CollectUser oSendUser = getSendUserInfoFromName(userName);
+    // 当收集目录以及分发地址均是使用文件目录时，启用文件比对功能
+    if (FILE_TYPE == oSendUser.user.sendType && ui.radFile->isChecked())
+    {
+        ui.compare_content->setVisible(true);
+    }
+    else
+    {
+        ui.compare_content->setVisible(false);
+    }
+    //ui.compare_content->setVisible(bFile);
+}
+
+void CollectSetDlg::onCompareContent(int state)
+{
+    if (Qt::Checked == state)
+    {
+        QPalette pal;
+        pal.setColor(QPalette::WindowText, Qt::red);
+        ui.label_result->setPalette(pal);
+        ui.label_result->setText(QStringLiteral("启用内容比较会降低文件同步效率！"));
+        QTimer::singleShot(3000, this, SLOT(onTestResultTimeout()));
+    }
+
 }

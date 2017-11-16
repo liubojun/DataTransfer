@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>469</width>
-    <height>447</height>
+    <width>424</width>
+    <height>489</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -405,6 +405,10 @@
           </property>
          </spacer>
         </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
         <item>
          <widget class="QCheckBox" name="checkBox_2">
           <property name="text">
@@ -428,12 +432,32 @@
         <item>
          <widget class="QCheckBox" name="recordLatestTime">
           <property name="text">
-           <string>每次取最新</string>
+           <string>记录时间戳</string>
           </property>
          </widget>
         </item>
         <item>
          <spacer name="horizontalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="compare_content">
+          <property name="text">
+           <string>比对内容</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_11">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>

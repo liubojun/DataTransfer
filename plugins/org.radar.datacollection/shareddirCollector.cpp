@@ -839,14 +839,30 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
         // 分发到目录
         if (cUser.user.sendType == 0)
         {
-            QFile file(dstFileFullPath);
-            if (0 == cUser.user.compress && 0 == cUser.user.encrypt)
+            QFileInfo file(dstFileFullPath);
+            if (0 == cUser.user.compress)
             {
                 //qDebug() << fi.size() << file.size();
                 if (file.exists() && fi.size() == file.size())
                 {
-                    continue;
+                    QSLOG_DEBUG(QString("dest file exist and size is the same with the source ,file content is not the same"
+                                        "source file: %1, use content comare : %2").arg(fi.fileName()).arg(m_collectSet.compareContent));
+                    if (m_collectSet.compareContent)
+                    {
+                        QFile file_source(fi.absoluteFilePath());
+                        QFile file_dest(file.absoluteFilePath());
+                        if (file_source.readAll() == file_dest.readAll())
+                        {
+                            continue;
+                        }
+
+                    }
+                    else
+                    {
+                        continue;
+                    }
                 }
+
             }
             else
             {

@@ -52,6 +52,12 @@ private slots:
     // 编辑换名规则
     void onRenameRuleEdit();
 
+    // 切换分发用户
+    void onSendUserChange(const QString &userName);
+
+    // 是否启用文本内容比较
+    void onCompareContent(int state);
+
 signals:
     void commit(const CollectTask &task);
 

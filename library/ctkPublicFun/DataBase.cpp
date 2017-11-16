@@ -11,10 +11,10 @@
 DataBase *DataBase::s_db = NULL;
 QMutex DataBase::m_oMutex;
 
-QString g_tbDirCol[] = {"DIRID", "DIRNAME", "ENABLE", "COLLECTTYPE", "FTPTRANSFERMODE", "FTPCONNECTMODE", "RLTVPATH", "DISPATCH",
-                        "FILETEMPLATE", "SUBDIRCHECK", "MOVEFLAG", "COLTIMERANGE", "RECORDLATESTTIME", "LOGINUSER", "LOGINPASS",
-                        "IP", "PORT"
-                       };
+//QString g_tbDirCol[] = {"DIRID", "DIRNAME", "ENABLE", "COLLECTTYPE", "FTPTRANSFERMODE", "FTPCONNECTMODE", "RLTVPATH", "DISPATCH",
+//                        "FILETEMPLATE", "SUBDIRCHECK", "MOVEFLAG", "COLTIMERANGE", "RECORDLATESTTIME", "COMPARE_CONTENT", "LOGINUSER", "LOGINPASS",
+//                        "IP", "PORT"
+//};
 //QString g_tbColUser[] = {"DIRID", "USERID", "RLTVPATH"};
 //QString g_tbSendUser[] = {"USERID", "USERNAME", "SENDTYPE", "SENDSUFFIX", "RLTVPATH", "LOGINUSER", "LOGINPASS",
 //                          "IP", "PORT", "KEEPDIR", "COMPRESS", "ENCRYPT", "CONPUT", "MAXTRYCOUNS"
@@ -85,6 +85,7 @@ DataBase::DataBase()
                "[MOVEFLAG] INT, "
                "[COLTIMERANGE] INT, "
                "[RECORDLATESTTIME] BOOL, "
+               "[COMPARE_CONTENT] BOOL DEFAULT 0"
                "[LOGINUSER] VARCHAR(20), "
                "[LOGINPASS] VARCHAR(20), "
                "[IP] VARCHAR(20), "
@@ -159,30 +160,34 @@ void DataBase::QueryCollectTask(QList<CollectTask> &colTasks)
         }
 
         QSqlQuery query(m_db);
-        QString sql = "SELECT * FROM T_DIR_COL ORDER BY DIRNAME";
+        QString sql = "SELECT DIRID, DIRNAME, ENABLE, COLLECTTYPE, FTPTRANSFERMODE, FTPCONNECTMODE, RLTVPATH, DISPATCH,"
+                      "FILETEMPLATE, SUBDIRCHECK, MOVEFLAG, COLTIMERANGE, RECORDLATESTTIME, COMPARE_CONTENT, LOGINUSER, LOGINPASS,"
+                      "IP, PORT FROM T_DIR_COL ORDER BY DIRNAME";
         bool res = query.exec(sql);
         if (res)
         {
             while (query.next())
             {
                 CollectTask cTask;
-                cTask.dirID = query.value(0).toString();
-                cTask.dirName = query.value(1).toString();
-                cTask.enable = query.value(2).toInt();
-                cTask.collectType = query.value(3).toInt();
-                cTask.ftp_transferMode = query.value(4).toInt();
-                cTask.ftp_connectMode = query.value(5).toInt();
-                cTask.rltvPath = query.value(6).toString();
-                cTask.dispatch = query.value(7).toString();
-                cTask.fileTemplate = query.value(8).toString();
-                cTask.subdirFlag = query.value(9).toInt();
-                cTask.moveFlag = query.value(10).toInt();
-                cTask.col_timerange = query.value(11).toInt();
-                cTask.recordLatestTime = query.value(12).toBool();
-                cTask.loginUser = query.value(13).toString();
-                cTask.loginPass = query.value(14).toString();
-                cTask.ip = query.value(15).toString();
-                cTask.port = query.value(16).toInt();
+                int index = 0;
+                cTask.dirID = query.value(index++).toString();
+                cTask.dirName = query.value(index++).toString();
+                cTask.enable = query.value(index++).toInt();
+                cTask.collectType = query.value(index++).toInt();
+                cTask.ftp_transferMode = query.value(index++).toInt();
+                cTask.ftp_connectMode = query.value(index++).toInt();
+                cTask.rltvPath = query.value(index++).toString();
+                cTask.dispatch = query.value(index++).toString();
+                cTask.fileTemplate = query.value(index++).toString();
+                cTask.subdirFlag = query.value(index++).toInt();
+                cTask.moveFlag = query.value(index++).toInt();
+                cTask.col_timerange = query.value(index++).toInt();
+                cTask.recordLatestTime = query.value(index++).toBool();
+                cTask.compareContent = query.value(index++).toBool();
+                cTask.loginUser = query.value(index++).toString();
+                cTask.loginPass = query.value(index++).toString();
+                cTask.ip = query.value(index++).toString();
+                cTask.port = query.value(index++).toInt();
 
                 colTasks.append(cTask);
             }
@@ -204,7 +209,9 @@ bool DataBase::QueryCollectTask(CollectTask &task)
         }
 
         QSqlQuery query(m_db);
-        QString sql = QString("select * from T_DIR_COL where %1='%2'").arg(g_tbDirCol[0]).arg(task.dirID);
+        QString sql = QString("select DIRID, DIRNAME, ENABLE, COLLECTTYPE, FTPTRANSFERMODE, FTPCONNECTMODE, RLTVPATH, DISPATCH,"
+                              "FILETEMPLATE, SUBDIRCHECK, MOVEFLAG, COLTIMERANGE, RECORDLATESTTIME, COMPARE_CONTENT, LOGINUSER, LOGINPASS,"
+                              "IP, PORT from T_DIR_COL where DIRID = '%1'").arg(task.dirID);
         bool res = query.exec(sql);
         if (!res)
         {
@@ -212,23 +219,25 @@ bool DataBase::QueryCollectTask(CollectTask &task)
         }
         if (query.next())
         {
-            task.dirID = query.value(0).toString();
-            task.dirName = query.value(1).toString();
-            task.enable = query.value(2).toInt();
-            task.collectType = query.value(3).toInt();
-            task.ftp_transferMode = query.value(4).toInt();
-            task.ftp_connectMode = query.value(5).toInt();
-            task.rltvPath = query.value(6).toString();
-            task.dispatch = query.value(7).toString();
-            task.fileTemplate = query.value(8).toString();
-            task.subdirFlag = query.value(9).toInt();
-            task.moveFlag = query.value(10).toInt();
-            task.col_timerange = query.value(11).toInt();
-            task.recordLatestTime = query.value(12).toInt();
-            task.loginUser = query.value(13).toString();
-            task.loginPass = query.value(14).toString();
-            task.ip = query.value(15).toString();
-            task.port = query.value(16).toInt();
+            int index = 0;
+            task.dirID = query.value(index++).toString();
+            task.dirName = query.value(index++).toString();
+            task.enable = query.value(index++).toInt();
+            task.collectType = query.value(index++).toInt();
+            task.ftp_transferMode = query.value(index++).toInt();
+            task.ftp_connectMode = query.value(index++).toInt();
+            task.rltvPath = query.value(index++).toString();
+            task.dispatch = query.value(index++).toString();
+            task.fileTemplate = query.value(index++).toString();
+            task.subdirFlag = query.value(index++).toInt();
+            task.moveFlag = query.value(index++).toInt();
+            task.col_timerange = query.value(index++).toInt();
+            task.recordLatestTime = query.value(index++).toBool();
+            task.compareContent = query.value(index++).toBool();
+            task.loginUser = query.value(index++).toString();
+            task.loginPass = query.value(index++).toString();
+            task.ip = query.value(index++).toString();
+            task.port = query.value(index++).toInt();
 
             return true;
         }
@@ -518,30 +527,31 @@ bool DataBase::InsertCollectTask(const CollectTask &task)
         }
 
         QSqlQuery query(m_db);
-        QString sql = QString("REPLACE INTO T_DIR_COL(%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12,%13,%14, %15, %16, %17)"
-                              "VALUES(:%1,:%2,:%3,:%4,:%5,:%6,:%7,:%8,:%9,:%10,:%11,:%12,:%13, :%14, :%15, :%16, :%17)")
-                      .arg(g_tbDirCol[0]).arg(g_tbDirCol[1]).arg(g_tbDirCol[2]).arg(g_tbDirCol[3]).arg(g_tbDirCol[4])
-                      .arg(g_tbDirCol[5]).arg(g_tbDirCol[6]).arg(g_tbDirCol[7]).arg(g_tbDirCol[8]).arg(g_tbDirCol[9])
-                      .arg(g_tbDirCol[10]).arg(g_tbDirCol[11]).arg(g_tbDirCol[12]).arg(g_tbDirCol[13]).arg(g_tbDirCol[14])
-                      .arg(g_tbDirCol[15]).arg(g_tbDirCol[16]);
+        QString sql = QString("REPLACE INTO T_DIR_COL(DIRID, DIRNAME, ENABLE, COLLECTTYPE, FTPTRANSFERMODE, FTPCONNECTMODE, RLTVPATH, DISPATCH,"
+                              "FILETEMPLATE, SUBDIRCHECK, MOVEFLAG, COLTIMERANGE, RECORDLATESTTIME, COMPARE_CONTENT, LOGINUSER, LOGINPASS,"
+                              "IP, PORT)"
+                              "VALUES(:DIRID, :DIRNAME, :ENABLE, :COLLECTTYPE, :FTPTRANSFERMODE, :FTPCONNECTMODE, :RLTVPATH, :DISPATCH,"
+                              ":FILETEMPLATE, :SUBDIRCHECK, :MOVEFLAG, :COLTIMERANGE, :RECORDLATESTTIME, :COMPARE_CONTENT, :LOGINUSER, :LOGINPASS,"
+                              ":IP, :PORT)");
         query.prepare(sql);
-        query.bindValue(":"+g_tbDirCol[0], task.dirID);
-        query.bindValue(":"+g_tbDirCol[1], task.dirName);
-        query.bindValue(":"+g_tbDirCol[2], task.enable);
-        query.bindValue(":"+g_tbDirCol[3], task.collectType);
-        query.bindValue(":" + g_tbDirCol[4], task.ftp_transferMode);
-        query.bindValue(":" + g_tbDirCol[5], task.ftp_connectMode);
-        query.bindValue(":"+g_tbDirCol[6], task.rltvPath);
-        query.bindValue(":"+g_tbDirCol[7], task.dispatch);
-        query.bindValue(":"+g_tbDirCol[8], task.fileTemplate);
-        query.bindValue(":"+g_tbDirCol[9], task.subdirFlag);
-        query.bindValue(":"+g_tbDirCol[10], task.moveFlag);
-        query.bindValue(":"+g_tbDirCol[11], task.col_timerange);
-        query.bindValue(":"+g_tbDirCol[12], task.recordLatestTime);
-        query.bindValue(":"+g_tbDirCol[13], task.loginUser);
-        query.bindValue(":"+g_tbDirCol[14], task.loginPass);
-        query.bindValue(":"+g_tbDirCol[15], task.ip);
-        query.bindValue(":"+g_tbDirCol[16], task.port);
+        query.bindValue(":DIRID", task.dirID);
+        query.bindValue(":DIRNAME", task.dirName);
+        query.bindValue(":ENABLE", task.enable);
+        query.bindValue(":COLLECTTYPE", task.collectType);
+        query.bindValue(":FTPTRANSFERMODE", task.ftp_transferMode);
+        query.bindValue(":FTPCONNECTMODE", task.ftp_connectMode);
+        query.bindValue(":RLTVPATH", task.rltvPath);
+        query.bindValue(":DISPATCH", task.dispatch);
+        query.bindValue(":FILETEMPLATE", task.fileTemplate);
+        query.bindValue(":SUBDIRCHECK", task.subdirFlag);
+        query.bindValue(":MOVEFLAG", task.moveFlag);
+        query.bindValue(":COLTIMERANGE", task.col_timerange);
+        query.bindValue(":RECORDLATESTTIME", task.recordLatestTime);
+        query.bindValue(":RECORDLATESTTIME", task.recordLatestTime);
+        query.bindValue(":LOGINUSER", task.loginUser);
+        query.bindValue(":COMPARE_CONTENT", task.compareContent);
+        query.bindValue(":IP", task.ip);
+        query.bindValue(":PORT", task.port);
 
         bool res = query.exec();
         if (!res)
@@ -574,7 +584,7 @@ bool DataBase::DeltCollectTask(const QString &dirID)
         QString sql;
         bool res;
         // 先删除收集任务表
-        sql = QString("delete from T_DIR_COL where %1='%2'").arg(g_tbDirCol[0]).arg(dirID);
+        sql = QString("delete from T_DIR_COL where DIRID = '%1'").arg(dirID);
         res = query.exec(sql);
         if (res)
         {

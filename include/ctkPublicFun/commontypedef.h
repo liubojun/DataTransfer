@@ -382,6 +382,12 @@ typedef struct Rectangle2D
 
 //////////////////////////////////////////////////////////////////////////
 
+typedef enum
+{
+    FILE_TYPE = 0,
+    FTP_TYPE = 1
+} SEND_TYPE;
+
 struct UserInfo
 {
     QString		userID;
@@ -435,7 +441,7 @@ struct CollectTask
     QString ip;
     int		port;
     bool    recordLatestTime;	// 是否记录最后收集时间，一旦记录了最后收集时间，下次启动收集时，就会从比最后收集时间新的文件开始收集
-
+    bool    compareContent;		// 源文件与目标文件比较时，是否启用内容比对，效率较低，只有FILE TO FILE才可使用此选项
     CollectTask()
     {
         enable = 1;

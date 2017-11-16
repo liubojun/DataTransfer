@@ -790,7 +790,8 @@ void MainWindow::onProperty()
                     task.recordLatestTime != m_pCollectDlg->m_task.recordLatestTime ||
                     task.ftp_transferMode != m_pCollectDlg->m_task.ftp_transferMode ||
                     task.ftp_connectMode != m_pCollectDlg->m_task.ftp_connectMode ||
-                    strOldSenderUser != m_pCollectDlg->getSendUserNameFromDirID(task.dirID))
+                    strOldSenderUser != m_pCollectDlg->getSendUserNameFromDirID(task.dirID) ||
+                    task.compareContent != m_pCollectDlg->m_task.compareContent)
             {
                 bRestart = true;
             }
