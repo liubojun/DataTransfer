@@ -851,6 +851,12 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
                     {
                         QFile file_source(fi.absoluteFilePath());
                         QFile file_dest(file.absoluteFilePath());
+
+                        if (!file_source.open(QIODevice::ReadOnly) || !file_dest.open(QIODevice::ReadOnly))
+                        {
+                            QSLOG_ERROR(QString("open file failure"));
+                        }
+
                         if (file_source.readAll() == file_dest.readAll())
                         {
                             continue;

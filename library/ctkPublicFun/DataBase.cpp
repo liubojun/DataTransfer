@@ -209,7 +209,7 @@ bool DataBase::QueryCollectTask(CollectTask &task)
         }
 
         QSqlQuery query(m_db);
-        QString sql = QString("select DIRID, DIRNAME, ENABLE, COLLECTTYPE, FTPTRANSFERMODE, FTPCONNECTMODE, RLTVPATH, DISPATCH,"
+        QString sql = QString("SELECT DIRID, DIRNAME, ENABLE, COLLECTTYPE, FTPTRANSFERMODE, FTPCONNECTMODE, RLTVPATH, DISPATCH,"
                               "FILETEMPLATE, SUBDIRCHECK, MOVEFLAG, COLTIMERANGE, RECORDLATESTTIME, COMPARE_CONTENT, LOGINUSER, LOGINPASS,"
                               "IP, PORT from T_DIR_COL where DIRID = '%1'").arg(task.dirID);
         bool res = query.exec(sql);
@@ -547,9 +547,9 @@ bool DataBase::InsertCollectTask(const CollectTask &task)
         query.bindValue(":MOVEFLAG", task.moveFlag);
         query.bindValue(":COLTIMERANGE", task.col_timerange);
         query.bindValue(":RECORDLATESTTIME", task.recordLatestTime);
-        query.bindValue(":RECORDLATESTTIME", task.recordLatestTime);
-        query.bindValue(":LOGINUSER", task.loginUser);
         query.bindValue(":COMPARE_CONTENT", task.compareContent);
+        query.bindValue(":LOGINUSER", task.loginUser);
+        query.bindValue(":LOGINPASS", task.loginPass);
         query.bindValue(":IP", task.ip);
         query.bindValue(":PORT", task.port);
 
