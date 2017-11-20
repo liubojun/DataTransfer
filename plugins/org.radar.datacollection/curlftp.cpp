@@ -194,7 +194,7 @@ int CurlFtp::getNewFiles(FileInfoList &fileList)
         }
 
         m_strCurDir = m_lstDirs.takeFirst();
-        if (m_strCurDir.right(1) != "/")
+        if (m_strCurDir.length() >= 1 && m_strCurDir.right(1) != "/")
         {
             m_strCurDir += "/";
         }
@@ -315,8 +315,7 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
     //    free(listInfo.memdata);
     //    return;
     //}
-    char url[512];
-    memset(url, 0, sizeof(url));
+    char url[512] = { 0 };
     sprintf(url, "ftp://%s:%d%s/", m_strIP.c_str(), m_nPort, strDir.c_str());
     curl_easy_setopt(m_pCurl, CURLOPT_URL, url);
 
@@ -476,7 +475,12 @@ QString CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStr
 
         }
 
-        QString nMdfyTime = oneInfo.strMdfyTime.mid(0, 14);// QDateTime::fromString(oneInfo.strMdfyTime.mid(0, 14), "yyyyMMddhhmmss").toTime_t();
+        QString nMdfyTime("");
+        if (oneInfo.strMdfyTime.length() >= 14)
+        {
+            nMdfyTime = oneInfo.strMdfyTime.mid(0, 14);
+        }
+        //nMdfyTime = oneInfo.strMdfyTime.mid(0, 14);// QDateTime::fromString(oneInfo.strMdfyTime.mid(0, 14), "yyyyMMddhhmmss").toTime_t();
         // LIST命令只能获取到分钟，所以出现分钟一样的文件，应该与目标目录下进行比较
         if (nMdfyTime > iLastModifiedTime)
         {
@@ -980,12 +984,13 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
 
     // 打开本地文件，并获取文件大小
     FILE *pfile = fopen(localPath, "rb");
-    QSharedPointer<FILE> autoClose(pfile, fclose);
+
     if (pfile == NULL)
     {
         QSLOG_ERROR(QStringLiteral("打开文件失败：%1").arg(localPath));
         return -1;
     }
+    QSharedPointer<FILE> autoClose(pfile, fclose);
     fseek(pfile, 0, SEEK_END);
     long fsize = ftell(pfile);
     fseek(pfile, 0, SEEK_SET);
