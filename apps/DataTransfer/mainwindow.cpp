@@ -291,7 +291,8 @@ void MainWindow::addLog(const QString &dirName, const QString &info, int infoTyp
     ui.tableWidget->insertRow(0);
 
     QString strTime = QDateTime::currentDateTime().toString("MM-dd hh:mm:ss");
-    QTableWidgetItem *pItem = new QTableWidgetItem(QIcon(":/02.png"), strTime);
+    //QTableWidgetItem *pItem = new QTableWidgetItem(QIcon(":/02.png"), strTime);
+    QTableWidgetItem *pItem = new QTableWidgetItem(strTime);
     ui.tableWidget->setItem(0, 0, pItem);
     pItem = new QTableWidgetItem(dirName);
     ui.tableWidget->setItem(0, 1, pItem);
@@ -322,15 +323,15 @@ void MainWindow::addLog(const CollectTask &task, const QString &info, int infoTy
 
     QDateTime qDT = QDateTime::currentDateTime();
     QString strTime = qDT.toString("MM-dd hh:mm:ss");
-    QTableWidgetItem *pItem = NULL;
-    if (1 == infoType)
-    {
-        pItem = new QTableWidgetItem(QIcon(":/01.png"), strTime);
-    }
-    else if (2 == infoType)
-    {
-        pItem = new QTableWidgetItem(QIcon(":/03.png"), strTime);
-    }
+    QTableWidgetItem *pItem = new QTableWidgetItem(strTime);;
+    //if (1 == infoType)
+    //{
+    //    pItem = new QTableWidgetItem(QIcon(":/01.png"), strTime);
+    //}
+    //else if (2 == infoType)
+    //{
+    //    pItem = new QTableWidgetItem(QIcon(":/03.png"), strTime);
+    //}
 
     //QTableWidgetItem *pItem = new QTableWidgetItem(strTime);
     ui.tableWidget->setItem(0, 0, pItem);
