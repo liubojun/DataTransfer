@@ -883,27 +883,42 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
         else
         {
             QSLOG_DEBUG("SEND TO FTP");
-            char ftpUrl[200] = {0};
-            char ftpPath[512] = { 0 };
-            char usrPwd[100] = {0};
+            //char ftpUrl[200] = {0};
+            //char ftpPath[512] = { 0 };
+            //char usrPwd[100] = {0};
             string strIp = cUser.user.ip.toStdString();
             int nPort = cUser.user.port;
             string strPath = dstFileFullPath.toLocal8Bit().data();
             string strName = tTask.strDestFileName.toLocal8Bit().data();
             string strUsr = cUser.user.lgUser.toLocal8Bit().data();
             string strPwd = cUser.user.lgPass.toLocal8Bit().data();
-            sprintf(ftpUrl, "ftp://%s:%d%s", strIp.c_str(), nPort, strPath.c_str());
-            sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
+            QString ftpUrl = QString("ftp://%1:%2%3").arg(strIp.c_str()).arg(nPort).arg(strPath.c_str());
+            //sprintf(ftpUrl, "ftp://%s:%d%s", strIp.c_str(), nPort, strPath.c_str());
+            QString usrPwd = QString("%1:%2").arg(strUsr.c_str()).arg(strPwd.c_str());
+            //sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
 
-            string strDestPath = dstFileFullPath.mid(0, dstFileFullPath.lastIndexOf("/")+1).toLocal8Bit().toStdString();
-            sprintf(ftpPath, "ftp://%s:%d%s", strIp.c_str(), nPort, strDestPath.c_str());
+            int iIndex = dstFileFullPath.lastIndexOf("/");
+            string strDestPath;
+            if (dstFileFullPath.length() > iIndex)
+            {
+                strDestPath = dstFileFullPath.mid(0, iIndex + 1).toLocal8Bit().toStdString();
+            }
+            else
+            {
+                QSLOG_ERROR("dstFileFullPath.length() is incorrect.");
+            }
+            //string strDestPath = dstFileFullPath.mid(0, iIndex + 1).toLocal8Bit().toStdString();
+            QString ftpPath = QString("ftp://%1:%2%3").arg(strIp.c_str()).arg(nPort).arg(strDestPath.c_str());
+            //sprintf(ftpPath, "ftp://%s:%d%s", strIp.c_str(), nPort, strDestPath.c_str());
             // CurlFtp m_ftp;
             double dSize = 0;
-            if (oCurlFtp.getFileSize(ftpUrl, usrPwd, strName, dSize))
+            if (oCurlFtp.getFileSize(ftpUrl.toLocal8Bit().toStdString().c_str(),
+                                     usrPwd.toLocal8Bit().toStdString().c_str(), strName, dSize))
             {
                 if (fi.size() != (long long)dSize)
                 {
-                    if (-1 == oCurlFtp.deleteFtpFile(ftpPath, usrPwd, strName))
+                    if (-1 == oCurlFtp.deleteFtpFile(ftpPath.toLocal8Bit().toStdString().c_str(),
+                                                     usrPwd.toLocal8Bit().toStdString().c_str(), strName))
                     {
                         continue;
                     }

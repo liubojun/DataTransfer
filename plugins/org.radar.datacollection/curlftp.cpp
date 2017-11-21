@@ -170,16 +170,20 @@ int CurlFtp::setCommOpt()
 int CurlFtp::getNewFiles(FileInfoList &fileList)
 {
     // 每次都去连接
-    char url[512] = {0};
-    char usrpwd[100] = {0};
-    sprintf(url, "ftp://%s:%d%s/", m_strIP.c_str(), m_nPort, m_strRoot.c_str());
-    QSLOG_DEBUG("WE WILL LOOK FOR:" + QString(url));
+    //char url[512] = {0};
+    //char usrpwd[100] = {0};
+    QString url = QString("ftp://%1:%2%3/").arg(m_strIP.c_str()).arg(m_nPort).arg(m_strRoot.c_str());
+    //sprintf(url, "ftp://%s:%d%s/", m_strIP.c_str(), m_nPort, m_strRoot.c_str());
+    QSLOG_DEBUG("WE WILL LOOK FOR:" + url);
     // modified by liubojun
     // sprintf(url, "sftp://%s", m_strIP.c_str(), m_nPort);
-    sprintf(usrpwd, "%s:%s", m_strUser.c_str(), m_strPwd.c_str());
-    if (!connectToHost(url, usrpwd))
+    QString usrpwd = QString("%1:%2").arg(m_strUser.c_str()).arg(m_strPwd.c_str());
+    // sprintf(usrpwd, "%s:%s", m_strUser.c_str(), m_strPwd.c_str());
+    if (!connectToHost(url.toLocal8Bit().toStdString().c_str(), usrpwd.toLocal8Bit().toStdString().c_str()))
+        // if (!connectToHost(url, usrpwd.toLocal8Bit().toStdString().c_str()))
     {
         emit done();
+        //QSLOG_ERROR("connectToHost error." + url);
         return -1;
     }
     //////////////////////////////////////////////////////////////////////////
@@ -194,10 +198,12 @@ int CurlFtp::getNewFiles(FileInfoList &fileList)
         }
 
         m_strCurDir = m_lstDirs.takeFirst();
+        //QSLOG_DEBUG(m_strCurDir);
         if (m_strCurDir.length() >= 1 && m_strCurDir.right(1) != "/")
         {
             m_strCurDir += "/";
         }
+        //QSLOG_DEBUG(m_strCurDir);
 //          QDateTime qdtime = QDateTime::fromTime_t(m_pCoBase->m_pTsctTime->mapDirTime[m_strCurDir.toStdString()]);
 //          m_strCurDirLastTime = qdtime.toString("yyyyMMddHHmmss").toStdString();
         listFiles(m_strCurDir.toLocal8Bit().data(), fileList);
@@ -315,9 +321,11 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
     //    free(listInfo.memdata);
     //    return;
     //}
-    char url[512] = { 0 };
-    sprintf(url, "ftp://%s:%d%s/", m_strIP.c_str(), m_nPort, strDir.c_str());
-    curl_easy_setopt(m_pCurl, CURLOPT_URL, url);
+    //char url[512] = { 0 };
+    //sprintf(url, "ftp://%s:%d%s/", m_strIP.c_str(), m_nPort, strDir.c_str());
+    QString url = QString("ftp://%1:%2%3").arg(m_strIP.c_str()).arg(m_nPort).arg(strDir.c_str());
+    //QSLOG_DEBUG(url);
+    curl_easy_setopt(m_pCurl, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
 
     // list当前目录
     //curl_easy_setopt(m_pCurl, CURLOPT_CUSTOMREQUEST, "MLSD");
@@ -333,12 +341,14 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
         if (res != CURLE_OK)
         {
             free(listInfo.memdata);
+            QSLOG_ERROR("curl_easy_perform error" + QString(curl_easy_strerror(res)));
             return;
         }
     }
     // 解析MLSD的返回内容
     //QString strInfo = QString::fromLocal8Bit(listInfo.memdata);
     QString strInfo(listInfo.memdata);		//不同的机器可能乱码??
+    //QSLOG_DEBUG(strInfo);
     //free(listInfo.memdata);
 
     QString strDBPath = qApp->applicationDirPath()+ "/work/record/" + m_pCoBase->m_collectSet.dirID + "/record.index";
@@ -480,6 +490,10 @@ QString CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStr
         {
             nMdfyTime = oneInfo.strMdfyTime.mid(0, 14);
         }
+        else
+        {
+            QSLOG_ERROR("oneInfo.strMdfyTime length is incorrect.");
+        }
         //nMdfyTime = oneInfo.strMdfyTime.mid(0, 14);// QDateTime::fromString(oneInfo.strMdfyTime.mid(0, 14), "yyyyMMddhhmmss").toTime_t();
         // LIST命令只能获取到分钟，所以出现分钟一样的文件，应该与目标目录下进行比较
         if (nMdfyTime > iLastModifiedTime)
@@ -491,7 +505,15 @@ QString CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStr
         {
             FileInfo fInfo;
             fInfo.strFileName = oneInfo.strFileName.toLocal8Bit().data();
-            fInfo.strMdyTime = oneInfo.strMdfyTime.toStdString().substr(0, 14);
+            if (oneInfo.strMdfyTime.length() >= 14)
+            {
+                fInfo.strMdyTime = oneInfo.strMdfyTime.toStdString().substr(0, 14);
+            }
+            else
+            {
+                QSLOG_ERROR("oneInfo.strMdfyTime length is incorrect.");
+            }
+
 
             // 增加针对.tmp临时文件结尾的收集文件进行过滤
             if (QString::fromLocal8Bit(fInfo.strFileName.c_str()).toLower().endsWith(".tmp"))
@@ -891,12 +913,13 @@ int CurlFtp::deleteFtpFile(const char *url, const char *user_pwd, const string &
 {
     // 如果远端Ftp服务器上已经存在了该文件，那么需要删除该文件
 
-    char szCmd[1024] = "DELE ";
-    strcat(szCmd, filename.c_str());
+    //char szCmd[1024] = "DELE ";
+    //strcat(szCmd, filename.c_str());
+    QString szCmd = QString("DELE ").arg(filename.c_str());
     curl_easy_setopt(m_pRemoveDestCurl, CURLOPT_URL, url);
     curl_easy_setopt(m_pRemoveDestCurl, CURLOPT_USERPWD, user_pwd);
     struct curl_slist *headerlist = NULL;
-    headerlist = curl_slist_append(headerlist, szCmd);
+    headerlist = curl_slist_append(headerlist, szCmd.toLocal8Bit().toStdString().c_str());
     curl_easy_setopt(m_pRemoveDestCurl, CURLOPT_POSTQUOTE, headerlist);
 
     // modified by liubojun @2017-10-28,没有这两句话会出问题
@@ -1214,7 +1237,7 @@ bool CurlFtp::TestConnection(const char *url, const char *user_pwd)
     CURLcode res = curl_easy_perform(curl);
     if (CURLE_OK != res)
     {
-        QSLOG_ERROR(QString("connectToHost error: %1").arg(curl_easy_strerror(res)));
+        QSLOG_INFO(QString("connectToHost error: %1").arg(curl_easy_strerror(res)));
         curl_easy_cleanup(curl);
         return false;
     }
@@ -1233,14 +1256,14 @@ void CurlFtp::process4Ftp(CListInfo &oneInfo, const QStringList &lstParts)
         //05-07-17 12:23AM
 
         // oneInfo.strMdfyTime = QDateTime::fromString(lstParts[0] + lstParts[1] , "MM-dd-yyhh:mm").toString("yyyyMMddhhmmss");
-        if (lstParts[1].mid(5, 2).toUpper() == "AM")
+        if (lstParts[1].length() >= 8 && lstParts[1].mid(5, 2).toUpper() == "AM")
         {
 
             oneInfo.strMdfyTime = QDateTime(QDate((QString::number(QDate::currentDate().year()).mid(0, 2) + lstParts[0].mid(6, 2)).toInt(), lstParts[0].mid(0, 2).toInt(), lstParts[0].mid(3, 2).toInt()), QTime(lstParts[1].mid(0, 2).toInt(), lstParts[1].mid(3, 2).toInt(), 0)).toString("yyyyMMddhhmmss");
         }
         else
         {
-            if (lstParts[1].mid(0, 2).toInt() == 12)
+            if (lstParts[1].length() >= 8 && lstParts[1].mid(0, 2).toInt() == 12)
             {
                 // 如果到下午12点，正好为PM
                 oneInfo.strMdfyTime = QDateTime(QDate((QString::number(QDate::currentDate().year()).mid(0, 2) + lstParts[0].mid(6, 2)).toInt(), lstParts[0].mid(0, 2).toInt(), lstParts[0].mid(3, 2).toInt()), QTime(lstParts[1].mid(0, 2).toInt(), lstParts[1].mid(3, 2).toInt(), 0)).toString("yyyyMMddhhmmss");

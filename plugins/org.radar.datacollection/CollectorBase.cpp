@@ -206,15 +206,17 @@ bool CollectorBase::testFileConnection(QString strUrl)
 bool CollectorBase::testFtpConnection(const QString & ip, int port, const QString & lgUser, const QString & lgPass, int transfermode, int connectmode)
 {
     CurlFtp cFtp(this);
-    char url[512] = {0};
-    char usrPwd[100] = {0};
-    sprintf(url, "ftp://%s:%d", ip.toStdString().c_str(), port);
+    // char url[512] = {0};
+    QString url = QString("ftp://%1:%2").arg(ip).arg(port);
+    //char usrPwd[100] = {0};
+    QString usrPwd = QString("%1:%2").arg(lgUser).arg(lgPass);
+    //sprintf(url, "ftp://%s:%d", ip.toStdString().c_str(), port);
     // sprintf(url, "sftp://%s", ip.toStdString().c_str(), port);
-    sprintf(usrPwd, "%s:%s", lgUser.toStdString().c_str(), lgPass.toStdString().c_str());
+    //sprintf(usrPwd, "%s:%s", lgUser.toStdString().c_str(), lgPass.toStdString().c_str());
     cFtp.setFtpTransferMode(m_collectSet.ftp_transferMode);
     cFtp.setFtpConnectMode(m_collectSet.ftp_connectMode);
 
-    return cFtp.connectToHost(url, usrPwd, 5);
+    return cFtp.connectToHost(url.toLocal8Bit().toStdString().c_str(), usrPwd.toLocal8Bit().toStdString().c_str(), 5);
 }
 
 bool CollectorBase::readSet()
