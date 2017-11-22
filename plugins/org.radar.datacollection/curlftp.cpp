@@ -996,6 +996,7 @@ bool CurlFtp::getFileSize(const char *url, const char *user_pwd, const string &f
 
 int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string &filename, const char *localPath, const char *sendsuffix)
 {
+    QSLOG_DEBUG("begin upload file to ftp");
     // 连接ftp服务器
     //if (!TestConnection(url, user_pwd))
     //{
@@ -1069,6 +1070,7 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
     }
 
     //curl_easy_cleanup(curl);
+    QSLOG_DEBUG("end upload file to ftp");
     return 0;
 }
 
