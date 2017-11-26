@@ -216,7 +216,7 @@ bool CollectorBase::testFtpConnection(const QString & ip, int port, const QStrin
     cFtp.setFtpTransferMode(m_collectSet.ftp_transferMode);
     cFtp.setFtpConnectMode(m_collectSet.ftp_connectMode);
 
-    return cFtp.connectToHost(url.toLocal8Bit().toStdString().c_str(), usrPwd.toLocal8Bit().toStdString().c_str(), 5);
+    return cFtp.connectToHost(url.toLocal8Bit().toStdString().c_str(), usrPwd.toLocal8Bit().toStdString().c_str());
 }
 
 bool CollectorBase::readSet()

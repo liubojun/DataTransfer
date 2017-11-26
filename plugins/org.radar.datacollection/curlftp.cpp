@@ -39,7 +39,7 @@ static size_t WriteInMemoryFun(void *contents, size_t size, size_t nmemb, void *
     if (mem->memdata == NULL)
     {
         /* out of memory! */
-        printf("not enough memory (realloc returned NULL)\n");
+        QSLOG_ERROR("not enough memory (realloc returned NULL)\n");
         return 0;
     }
 
@@ -183,7 +183,7 @@ int CurlFtp::getNewFiles(FileInfoList &fileList)
         // if (!connectToHost(url, usrpwd.toLocal8Bit().toStdString().c_str()))
     {
         emit done();
-        //QSLOG_ERROR("connectToHost error." + url);
+        QSLOG_ERROR("connectToHost error." + url);
         return -1;
     }
     //////////////////////////////////////////////////////////////////////////
@@ -227,13 +227,21 @@ bool CurlFtp::connectToHost(const char *url, const char *user_pwd, int timeout)
 
     if (1 == ftp_transfermode)
     {
-        curl_easy_setopt(m_pCurl, CURLOPT_TRANSFERTEXT, 1L);
+        if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_TRANSFERTEXT, 1L))
+        {
+            QSLOG_ERROR("curl_easy_setopt error.");
+            return false;
+        }
         //string cmd = "TYPE A";
         //headerlist = curl_slist_append(headerlist, cmd.c_str());
     }
     else
     {
-        curl_easy_setopt(m_pCurl, CURLOPT_TRANSFERTEXT, 0);
+        if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_TRANSFERTEXT, 0))
+        {
+            QSLOG_ERROR("curl_easy_setopt error.");
+            return false;
+        }
         //string cmd = "TYPE I";
         //headerlist = curl_slist_append(headerlist, cmd.c_str());
     }
@@ -243,7 +251,11 @@ bool CurlFtp::connectToHost(const char *url, const char *user_pwd, int timeout)
     //curl_easy_setopt(m_pCurl, CURLOPT_POSTQUOTE, headerlist);
     if (1 == ftp_connectmode)
     {
-        curl_easy_setopt(m_pCurl, CURLOPT_FTPPORT, "-");
+        if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_FTPPORT, "-"))
+        {
+            QSLOG_ERROR("curl_easy_setopt error.");
+            return false;
+        }
     }
 
 
@@ -251,29 +263,61 @@ bool CurlFtp::connectToHost(const char *url, const char *user_pwd, int timeout)
     // CURL *curl = curl_easy_init();
     // QSharedPointer<CURL> autoRelease(curl, curl_easy_cleanup);
 
-    curl_easy_setopt(m_pCurl, CURLOPT_URL, url);
-    curl_easy_setopt(m_pCurl, CURLOPT_USERPWD, user_pwd);
+    if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_URL, url))
+    {
+        QSLOG_ERROR("curl_easy_setopt error.");
+        return false;
+    }
+    if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_USERPWD, user_pwd))
+    {
+        QSLOG_ERROR("curl_easy_setopt error.");
+        return false;
+    }
     // modified by liubojun.
     // 20170828,ftp大目录，轮询速度较慢
     if (-1 != timeout)
     {
-        curl_easy_setopt(m_pCurl, CURLOPT_TIMEOUT, timeout);
+        if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_TIMEOUT, timeout))
+        {
+            QSLOG_ERROR("curl_easy_setopt error.");
+            return false;
+        }
     }
 
-    curl_easy_setopt(m_pCurl, CURLOPT_NOSIGNAL,1L);
+    if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_NOSIGNAL, 1L))
+    {
+        QSLOG_ERROR("curl_easy_setopt error.");
+        return false;
+    }
     // curl_easy_setopt(m_pCurl, CURLOPT_FTP_FILEMETHOD, CURLFTPMETHOD_DEFAULT);
 //#ifndef DISABLE_SSH_AGENT
 //    curl_easy_setopt(m_pCurl, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_AGENT);
 //#endif
     // curl_easy_setopt(m_pCurl, CURLOPT_USE_SSL, CURLUSESSL_ALL);
     //curl_easy_setopt(m_pCurl, CURLOPT_FTP_CREATE_MISSING_DIRS, TRUE);
-    curl_easy_setopt(m_pCurl, CURLOPT_VERBOSE, 1L);
-    curl_easy_setopt(m_pCurl, CURLOPT_NOSIGNAL,1L);
+    if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_VERBOSE, 1L))
+    {
+        QSLOG_ERROR("curl_easy_setopt error.");
+        return false;
+    }
+    if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_NOSIGNAL, 1L))
+    {
+        QSLOG_ERROR("curl_easy_setopt error.");
+        return false;
+    }
 
     // modified by liubojun @2017-10-28,没有这两句话会出问题
     struct MemoryData listInfo;
-    curl_easy_setopt(m_pCurl, CURLOPT_WRITEDATA, (void *)&listInfo);
-    curl_easy_setopt(m_pCurl, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
+    if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_WRITEDATA, (void *)&listInfo))
+    {
+        QSLOG_ERROR("curl_easy_setopt error.");
+        return false;
+    }
+    if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_WRITEFUNCTION, WriteInMemoryFun))
+    {
+        QSLOG_ERROR("curl_easy_setopt error.");
+        return false;
+    }
 
     CURLcode res = curl_easy_perform(m_pCurl);
     if (CURLE_OK != res)
@@ -299,9 +343,21 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
     CURLcode res;
 
     struct MemoryData listInfo;
-    curl_easy_setopt(m_pCurl, CURLOPT_WRITEDATA, (void *)&listInfo);
-    curl_easy_setopt(m_pCurl, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
-    curl_easy_setopt(m_pCurl, CURLOPT_NOSIGNAL,1L);
+    if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_WRITEDATA, (void *)&listInfo))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return;
+    }
+    if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_WRITEFUNCTION, WriteInMemoryFun))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return;
+    }
+    if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_NOSIGNAL, 1L))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return;
+    }
     // 切换到strDir目录
     // string strCmd = string("CWD ") + "//x_rada";
     //curl_easy_setopt(m_pCurl, CURLOPT_FTP_FILEMETHOD, CURLFTPMETHOD_NOCWD);
@@ -325,7 +381,11 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
     //sprintf(url, "ftp://%s:%d%s/", m_strIP.c_str(), m_nPort, strDir.c_str());
     QString url = QString("ftp://%1:%2%3").arg(m_strIP.c_str()).arg(m_nPort).arg(strDir.c_str());
     //QSLOG_DEBUG(url);
-    curl_easy_setopt(m_pCurl, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+    if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str()))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return;
+    }
 
     // list当前目录
     //curl_easy_setopt(m_pCurl, CURLOPT_CUSTOMREQUEST, "MLSD");
@@ -336,11 +396,15 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
         bFtpSupportMLSD = false;
         //QSLOG_ERROR(QString("MLSD error: %1, list dir: %2").arg(curl_easy_strerror(res)).arg(QString::fromLocal8Bit(strCmd.c_str())));
         //QSLOG_DEBUG(QString::fromLocal8Bit("使用MLSD命名返回错误,尝试使用LIST命名"));
-        curl_easy_setopt(m_pCurl, CURLOPT_CUSTOMREQUEST, "LIST");
+        if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_CUSTOMREQUEST, "LIST"))
+        {
+            QSLOG_ERROR("curl_easy_setopt error");
+            return;
+        }
         res = curl_easy_perform(m_pCurl);
         if (res != CURLE_OK)
         {
-            free(listInfo.memdata);
+            //free(listInfo.memdata);
             QSLOG_ERROR("curl_easy_perform error" + QString(curl_easy_strerror(res)));
             return;
         }
@@ -493,6 +557,7 @@ QString CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStr
         else
         {
             QSLOG_ERROR("oneInfo.strMdfyTime length is incorrect.");
+            continue;
         }
         //nMdfyTime = oneInfo.strMdfyTime.mid(0, 14);// QDateTime::fromString(oneInfo.strMdfyTime.mid(0, 14), "yyyyMMddhhmmss").toTime_t();
         // LIST命令只能获取到分钟，所以出现分钟一样的文件，应该与目标目录下进行比较
@@ -512,6 +577,7 @@ QString CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStr
             else
             {
                 QSLOG_ERROR("oneInfo.strMdfyTime length is incorrect.");
+                continue;
             }
 
 
@@ -653,24 +719,41 @@ int CurlFtp::downloadFile(const char *url, const char *user_pwd, FileData *fileD
     if (NULL == curl)
     {
         QSLOG_ERROR(QStringLiteral("初始化curl失败!"));
+        return -1;
     }
     // QSharedPointer<CURL> autoRelease(curl, curl_easy_cleanup);
 
     // 指定全路径url
-    curl_easy_setopt(curl, CURLOPT_URL, url);
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_URL, url))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return -1;
+    }
     if (user_pwd != NULL)
     {
-        curl_easy_setopt(curl, CURLOPT_USERPWD, user_pwd);
+        if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_USERPWD, user_pwd))
+        {
+            QSLOG_ERROR("curl_easy_setopt error");
+            return -1;
+        }
     }
     if (1 == ftp_transfermode)
     {
-        curl_easy_setopt(m_pCurl, CURLOPT_TRANSFERTEXT, 1L);
+        if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_TRANSFERTEXT, 1L))
+        {
+            QSLOG_ERROR("curl_easy_setopt error");
+            return -1;
+        }
         //string cmd = "TYPE A";
         //headerlist = curl_slist_append(headerlist, cmd.c_str());
     }
     else
     {
-        curl_easy_setopt(m_pCurl, CURLOPT_TRANSFERTEXT, 0);
+        if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_TRANSFERTEXT, 0))
+        {
+            QSLOG_ERROR("curl_easy_setopt error");
+            return -1;
+        }
         //string cmd = "TYPE I";
         //headerlist = curl_slist_append(headerlist, cmd.c_str());
     }
@@ -680,13 +763,30 @@ int CurlFtp::downloadFile(const char *url, const char *user_pwd, FileData *fileD
     //curl_easy_setopt(m_pCurl, CURLOPT_POSTQUOTE, headerlist);
     if (1 == ftp_connectmode)
     {
-        curl_easy_setopt(m_pCurl, CURLOPT_FTPPORT, "-");
+        if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_FTPPORT, "-"))
+        {
+            QSLOG_ERROR("curl_easy_setopt error");
+            return -1;
+        }
     }
     // 设置下载文件的回调函数
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteInFileFun);
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteInFileFun))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return -1;
+    }
     // 设置传递给回调函数的对象指针
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fileData);
-    curl_easy_setopt(curl, CURLOPT_NOSIGNAL,1L);
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_WRITEDATA, fileData))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return -1;
+    }
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return -1;
+
+    }
 
     /* QUrl ourl(QString::fromLocal8Bit(url));
     QString strFile = ourl.toLocalFile();
@@ -1029,7 +1129,11 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
     CURL *curl = m_pDestCurl;
     // CURL *curl = curl_easy_init();
     // QSharedPointer<CURL> autoRelease(curl, curl_easy_cleanup);
-    curl_easy_setopt(curl, CURLOPT_NOSIGNAL,1L);
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return -1;
+    }
     struct curl_slist *headerlist = NULL;
     CURLcode res = CURLE_OK;
 
@@ -1039,16 +1143,65 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
     strUrl += filename + sendsuffix;
 
     headerlist = curl_slist_append(headerlist, cmdTmpName.c_str());
+    if (NULL == headerlist)
+    {
+        QSLOG_ERROR("curl_slist_append error");
+        return -1;
+    }
     headerlist = curl_slist_append(headerlist, cmdOrgName.c_str());
-    curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
-    curl_easy_setopt(curl, CURLOPT_URL, strUrl.c_str());
-    curl_easy_setopt(curl, CURLOPT_USERPWD, user_pwd);
-    curl_easy_setopt(curl, CURLOPT_FTP_CREATE_MISSING_DIRS, 1);
-    curl_easy_setopt(curl, CURLOPT_READDATA, pfile);
-    curl_easy_setopt(curl, CURLOPT_READFUNCTION, ReadFromFile);
-    curl_easy_setopt(curl, CURLOPT_POSTQUOTE, headerlist);
-    curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)fsize);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    if (NULL == headerlist)
+    {
+        QSLOG_ERROR("curl_slist_append error");
+        return -1;
+    }
+
+    QSharedPointer<curl_slist> autoDelete(headerlist, curl_slist_free_all);
+
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_UPLOAD, 1))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return -1;
+    }
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_URL, strUrl.c_str()))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return -1;
+    }
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_USERPWD, user_pwd))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return -1;
+    }
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_FTP_CREATE_MISSING_DIRS, 1))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return -1;
+    }
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_READDATA, pfile))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return -1;
+    }
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_READFUNCTION, ReadFromFile))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return -1;
+    }
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_POSTQUOTE, headerlist))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return -1;
+    }
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)fsize))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return -1;
+    }
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L))
+    {
+        QSLOG_ERROR("curl_easy_setopt error");
+        return -1;
+    }
     //--进度条功能--
     // 	struct myprogress prog;
     // 	prog.lastruntime = 0;
@@ -1058,7 +1211,7 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
     // 	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, FALSE);
     //------------
     res = curl_easy_perform(curl);
-    curl_slist_free_all(headerlist);
+    //curl_slist_free_all(headerlist);
 
     if (CURLE_OK != res)
     {

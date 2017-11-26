@@ -302,8 +302,8 @@ void MainWindow::addLog(const QString &dirName, const QString &info, int infoTyp
 
 void MainWindow::addLog(const CollectTask &task, const QString &info, int infoType)
 {
-    /*	QTime tt;
-    	tt.start()*/;
+    ///*	QTime tt;
+    //	tt.start()*/;
     if (m_logNum >= 500)
     {
         // 清空tablewidget的内容
@@ -320,18 +320,18 @@ void MainWindow::addLog(const CollectTask &task, const QString &info, int infoTy
 
     m_logNum++;
     ui.tableWidget->insertRow(0);
-
+    QMutexLocker guard(&m_oLocker2);
     QDateTime qDT = QDateTime::currentDateTime();
     QString strTime = qDT.toString("MM-dd hh:mm:ss");
     QTableWidgetItem *pItem = new QTableWidgetItem(strTime);;
-    //if (1 == infoType)
-    //{
-    //    pItem = new QTableWidgetItem(QIcon(":/01.png"), strTime);
-    //}
-    //else if (2 == infoType)
-    //{
-    //    pItem = new QTableWidgetItem(QIcon(":/03.png"), strTime);
-    //}
+    if (1 == infoType)
+    {
+        pItem = new QTableWidgetItem(QIcon(":/01.png"), strTime);
+    }
+    else if (2 == infoType)
+    {
+        pItem = new QTableWidgetItem(QIcon(":/03.png"), strTime);
+    }
 
     //QTableWidgetItem *pItem = new QTableWidgetItem(strTime);
     ui.tableWidget->setItem(0, 0, pItem);
@@ -357,16 +357,16 @@ void MainWindow::addLog(const CollectTask &task, const QString &info, int infoTy
     {
         // 发送失败
     }
-    /*QSLOG_INFO(QString("******%1******").arg(tt.elapsed()));*/
+    ///*QSLOG_INFO(QString("******%1******").arg(tt.elapsed()));*/
 
-    //m_oLocker.lock();
+    ////m_oLocker.lock();
 
-    //if (m_ilogsize <= 100)
-    //{
-    //	m_oConditon.wakeAll();
-    //}
-    //m_oLocker.unlock();
-    //m_ilogsize--;
+    ////if (m_ilogsize <= 100)
+    ////{
+    ////	m_oConditon.wakeAll();
+    ////}
+    ////m_oLocker.unlock();
+    ////m_ilogsize--;
 }
 
 void MainWindow::openSrcPath()

@@ -172,6 +172,7 @@ private:
     // 线程控制，用来控制打印日志
     QWaitCondition m_oConditon;
     QMutex m_oLocker;
+    QMutex m_oLocker2;	// 控制往界面表格处打印
     int m_ilogsize;
 };
 

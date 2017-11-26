@@ -112,7 +112,11 @@ struct MemoryData
 
     ~MemoryData()
     {
-        free(memdata);
+        if (NULL != memdata)
+        {
+            free(memdata);
+        }
+
     }
 };
 
