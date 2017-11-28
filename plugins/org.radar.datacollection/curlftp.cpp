@@ -94,8 +94,19 @@ static size_t WriteInFileFun(void *buffer, size_t size, size_t nmemb, void *stre
 // 从文件上传
 static size_t ReadFromFile(void *buffer, size_t size, size_t nmemb, void *stream)
 {
+    curl_off_t nread;
+    /* in real-world cases, this would probably get this data differently
+    as this fread() stuff is exactly what the library already would do
+    by default internally */
     size_t retcode = fread(buffer, size, nmemb, (FILE *)stream);
+
+    nread = (curl_off_t)retcode;
+
+    QSLOG_DEBUG(QString("*** We read %1 bytes from file").arg(nread));
     return retcode;
+
+    //size_t retcode = fread(buffer, size, nmemb, (FILE *)stream);
+    //return retcode;
 }
 
 static size_t throw_away(void *ptr, size_t size, size_t nmemb, void *data)
@@ -1115,9 +1126,15 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
         return -1;
     }
     QSharedPointer<FILE> autoClose(pfile, fclose);
-    fseek(pfile, 0, SEEK_END);
-    long fsize = ftell(pfile);
-    fseek(pfile, 0, SEEK_SET);
+    //fseek(pfile, 0, SEEK_END);
+    //long fsize = ftell(pfile);
+    //fseek(pfile, 0, SEEK_SET);
+    QFile file(localPath);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        QSLOG_ERROR("open file: " + QString(localPath) + " failure");
+        return -1;
+    }
 
     //CURL *curl = m_pCurl;
     //if (curl == NULL)
@@ -1192,7 +1209,7 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
         QSLOG_ERROR("curl_easy_setopt error");
         return -1;
     }
-    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)fsize))
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)file.size()))
     {
         QSLOG_ERROR("curl_easy_setopt error");
         return -1;

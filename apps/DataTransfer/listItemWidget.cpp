@@ -22,9 +22,13 @@ MyItemWidget::MyItemWidget(const ICONTYPE &icon, const QString &name, QString st
     ui.label_2->setText(state);
 
     // gif动画
-    m_pMovie = new QMovie(":/working.gif");
-    m_pMovie->setSpeed(50);
-    ui.le_gif->setMovie(m_pMovie);
+    //m_pMovie = new QMovie(":/working.gif");
+    //m_pMovie->setSpeed(50);
+    //ui.le_gif->setMovie(m_pMovie);
+    m_pStatusWnd = new CStatusLabel();
+    QVBoxLayout *pLayout = new QVBoxLayout();
+    ui.le_gif->setLayout(pLayout);
+    pLayout->addWidget(m_pStatusWnd);
 }
 
 MyItemWidget::~MyItemWidget()
@@ -113,12 +117,14 @@ void MyItemWidget::ShowGif(bool bFlag)
     if (bFlag)
     {
         ui.le_gif->show();
-        m_pMovie->start();
+        m_pStatusWnd->start();
+        //m_pMovie->start();
     }
     else
     {
         ui.le_gif->hide();
-        m_pMovie->stop();
+        m_pStatusWnd->stop();
+        //m_pMovie->stop();
     }
 }
 

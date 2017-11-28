@@ -23,6 +23,7 @@ SET(SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/clearItemWidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/regexpression.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/renameDlg.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/status.cpp
 )
 
 # .h文件
@@ -40,6 +41,7 @@ SET(HDRS
   ${CMAKE_CURRENT_SOURCE_DIR}/clearItemWidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/regexpression.h
   ${CMAKE_CURRENT_SOURCE_DIR}/renameDlg.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/status.h
 )
 
 SET(MOC_HDRS
@@ -65,6 +67,7 @@ SET(MOC_HDRS
 	${CMAKE_CURRENT_SOURCE_DIR}/clearItemWidget.h
 	${CMAKE_CURRENT_SOURCE_DIR}/regexpression.h
 	${CMAKE_CURRENT_SOURCE_DIR}/renameDlg.h
+	${CMAKE_CURRENT_SOURCE_DIR}/status.h
 )
 
 SET(UI
