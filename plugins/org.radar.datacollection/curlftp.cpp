@@ -102,7 +102,7 @@ static size_t ReadFromFile(void *buffer, size_t size, size_t nmemb, void *stream
 
     nread = (curl_off_t)retcode;
 
-    QSLOG_DEBUG(QString("*** We read %1 bytes from file").arg(nread));
+    //QSLOG_DEBUG(QString("*** We read %1 bytes from file").arg(nread));
     return retcode;
 
     //size_t retcode = fread(buffer, size, nmemb, (FILE *)stream);

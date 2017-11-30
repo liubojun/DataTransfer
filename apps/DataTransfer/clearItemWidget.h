@@ -5,6 +5,8 @@
 #include <QMovie>
 #include "ui_clearItemWidget.h"
 
+#include "status.h"
+
 class ClearItemWidget : public QWidget
 {
     Q_OBJECT
@@ -22,5 +24,6 @@ private:
     Ui::clearItemWidget ui;
 
     QMovie *m_pMovie;
+    //CStatusLabel *m_pStatusWnd;
 };
 #endif // clearItemWidget_h__

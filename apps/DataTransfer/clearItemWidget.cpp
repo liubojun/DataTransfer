@@ -14,6 +14,10 @@ ClearItemWidget::ClearItemWidget(const QString &name, QWidget *parent /*= NULL*/
     m_pMovie = new QMovie(":/working.gif");
     m_pMovie->setSpeed(50);
     ui.le_gif->setMovie(m_pMovie);
+    //m_pStatusWnd = new CStatusLabel();
+    //QVBoxLayout *pLayout = new QVBoxLayout();
+    //ui.le_gif->setLayout(pLayout);
+    //pLayout->addWidget(m_pStatusWnd);
 
     QString strTime = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
     QString state = QStringLiteral("%1/%2 %3:%4 Æô¶¯").arg(strTime.mid(4,2)).arg(strTime.mid(6,2))
@@ -27,11 +31,13 @@ void ClearItemWidget::ShowGif(bool bFlag)
     {
         ui.le_gif->show();
         m_pMovie->start();
+        //m_pStatusWnd->start();
     }
     else
     {
         ui.le_gif->hide();
         m_pMovie->stop();
+        //m_pStatusWnd->stop();
     }
 }
 

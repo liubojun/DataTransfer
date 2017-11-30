@@ -234,9 +234,9 @@ void RunCrashHandler()
 
 int main(int argc, char **argv)
 {
-#ifdef _WIN32
-    RunCrashHandler();
-#endif
+//#ifdef _WIN32
+//    RunCrashHandler();
+//#endif
     Q_TRY_BEGIN
 
 

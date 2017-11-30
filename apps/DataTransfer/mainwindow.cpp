@@ -441,17 +441,24 @@ void MainWindow::openDstPath()
     int nIndex = ui.listWidget->currentRow();
     if (nIndex < 0)
     {
+        QSLOG_ERROR("nIndex < 0");
         return;
     }
     QListWidgetItem *pItem = ui.listWidget->currentItem();
     QMap<QListWidgetItem*, QString>::const_iterator it = m_ItemTask.find(pItem);
     if (it == m_ItemTask.end())
     {
+        QSLOG_ERROR("TASK NOT FOUND");
         return;
     }
     if (m_sqlite == NULL)
     {
         m_sqlite = DataBase::getInstance();
+    }
+    // 如果是收集任务
+    if (it.key()->text() == CLEARITEM)
+    {
+        return;
     }
 
     //return;	// 临时
