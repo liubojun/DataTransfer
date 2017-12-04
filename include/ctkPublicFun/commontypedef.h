@@ -470,10 +470,9 @@ struct TransTask
 enum TaskState
 {
     SYSTEM = 0,
-    SUCCESS,
-    FAIL
+    GOOD = 1,
+    BAD = 2
 };
-
 
 
 struct ClearTask

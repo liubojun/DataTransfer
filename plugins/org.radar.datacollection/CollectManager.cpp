@@ -19,7 +19,7 @@ CollectManager::CollectManager(ICtkPluginManager *pCtkManager, QWaitCondition &i
     //connectMsgServer();		//连接消息服务器
 
     //m_pThread = QSharedPointer<QThread>(new QThread(this));
-    QObject::connect(m_pThread.data(), SIGNAL(finished()), m_pThread.data(), SLOT(deleteLater()));
+    //QObject::connect(m_pThread.data(), SIGNAL(finished()), this, SLOT(deleteLater()));
     //m_pThread->start();
 
     //readThreadNum();
@@ -236,6 +236,7 @@ void CollectManager::stopAllCollection()
     foreach(CollectorBase *pCollect, m_pCollects)
     {
         pCollect->stop();
+        //delete pCollect;
     }
     emit print(QStringLiteral("[%1]: 所有收集任务已停止。").arg(QDateTime::currentDateTime().toString(Qt::ISODate)));
     m_pCollects.clear();

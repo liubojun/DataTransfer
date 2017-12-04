@@ -66,7 +66,7 @@ void DistributeFile::transfer(TransTask &task)
         {
             QString logInfo = QStringLiteral("从FTP下载文件[%1]失败。").arg(task.fileName);
             //m_pBase->emitLog(task.collectSet.dirName, logInfo);
-            m_pBase->emitLog(logInfo, FAIL);
+            m_pBase->emitLog(logInfo, BAD);
             return;
         }
     }
@@ -98,7 +98,7 @@ void DistributeFile::transfer(TransTask &task)
         {
             QString logInfo = QStringLiteral("从源目录下载[%1]失败。").arg(task.srcFileFullPath);
             //m_pBase->emitLog(task.collectSet.dirName, logInfo);
-            m_pBase->emitLog(logInfo, FAIL);
+            m_pBase->emitLog(logInfo, BAD);
             return;
         }
     }
@@ -147,7 +147,7 @@ void DistributeFile::transfer(TransTask &task)
         {
             QString strInfo = QStringLiteral("文件[%1]发送完成。").arg(task.fileName);
             //m_pBase->emitLog(task.collectSet.dirName, strInfo);
-            m_pBase->emitLog(strInfo, SUCCESS);
+            m_pBase->emitLog(strInfo, GOOD);
         }
     }
 
@@ -389,7 +389,7 @@ bool DistributeFile::sendToFtp(const char *fullPath, TransTask &task, int userIn
     {
         QString logInfo = QStringLiteral("文件[%1]上传到ftp失败。").arg(task.fileName);
         //m_pBase->emitLog(task.collectSet.dirName, logInfo);
-        m_pBase->emitLog(logInfo, FAIL);
+        m_pBase->emitLog(logInfo, BAD);
         return false;
     }
 

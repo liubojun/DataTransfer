@@ -41,7 +41,7 @@ public slots:
 private:
     CollectorBase *m_pParent;
 
-    bool m_bHasFinished;
+    //bool m_bHasFinished;
 };
 
 #endif

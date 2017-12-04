@@ -9,9 +9,12 @@
 #include <QProcess>
 #include <QTextCodec>
 #include <QThread>
+#include <QProcess>
 #include "dataclearDlg.h"
 #include "clearItemWidget.h"
 #include "pathbuilder.h"
+#include "IDispatchTimer.h"
+//#include "quartz.h"
 //--
 
 MainWindow::MainWindow(ICtkPluginManager *ctk,QMainWindow *parent /*= NULL*/)
@@ -21,62 +24,6 @@ MainWindow::MainWindow(ICtkPluginManager *ctk,QMainWindow *parent /*= NULL*/)
 {
     ui.setupUi(this);
     InitUI();
-
-    QObject *pObj = NULL;
-    pObj = m_pCtk->getService("IDataCollection");
-    m_ilogsize = 0;
-    if (NULL != pObj)
-    {
-        m_pCollect = (qobject_cast<IDataCollection*>(pObj))->createCollector(m_oConditon, m_oLocker, m_ilogsize);
-        // 绑定信号...
-        //connect(m_pCollect.data(), SIGNAL(showLog(const QString &, const QString &)), this, SLOT(addLog(const QString &, const QString &)));
-        connect(m_pCollect.data(), SIGNAL(showLog(const CollectTask &, const QString &, int)), this, SLOT(addLog(const CollectTask &, const QString &, int)));
-        connect(m_pCollect.data(), SIGNAL(taskState(const CollectTask&, int, int)), this, SLOT(setTaskIcon(const CollectTask&, int, int)));
-        connect(m_pCollect.data(), SIGNAL(startGif(const QString&, bool)), this, SLOT(setGif(const QString&, bool)));
-        connect(this, SIGNAL(doCollectWork(const QString&)), m_pCollect.data(), SLOT(onDoWork(const QString&)));
-        connect(this, SIGNAL(enable(const QString&, bool)), m_pCollect.data(), SLOT(onEnable(const QString&, bool)));
-    }
-    else
-    {
-        QSLOG_ERROR(QString::fromLocal8Bit("获取数据收集插件失败"));
-        return;
-    }
-
-    pObj = m_pCtk->getService("IDataClear");
-    if (NULL != pObj)
-    {
-        m_pDataClear = qobject_cast<IDataClear *>(pObj);
-        if (NULL == m_pDataClear)
-        {
-            QSLOG_ERROR(QString::fromLocal8Bit("获取数据清理插件失败"));
-            return;
-        }
-        //m_pClearThread = QSharedPointer<QThread>(new QThread());
-        //m_pClearThread->start();
-        connect(this, SIGNAL(doClearWork(const QString &)), m_pDataClear, SLOT(doNow(const QString &)));
-        connect(m_pDataClear, SIGNAL(taskBegin(const QString &)), this, SLOT(onClearTaskBegin(const QString &)));
-        connect(m_pDataClear, SIGNAL(taskEnd(const QString &)), this, SLOT(onClearTaskEnd(const QString &)));
-    }
-    else
-    {
-        QSLOG_ERROR(QString::fromLocal8Bit("获取数据清理插件失败"));
-        return;
-    }
-
-    // 注册信号参数
-    qRegisterMetaType<CollectTask>("CollectTask");
-    qRegisterMetaType<QSet<QString> >("QSet<QString>");
-
-    // 启动收集任务
-    startCollect();
-
-    // 启动清理任务
-    startClear();
-    ui.listWidget->setCurrentRow(0);
-
-    m_runTime = QDateTime::currentDateTime();
-    //m_runTime.start();
-    QTimer::singleShot(1000, this, SLOT(refreshStatus()));
 }
 
 MainWindow::~MainWindow()
@@ -162,6 +109,66 @@ void MainWindow::InitUI()
     m_pSysTrayicon->setIcon(sysIcon);
     m_pSysTrayicon->setToolTip(this->windowTitle());
     connect(m_pSysTrayicon.data(), SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(showWin(QSystemTrayIcon::ActivationReason)));
+}
+
+void MainWindow::initialize()
+{
+    QObject *pObj = NULL;
+    pObj = m_pCtk->getService("IDataCollection");
+    m_ilogsize = 0;
+    if (NULL != pObj)
+    {
+        m_pCollect = (qobject_cast<IDataCollection*>(pObj))->createCollector(m_oConditon, m_oLocker, m_ilogsize);
+        // 绑定信号...
+        //connect(m_pCollect.data(), SIGNAL(showLog(const QString &, const QString &)), this, SLOT(addLog(const QString &, const QString &)));
+        connect(m_pCollect.data(), SIGNAL(showLog(const CollectTask &, const QString &, int)), this, SLOT(addLog(const CollectTask &, const QString &, int)));
+        connect(m_pCollect.data(), SIGNAL(taskState(const CollectTask&, int, int)), this, SLOT(setTaskIcon(const CollectTask&, int, int)));
+        connect(m_pCollect.data(), SIGNAL(startGif(const QString&, bool)), this, SLOT(setGif(const QString&, bool)));
+        connect(this, SIGNAL(doCollectWork(const QString&)), m_pCollect.data(), SLOT(onDoWork(const QString&)));
+        connect(this, SIGNAL(enable(const QString&, bool)), m_pCollect.data(), SLOT(onEnable(const QString&, bool)));
+    }
+    else
+    {
+        QSLOG_ERROR(QString::fromLocal8Bit("获取数据收集插件失败"));
+        return;
+    }
+
+    pObj = m_pCtk->getService("IDataClear");
+    if (NULL != pObj)
+    {
+        m_pDataClear = qobject_cast<IDataClear *>(pObj);
+        if (NULL == m_pDataClear)
+        {
+            QSLOG_ERROR(QString::fromLocal8Bit("获取数据清理插件失败"));
+            return;
+        }
+        //m_pClearThread = QSharedPointer<QThread>(new QThread());
+        //m_pClearThread->start();
+        connect(this, SIGNAL(doClearWork(const QString &)), m_pDataClear, SLOT(doNow(const QString &)));
+        connect(m_pDataClear, SIGNAL(taskBegin(const QString &)), this, SLOT(onClearTaskBegin(const QString &)));
+        connect(m_pDataClear, SIGNAL(taskEnd(const QString &)), this, SLOT(onClearTaskEnd(const QString &)));
+    }
+    else
+    {
+        QSLOG_ERROR(QString::fromLocal8Bit("获取数据清理插件失败"));
+        return;
+    }
+
+    // 注册信号参数
+    qRegisterMetaType<CollectTask>("CollectTask");
+    qRegisterMetaType<QSet<QString> >("QSet<QString>");
+    qRegisterMetaType<string>("string");
+
+    // 启动收集任务
+    startCollect();
+
+    // 启动清理任务
+    startClear();
+    ui.listWidget->setCurrentRow(0);
+
+    m_runTime = QDateTime::currentDateTime();
+
+    QTimer::singleShot(1000, this, SLOT(refreshStatus()));
 }
 
 void MainWindow::addCollectSet()
@@ -368,6 +375,59 @@ void MainWindow::addLog(const CollectTask &task, const QString &info, int infoTy
     ////m_oLocker.unlock();
     ////m_ilogsize--;
 }
+
+void MainWindow::print(const string &dirName, const string &dirId, const string &info, int infoType)
+{
+    QSLOG_DEBUG("PRINT2");
+    if (m_logNum >= 500)
+    {
+        // 清空tablewidget的内容
+        ui.tableWidget->setRowCount(0);
+        ui.tableWidget->clearContents();
+
+        m_logNum = 0;
+    }
+
+    m_logNum++;
+    ui.tableWidget->insertRow(0);
+    QMutexLocker guard(&m_oLocker2);
+    QDateTime qDT = QDateTime::currentDateTime();
+    QString strTime = qDT.toString("MM-dd hh:mm:ss");
+    QTableWidgetItem *pItem = new QTableWidgetItem(strTime);;
+    if (1 == infoType)
+    {
+        pItem = new QTableWidgetItem(QIcon(":/01.png"), strTime);
+    }
+    else if (2 == infoType)
+    {
+        pItem = new QTableWidgetItem(QIcon(":/03.png"), strTime);
+    }
+
+    ui.tableWidget->setItem(0, 0, pItem);
+    pItem = new QTableWidgetItem(QString::fromLocal8Bit(dirName.c_str()));
+    ui.tableWidget->setItem(0, 1, pItem);
+    pItem = new QTableWidgetItem(QString::fromLocal8Bit(info.c_str()));
+    ui.tableWidget->setItem(0, 2, pItem);
+
+    if (infoType == 0)
+    {
+        // 系统消息
+    }
+    else if (infoType == 1)
+    {
+        // 发送成功
+        MyItemWidget *pIwidget = getItemWidget(QString::fromLocal8Bit(dirId.c_str()));
+        if (pIwidget != NULL)
+        {
+            pIwidget->AddSuccess(qDT);
+        }
+    }
+    else
+    {
+        // 发送失败
+    }
+}
+
 
 void MainWindow::openSrcPath()
 {

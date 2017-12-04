@@ -17,8 +17,12 @@
 #include "pathbuilder.h"
 #include "mainwindow.h"
 #include "change_name.h"
+#include "logprotocol.h"
+#include "logprint.h"
 
 #include <iostream>
+
+
 //Qt5通过以下来支持中文显示
 #ifdef WITH_QT5
 #ifdef _WIN32
@@ -237,7 +241,7 @@ int main(int argc, char **argv)
 //#ifdef _WIN32
 //    RunCrashHandler();
 //#endif
-    Q_TRY_BEGIN
+    /*Q_TRY_BEGIN*/
 
 
     QApplication app(argc, argv);
@@ -356,6 +360,12 @@ int main(int argc, char **argv)
     startScreen.showMessage(QStringLiteral("清理本地缓存完毕..."), Qt::AlignCenter, Qt::white);
 
     MainWindow *wnd = new MainWindow(plugin);
+    LogPrintImpl oLogPrint(wnd);
+    oLogPrint.run();
+    QCoreApplication::processEvents();
+
+    wnd->initialize();
+
     startScreen.showMessage(QStringLiteral("正在初始化界面..."), Qt::AlignCenter, Qt::white);
     wnd->show();
     startScreen.showMessage(QStringLiteral("界面初始化完成！"), Qt::AlignCenter, Qt::white);
@@ -367,9 +377,11 @@ int main(int argc, char **argv)
     int ret=app.exec();
     //wnd->close();
     // 等待所有子线程结束
+
+    oLogPrint.stop();
     delete wnd;
     QThread::sleep(5);
-//卸载所有插件
+    //卸载所有插件
     plugin->uninit();
 
     loader.unload();	//只在最后一个应用实例unload有效.
@@ -379,8 +391,8 @@ int main(int argc, char **argv)
     QSLOG_RELEASE
 
     if( 825 == ret ) QProcess::startDetached(qApp->applicationFilePath());
-    Q_TRY_END
-    Q_EXCEPT
+    /*Q_TRY_END*/
+    /*Q_EXCEPT*/
     // return ret;
 
 }

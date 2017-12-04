@@ -5,8 +5,12 @@
 #include "publicthread.h"
 #include "DistributeFile.h"
 #include "change_name.h"
+#include "IDataCollection.h"
+#include "IDispatchTimer.h"
+
 #include <QElapsedTimer>
 #include <QCoreApplication>
+#include <QProcess>
 
 FtpCollector::FtpCollector(CollectManager *pManager, QWaitCondition &in_oCond, QMutex &in_oLocker, int &in_iLogsize)
     : CollectorBase(pManager, in_oCond, in_oLocker, in_iLogsize)
@@ -67,16 +71,48 @@ int FtpCollector::stop()
 //             }
     }
 
+    //if (!m_oDataTransferPro.isNull())
+    //{
+    //    m_oDataTransferPro->terminate();
+    //}
     return 0;
 }
 
 void FtpCollector::getNewFiles()
 {
-    if (!m_bFinish)
+    //if (!m_bFinish)
+    //{
+    //    QSLOG_DEBUG("Last ftp collect isn't finished.");
+    //    return;
+    //}
+
+    // 使用共享内存，查看当前的QProcess是否存在，如果存在的话，则无需再次启动针对该目录ID的收集任务
+    if (!checkProcessFinished(m_collectSet.dirID))
     {
         QSLOG_DEBUG("Last ftp collect isn't finished.");
         return;
     }
+
+    emit print(QStringLiteral("[%1]: 开始收集任务 %2[%3]").arg(QDateTime::currentDateTime().toString(Qt::ISODate)).arg(m_collectSet.dirName)
+               .arg(m_collectSet.rltvPath));
+
+    bool bConnect = true;
+    // 先测试源路径是否正常
+    bConnect = testFtpConnection(m_collectSet.ip, m_collectSet.port, m_collectSet.loginUser, m_collectSet.loginPass, m_collectSet.ftp_transferMode, m_collectSet.ftp_connectMode);
+
+    if (!bConnect)
+    {
+        m_nLineState = 1;
+        emit taskState(m_collectSet, 0, m_nLineState);
+        return;
+    }
+
+    emit startGif(m_collectSet.dirID, true);
+    //m_oDataTransferPro = QSharedPointer<QProcess>(new QProcess());
+    QProcess::execute("DataTransferPro", QStringList() << m_collectSet.dirID);
+    emit startGif(m_collectSet.dirID, false);
+
+    return;
 
     if (!readSet())
     {
@@ -126,6 +162,75 @@ void FtpCollector::getNewFiles()
 
             m_pCftp->getNewFiles(m_fileList);
             emit startGif(m_collectSet.dirID, false);
+        }
+        else
+        {
+            m_nLineState = 1;
+            emit taskState(m_collectSet, 0, m_nLineState);
+        }
+    }
+
+    return;
+
+
+}
+
+void FtpCollector::getNewFiles(const CollectTask &in_oTask)
+{
+    QSLOG_DEBUG("====");
+    m_collectSet = in_oTask;
+
+    m_pCftp = QSharedPointer<CurlFtp>(new CurlFtp(this));
+    QObject::connect(m_pCftp.data(), SIGNAL(done()), this, SLOT(ftpDone()));
+
+    m_bRun = (bool)m_collectSet.enable;
+    if (!m_bRun)
+    {
+        return;
+    }
+
+    if (!readSet())
+    {
+        return;
+    }
+
+    // E:/workspace/DataTransfer/DataTransfer_code_20170831/vs2013/apps/DataTransfer/%T-1H%t%y/%t%m/%td
+    // modified by liubojun. 支持按照特定时间获取数据
+    QStringList rootPaths = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
+    for (int i = 0; i < rootPaths.size(); ++i)
+    {
+        m_collectSet.rltvPath = rootPaths.at(i);
+        m_pCftp->setHostPort(m_collectSet.ip, m_collectSet.port);
+        m_pCftp->setUserPwd(m_collectSet.loginUser, m_collectSet.loginPass);
+        m_pCftp->setRootPath(m_collectSet.rltvPath);
+        m_pCftp->setFtpTransferMode(m_collectSet.ftp_transferMode);
+        m_pCftp->setFtpConnectMode(m_collectSet.ftp_connectMode);
+        m_pCftp->setSubDirFlag(m_collectSet.subdirFlag);
+
+        emit print(QStringLiteral("[%1]: 开始收集任务 %2[%3]").arg(QDateTime::currentDateTime().toString(Qt::ISODate)).arg(m_collectSet.dirName)
+                   .arg(m_collectSet.rltvPath));
+
+        bool bConnect = true;
+        // 先测试源路径是否正常
+        bConnect = testFtpConnection(m_collectSet.ip, m_collectSet.port, m_collectSet.loginUser, m_collectSet.loginPass, m_collectSet.ftp_transferMode, m_collectSet.ftp_connectMode);
+
+        if (!bConnect)
+        {
+            m_nLineState = 1;
+            emit taskState(m_collectSet, 0, m_nLineState);
+            return;
+        }
+
+        if (bConnect)
+        {
+            m_nLineState = 0;
+            //emit taskState(m_collectSet, 0, m_nLineState);
+            //emit startGif(m_collectSet.dirID, true);
+            m_bFinish = false;
+            m_fileList.clear();	//清空新文件列表
+
+            m_pCftp->getNewFiles(m_fileList);
+            //emit startGif(m_collectSet.dirID, false);
         }
         else
         {

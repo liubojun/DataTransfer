@@ -25,6 +25,14 @@ public:
     CollectManager(ICtkPluginManager *pCtkManager, QWaitCondition &in_oCond, QMutex &in_oLocker, int &logsize);
     virtual ~CollectManager();
 
+    /**
+    * @brief  根据收集类型创建相应的收集器
+    * @param  collection_type type 收集类型
+    * @return QSharedPointer<CollectorBase>：收集器的智能指针
+    */
+    // QSharedPointer<CollectorBase> creatCollector(collection_type type);
+    virtual CollectorBase *creatCollector(collection_type type);
+
     bool readThreadNum();
 
     bool addCollect(const CollectSet &set);
@@ -81,13 +89,7 @@ private slots:
     virtual void onEnable(const QString&, bool);
 
 private:
-    /**
-     * @brief  根据收集类型创建相应的收集器
-     * @param  collection_type type 收集类型
-     * @return QSharedPointer<CollectorBase>：收集器的智能指针
-     */
-    // QSharedPointer<CollectorBase> creatCollector(collection_type type);
-    CollectorBase *creatCollector(collection_type type);
+
 
     bool delLastTime(string strID);
 

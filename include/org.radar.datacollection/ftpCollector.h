@@ -36,6 +36,9 @@ public slots:
     virtual int stop();
 public:
     virtual void getNewFiles();
+
+    virtual void getNewFiles(const CollectTask &in_oTask);
+
     virtual bool testCollection();
 
     virtual void taskDone(bool bFlag, const FileInfo &file);

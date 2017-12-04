@@ -20,6 +20,8 @@
 #include "publicthread.h"
 #include "DistributeFile.h"
 #include "change_name.h"
+#include "IDataCollection.h"
+#include "IDispatchTimer.h"
 
 bool _olderThen(const FileInfo &f1, const FileInfo &f2)
 {
@@ -326,6 +328,11 @@ void SharedDirCollector::getNewFiles(QString strDir, FileInfoList &fileList, boo
     }
 
     m_pTsctTime->mapDirTime[strCurDir] = qtCurTime;
+}
+
+void SharedDirCollector::getNewFiles(const CollectTask &in_oTask)
+{
+
 }
 
 void SharedDirCollector::getAllFiles(FileInfoList &fileList, QString strPath)

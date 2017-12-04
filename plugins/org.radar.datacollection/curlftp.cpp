@@ -126,7 +126,11 @@ CurlFtp::CurlFtp(CollectorBase *pBase)
 
     m_pCoBase = pBase;
 
-    connect(this, SIGNAL(emitLog(const QString &, int)), m_pCoBase, SLOT(emitLog(const QString &, int)));
+    if (NULL != m_pCoBase)
+    {
+        connect(this, SIGNAL(emitLog(const QString &, int)), m_pCoBase, SLOT(emitLog(const QString &, int)));
+    }
+
 
     m_pSourceCurl = curl_easy_init();
 
@@ -339,7 +343,7 @@ bool CurlFtp::connectToHost(const char *url, const char *user_pwd, int timeout)
         //{
         QString strLogInfo(QString("connectToHost error: %1").arg(curl_easy_strerror(res)));
         QSLOG_ERROR(strLogInfo);
-        emit emitLog(strLogInfo, FAIL);
+        emit emitLog(strLogInfo, BAD);
         return false;
         //}
     }
@@ -828,7 +832,7 @@ int CurlFtp::downloadFile(const char *url, const char *user_pwd, FileData *fileD
         QString strLogInfo(QString("downloadFile error: %1").arg(curl_easy_strerror(res)));
         QSLOG_ERROR(strLogInfo);
         //curl_easy_cleanup(curl);
-        emit emitLog(strLogInfo, FAIL);
+        emit emitLog(strLogInfo, BAD);
         return -1;
     }
     QSLOG_INFO(QString::fromLocal8Bit("文件下载到:%1成功").arg(fileData->filename));
@@ -1010,7 +1014,7 @@ int CurlFtp::uploadFileToDir(const char *url, const char *user_pwd, const string
     {
         QString logInfo(QString("uploadFile error: errcode = %1, reason = %2").arg(res).arg(curl_easy_strerror(res)));
         QSLOG_ERROR(logInfo);
-        emit emitLog(logInfo, FAIL);
+        emit emitLog(logInfo, BAD);
         curl_easy_cleanup(pCurl);
         return -1;
     }
@@ -1234,7 +1238,7 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
     {
         QString logInfo(QString("uploadFile error: %1").arg(curl_easy_strerror(res)));
         QSLOG_ERROR(logInfo);
-        emit emitLog(logInfo, FAIL);
+        emit emitLog(logInfo, BAD);
         //curl_easy_cleanup(curl);
         return -1;
     }

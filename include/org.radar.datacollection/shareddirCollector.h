@@ -65,6 +65,8 @@ public:
      */
     virtual void getNewFiles();
 
+    virtual void getNewFiles(const CollectTask &in_oTask);
+
     virtual void getAllFiles(FileInfoList &fileList, QString strPath);
 
     virtual bool testCollection();

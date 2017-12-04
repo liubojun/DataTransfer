@@ -24,10 +24,11 @@ using namespace std;
 #include <QThread>
 #include <QThreadPool>
 #include <QMutex>
+#include <QProcess>
 #include "commontypedef.h"
 #include "ICtkPluginManager.h"
-#include "IDispatchTimer.h"
-#include "filenametable.h"
+
+//#include "filenametable.h"
 #include "ctkLog.h"
 #include "../ctkProtocol/fileMsg.h"
 #include "IDataCollection.h"
@@ -42,7 +43,7 @@ using namespace std;
 #include "IFileCrypt.h"
 #include "IDataParse.h"
 #include "DataBase.h"
-
+#include "logprotocol.h"
 
 class IRadarBaseDataParse;
 
@@ -68,6 +69,9 @@ public:
      */
     virtual ~CollectorBase();
 
+private:
+    CollectorBase();
+public:
     void setCollectTask(const CollectTask &task)
     {
         m_collectSet = task;
@@ -203,6 +207,8 @@ public:
      * @return void：描述返回值
      */
     virtual void getNewFiles() = 0;
+
+    virtual void getNewFiles(const CollectTask &in_oTask) = 0;
 
     virtual bool testCollection() = 0;
 
@@ -370,6 +376,12 @@ public:
     */
     void updateLatestFileLists(const QString &dir, const list<string> &files);
 
+    /**
+    * @brief  检查当前子进程是否已经结束
+    * @return list<string>：文件列表
+    */
+    bool checkProcessFinished(const QString &dirId);
+
 protected:
     static QMutex m_mutexTime;
     static bool m_bReadTime;
@@ -384,6 +396,11 @@ protected:
     QWaitCondition &m_oCond;
     QMutex &m_oLocker;
     int &m_iLogsize;
+
+    RCF::RcfInitDeinit m_oRcfInit;
+    RcfClient<I_LogPrint> m_oRcfClient;
+
+    //QSharedPointer<QProcess> m_oDataTransferPro;
 };
 
 #endif // CollectorBase_h__

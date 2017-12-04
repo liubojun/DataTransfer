@@ -4,6 +4,7 @@
 #include "pathbuilder.h"
 #include "ctkPublicFun.h"
 #include "curlftp.h"
+#include "IDispatchTimer.h"
 #include <QUrl>
 #include <QRegExp>
 #include <QFileInfoList>
@@ -12,6 +13,8 @@
 #include <qthread.h>
 #include <lastCollectTime.h>
 #include <algorithm>
+#include <QtConcurrent/QtConcurrent>
+#include <QSharedMemory>
 
 // 初始化静态成员（自定义类对象，该类必须有默认构造函数）
 TransCollectTimeList CollectorBase::m_lstTCtime;
@@ -24,8 +27,9 @@ CollectorBase::CollectorBase(CollectManager *pManager, QWaitCondition &in_oCond,
     : m_pManager(pManager),
       m_oCond(in_oCond),
       m_oLocker(in_oLocker),
-      m_iLogsize(in_iLogsize)
-    , QObject(pParent)		//从QObject继承的类需要写pParent!!
+      m_iLogsize(in_iLogsize),
+      m_oRcfClient(RCF::TcpEndpoint(50001)),
+      QObject(pParent)		//从QObject继承的类需要写pParent!!
 {
     m_bFinish = true;
 
@@ -52,17 +56,19 @@ CollectorBase::CollectorBase(CollectManager *pManager, QWaitCondition &in_oCond,
     m_bRun = false;
     m_nLineState = 0;
 
-    m_oThread.start();
-    this->moveToThread(&m_oThread);
+    //m_oThread.start();
+    //this->moveToThread(&m_oThread);
     connect(this, SIGNAL(begin()), this, SLOT(onBegined()));
 }
 
 CollectorBase::~CollectorBase()
 {
-    m_oThread.requestInterruption();
+    //m_oThread.requestInterruption();
     //m_oThread.quit();
     //m_oThread.wait();
-    m_oThread.terminate();
+    //m_oThread.terminate();
+
+
 }
 
 bool CollectorBase::filterFileName(const QFileInfo &fi, const QString &strFilePath, FileInfo &fileInfo)
@@ -121,7 +127,23 @@ void CollectorBase::emitLog(const QString &info, int infoType)
     //}
     //m_oLocker.unlock();
     //m_iLogsize++;
-    emit showLog(m_collectSet, info, infoType);
+    //emit showLog(m_collectSet, info, infoType);
+
+
+    try
+    {
+        m_oRcfClient.print(m_collectSet.dirName.toLocal8Bit().toStdString(),
+                           m_collectSet.dirID.toLocal8Bit().toStdString(),
+                           info.toLocal8Bit().toStdString(), infoType);
+    }
+    catch (std::exception &ex)
+    {
+        QSLOG_ERROR(QString("rcf exception:").arg(ex.what()));
+    }
+
+
+
+    // 通过发送消息的方式通知控制进程
     // QThread::msleep(20);
 }
 
@@ -180,7 +202,9 @@ void CollectorBase::doWork()
 
 void CollectorBase::onBegined()
 {
-    getNewFiles();
+    // 将该函数丢到子线程中执行，防止阻塞主线程
+    QtConcurrent::run(QThreadPool::globalInstance(), this, &CollectorBase::getNewFiles);
+    //getNewFiles();
 }
 
 bool CollectorBase::testFileConnection(QString strUrl)
@@ -262,6 +286,16 @@ bool CollectorBase::containsFile(list<string> &files, const QString &file)
         files.push_back(file.toLocal8Bit().toStdString());
         return false;
     }
+}
+
+bool CollectorBase::checkProcessFinished(const QString &dirId)
+{
+    QSharedMemory oMem(dirId);
+    if (!oMem.attach())
+    {
+        return true;
+    }
+    return false;
 }
 
 

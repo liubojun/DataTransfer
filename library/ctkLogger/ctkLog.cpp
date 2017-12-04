@@ -13,6 +13,7 @@
 #include <QThread>
 #include <QDir>
 #include <QDateTime>
+#include <QLockFile>
 
 #include "ctkLog.h"
 //#include "QsLogThread.h"
@@ -47,6 +48,14 @@ QLogger::QLogger( qint64 size /* = 10M */, qint64 num /* = 10 */ )
         sLogDir.mkpath(m_strLogPath);
     }
     m_strLogPath = QString("%1%2.log").arg(m_strLogPath).arg(m_strAppName);
+
+    //QString lockFile = m_strLogPath + ".lock";
+    //if (!QFile::exists(lockFile))
+    //{
+    //    QFile oFile(lockFile);
+    //    oFile.open(QIODevice::WriteOnly);
+    //    oFile.close();
+    //}
 
     //设置log的路径（sLogPath）与、单个log文件的大小（size）及log文件的个数（num）
     //QsLogging::DestinationPtr fileDestination(QsLogging::DestinationFactory::MakeFileDestination(
@@ -84,6 +93,9 @@ void QLogger::print( const QString &level, const QString& msg, const char* file 
 {
     //QMutexLocker lockGuard(&m_oLocker);
     QMutexLocker locker(&m_oLocker);
+    QString lockFile = m_strLogPath + ".lock";
+    QLockFile fileLocker(lockFile);
+    bool flag = fileLocker.lock();
     QString m;
 
     if ( !file )
@@ -140,6 +152,7 @@ void QLogger::print( const QString &level, const QString& msg, const char* file 
 
     if (NULL == fp)
     {
+        fileLocker.unlock();
         return;
     }
     m.prepend(QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss") + " " );
@@ -148,6 +161,8 @@ void QLogger::print( const QString &level, const QString& msg, const char* file 
     stream << tmp_strFormat << "\n";
     fprintf(fp, stream.str().c_str());
     fclose(fp);
+
+    fileLocker.unlock();
 }
 
 //************************************

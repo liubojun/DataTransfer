@@ -12,6 +12,8 @@
 #include <QWaitCondition>
 #include <QMutex>
 
+class CollectorBase;
+
 class ICollectManager : public ILogPrint
 {
     Q_OBJECT
@@ -20,6 +22,8 @@ public:
     // ICollectManager(QWaitCondition &in_oCondition, QMutex &in_oLocker);
 
     virtual ~ICollectManager() {}
+
+    virtual CollectorBase *creatCollector(collection_type type) = 0;
 
     virtual bool addCollect(const CollectSet &set) = 0;
     virtual void delCollect(const string &strID) = 0;

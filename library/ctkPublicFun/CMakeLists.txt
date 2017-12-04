@@ -25,6 +25,7 @@ SET(HDRS
 	${RadarProjectInclude}/ctkPublicFun/pupdata.h  
 	${RadarProjectInclude}/ctkPublicFun/DataBase.h
 	${RadarProjectInclude}/ctkPublicFun/change_name.h
+	${RadarProjectInclude}/ctkPublicFun/logprotocol.h
 )
 
 #设置MOC相关变量
@@ -46,6 +47,8 @@ INCLUDE_DIRECTORIES(
 					${RadarProjectInclude}/org.radar.dataadapter
 					${RadarProjectInclude}/QsLog
 					${RadarProjectInclude}/ctkProtocol
+					${RadarProjectInclude}/3dpart
+					${RadarProjectInclude}/3dpart/RCF-2.2.0.0/include
 					${VLD_INCLUDE}
 					)
 					
@@ -64,7 +67,7 @@ IF (WIN32)
 		${QT_QTCORE_LIBRARY}
 		${QT_UITOOLS_LIBRARY}
 		${VLD_LIB}	#VLD内存泄露检查
-		CTKPluginFramework
+		CTKPluginFramework	
 		ctkLogger
 		Mpr
 	)

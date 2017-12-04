@@ -49,6 +49,24 @@ public:
 
     bool startClear();
 
+
+
+    /**
+     * @brief  完成主窗口的初始化
+     * @return ：无
+    */
+    void initialize();
+
+public slots:
+    /**
+    * @brief  通过RCF远程调用的方式打印日志
+    * @param  const std::string &dirName 收集目录名
+    * @param  const std::string &dirId   收集目录ID
+    * @param  const std::string &info    日志信息
+    * @param  const std::string &infoType日志等级
+    * @return ：无
+    */
+    void print(const string &dirName, const string &dirId, const string &info, int infoType);
 protected:
     virtual void closeEvent(QCloseEvent *);
     virtual void changeEvent(QEvent *);
@@ -69,11 +87,16 @@ private slots:
 
     bool addCollect(const CollectTask &task, bool bDb = true);
 
+
+
     bool addClear(const ClearTask &task, bool bDb = true);
 
     // 显示日志
     void addLog(const QString &dirName, const QString &info, int infoType=0);
     void addLog(const CollectTask &task, const QString &info, int infoType);
+
+
+
     // 打开源
     void openSrcPath();
     // 打开目标
@@ -116,6 +139,7 @@ private slots:
 
 private:
     void InitUI();
+
 
     // 获取当前选中的任务ID
     QString getCurTaskID(QListWidgetItem *&pItem);

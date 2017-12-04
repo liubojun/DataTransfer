@@ -41,7 +41,7 @@ MESSAGE(STATUS "${QT5_WRAP_UI}")
 find_package(CTK REQUIRED)
 
 #关闭boost自动链接
-ADD_DEFINITIONS("-DBOOST_ALL_NO_LIB")
+#ADD_DEFINITIONS("-DBOOST_ALL_NO_LIB")
 #output窗口中输出链接boost库版本以及链接顺序。
 ADD_DEFINITIONS("-DBOOST_LIB_DIAGNOSTIC")
 
@@ -50,9 +50,10 @@ ADD_DEFINITIONS("-DBOOST_LIB_DIAGNOSTIC")
 #endif()
 
 #set(Boost_USE_MULTITHREAD ON)
-#find_package(Boost REQUIRED COMPONENTS serialization)
+#find_package(Boost REQUIRED COMPONENTS exception)
 
-
+#SET(BOOST_EXCEPTION_LIBRARY ${Boost_EXCEPTION_LIBRARY_DEBUG})
+#MESSAGE(STATUS ">>>>>>>>${BOOST_EXCEPTION_LIBRARY}<<<<<<<<<<<<")
 
 #Boost相关的三个变量 
 #MESSAGE(STATUS "${Boost_INCLUDE_DIR}\n" 
@@ -104,6 +105,10 @@ IF (WIN32)
   SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /MANIFEST:NO")
   SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /MANIFEST:NO")
   SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+  SET(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+  
+  ADD_DEFINITIONS("-DWIN32_LEAN_AND_MEAN")
 ELSE (WIN32)
   IF(PEDANTIC AND NOT APPLE)
     SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
@@ -171,13 +176,13 @@ endmacro()
 #ctk插件配置
 
 #> Create a list of available plug-ins and make them known to the build system
-set(plugins
-  plugins/org.common.quartz:ON
-  #plugins/org.common.crypt:ON
-  plugins/org.radar.datacollection:ON
-  plugins/org.radar.dataclear:ON
-)
-ctkMacroSetupPlugins(${plugins})
+ set(plugins
+   plugins/org.common.quartz:ON
+   #plugins/org.common.crypt:ON
+   plugins/org.radar.datacollection:ON
+   plugins/org.radar.dataclear:ON
+ )
+ ctkMacroSetupPlugins(${plugins})
 #>
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps)		#应用
