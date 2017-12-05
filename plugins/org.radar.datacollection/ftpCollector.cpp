@@ -107,6 +107,10 @@ void FtpCollector::getNewFiles()
         return;
     }
 
+    // 如果连接是正常的话
+    m_nLineState = 0;
+    emit taskState(m_collectSet, 0, m_nLineState);
+
     emit startGif(m_collectSet.dirID, true);
     //m_oDataTransferPro = QSharedPointer<QProcess>(new QProcess());
     QProcess::execute("DataTransferPro", QStringList() << m_collectSet.dirID);
@@ -217,7 +221,7 @@ void FtpCollector::getNewFiles(const CollectTask &in_oTask)
         if (!bConnect)
         {
             m_nLineState = 1;
-            emit taskState(m_collectSet, 0, m_nLineState);
+            //emit taskState(m_collectSet, 0, m_nLineState);
             return;
         }
 
