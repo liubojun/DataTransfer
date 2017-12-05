@@ -380,7 +380,7 @@ int main(int argc, char **argv)
 
     oLogPrint.stop();
     delete wnd;
-    QThread::sleep(5);
+    QThread::sleep(2);
     //卸载所有插件
     plugin->uninit();
 

@@ -68,7 +68,7 @@ int SharedDirCollector::start()
     if (iDt)
     {
         QSharedPointer<CltDispatch> cDispatch = QSharedPointer<CltDispatch>(new CltDispatch(this));
-        //m_oThread.start();
+        m_oThread.start();
         cDispatch->moveToThread(&m_oThread);
 
         bool bFlag = iDt->SetDispatchTimer(m_collectSet.dispatch.toStdString(), cDispatch.data(), QSharedPointer<TimerCallBackParam>(new TimerCallBackParam()), m_pTimerObject);
