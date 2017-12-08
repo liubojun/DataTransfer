@@ -235,7 +235,11 @@ void RunCrashHandler()
 
 #endif
 //----
-
+#include <QDebug>
+#include <QProcess>
+#include <QStringList>
+#include <stdlib.h>
+#include <string.h>
 int main(int argc, char **argv)
 {
 //#ifdef _WIN32
@@ -248,6 +252,7 @@ int main(int argc, char **argv)
     CChangeName::init_rename_rules((app.applicationDirPath() + "/config/rename.rule").toStdString().c_str());
     // CChangeName::change_name("H08_B03_R030_20171112_1700.AWX", "KuiHua");
 
+    CPathBuilder::setChildProcessEnv();
 
     QSLOG_INFO("START DATA TRANSFER PROGRAM");
     std::cout << "START DATA TRANSFER PROGRAM" << std::endl;

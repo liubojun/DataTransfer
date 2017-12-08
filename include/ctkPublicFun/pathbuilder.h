@@ -124,6 +124,12 @@ public:
      */
     static QDateTime getDateTimeFromFileName(const QString &rule, const QString &filename);
 
+    /**
+     * @brief  set env for child process
+     * @return int：sucess 0, failure -1
+     */
+    static int setChildProcessEnv();
+
 protected:
     bool makeBuilderOrRunning();
 

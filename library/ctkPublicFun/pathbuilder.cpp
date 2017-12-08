@@ -5,6 +5,7 @@
 #include <QDir>
 #include <iostream>
 #include <QDebug>
+#include <QProcess>
 #include "pathbuilder.h"
 
 
@@ -685,5 +686,43 @@ QDateTime CPathBuilder::getDateTimeFromFileName(const QString &rule, const QStri
         }
     }
     return oRetDt;
+}
+
+int CPathBuilder::setChildProcessEnv()
+{
+    QStringList env = QProcess::systemEnvironment();
+    foreach (QString str, env)
+    {
+        //qDebug() << str;
+        if (str.startsWith("PATH"))
+        {
+            if (-1 == str.indexOf(qApp->applicationDirPath()))
+            {
+                str.append(":").append(qApp->applicationDirPath());
+                char *envbuffer = (char *)malloc(str.length()+1);
+                if (envbuffer == NULL)
+                {
+                    //QSLOG_ERROR("malloc error");
+                    return -1;
+                }
+
+                strcpy(envbuffer, str.toLocal8Bit().toStdString().data());
+                //qDebug() << envbuffer;
+                //QSLOG_DEBUG(envbuffer);
+                if (0 != putenv(envbuffer))
+                {
+                    //QSLOG_ERROR("putenv errr");
+                }
+                else
+                {
+                    //QSLOG_DEBUG("set child env success");
+                }
+                qDebug() << getenv("PATH");
+                // can not free, or putenv failure
+                //free(envbuffer);
+            }
+        }
+    }
+    return 0;
 }
 

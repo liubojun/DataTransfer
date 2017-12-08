@@ -113,6 +113,7 @@ void FtpCollector::getNewFiles()
 
     emit startGif(m_collectSet.dirID, true);
     //m_oDataTransferPro = QSharedPointer<QProcess>(new QProcess());
+
     QProcess::execute("DataTransferPro", QStringList() << m_collectSet.dirID);
     emit startGif(m_collectSet.dirID, false);
 

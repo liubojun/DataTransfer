@@ -136,7 +136,7 @@ void CPluginManagerImp::init()
         QStringList pluginsList;
         loaPlugins(strPluginPath, pluginsList);
 
-        QSLOG_INFO(tr("Begin loading plugins..."));
+        QSLOG_INFO(tr("Begin loading plugins...") + strPluginPath);
 
         foreach (const QString &p, pluginsList)
         {
