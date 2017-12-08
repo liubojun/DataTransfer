@@ -40,6 +40,7 @@ typedef enum
 #include "collectSet.h"
 #include "transferSet.h"
 #include "IBaseInterface.h"
+#include "macro.h"
 #include <QSharedPointer>
 #include <QWaitCondition>
 #include <QMutex>
