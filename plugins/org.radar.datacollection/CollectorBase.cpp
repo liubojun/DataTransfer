@@ -290,12 +290,28 @@ bool CollectorBase::containsFile(list<string> &files, const QString &file)
 
 bool CollectorBase::checkProcessFinished(const QString &dirId)
 {
-    QSharedMemory oMem(dirId);
-    if (!oMem.attach())
+    QString strLockPath = qApp->applicationDirPath() + "/lock/";
+    QDir oLockDir(strLockPath);
+    if (!oLockDir.exists())
+    {
+        oLockDir.mkpath(strLockPath);
+    }
+
+    QLockFile oMem(strLockPath + dirId);
+    if (oMem.tryLock())
     {
         return true;
     }
     return false;
+
+    //QString strLockPath = qApp->applicationDirPath() + "/lock/";
+    //QDir oLockDir(strLockPath);
+    //QSharedMemory oMem(dirId);
+    //if (!oMem.attach())
+    //{
+    //    return true;
+    //}
+    //return false;
 }
 
 

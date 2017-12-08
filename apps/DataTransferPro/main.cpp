@@ -9,6 +9,7 @@
 #include <QProcess>
 #include <QDir>
 #include <QSharedMemory>
+#include <QLockFile>
 #include "ctkLog.h"
 #include "ICtkPluginManager.h"
 #include "pathbuilder.h"
@@ -29,12 +30,19 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    QSharedMemory oMem(argv[1]);
-    if (!oMem.create(1))
-    {
-        QSLOG_ERROR("create shared memory failure!");
-        return false;
-    }
+    QString strLockPath = app.applicationDirPath() + "/lock/";
+    //QDir oLockDir(strLockPath);
+    //if (!oLockDir.exists())
+    //{
+    //    oLockDir.mkpath(strLockPath);
+    //}
+    QLockFile oMem(strLockPath + argv[1]);
+    oMem.lock();
+    //if (!oMem.create(1))
+    //{
+    //    QSLOG_ERROR("create shared memory failure!");
+    //    return false;
+    //}
 
     CChangeName::init_rename_rules((app.applicationDirPath() + "/config/rename.rule").toStdString().c_str());
 
@@ -62,6 +70,7 @@ int main(int argc, char **argv)
     }
     else
     {
+        oMem.unlock();
         return -1;
     }
     QSLOG_INFO(QObject::tr("load all plugins successful"));
@@ -75,12 +84,13 @@ int main(int argc, char **argv)
     QObject *pObj = plugin->getService("IDataCollection");
     if (NULL == pObj)
     {
+        oMem.unlock();
         return -1;
     }
     pCollect = (qobject_cast<IDataCollection*>(pObj))->createCollector(oCondition, oLocker, iLogSize);
 
     CollectTask oTask;
-    oTask.dirID = "{60c62861-de8d-4872-85e4-255a807ff57b}";
+    oTask.dirID = " {60c62861-de8d-4872-85e4-255a807ff57b}";
     oTask.dirID = argv[1];
     DataBase::getInstance()->QueryCollectTask(oTask);
 
@@ -90,6 +100,7 @@ int main(int argc, char **argv)
     CollectorBase *pCollectFather = pCollect->creatCollector((collection_type) oTask.collectType);
     if (NULL == pCollectFather)
     {
+        oMem.unlock();
         return -1;
     }
 
@@ -110,5 +121,6 @@ int main(int argc, char **argv)
     curl_global_cleanup();	// 清理libcurl资源
 
     //QSLOG_RELEASE
+    oMem.unlock();
     return 0;
 }
