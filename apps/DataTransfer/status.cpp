@@ -17,26 +17,26 @@ CStatusLabel::~CStatusLabel()
 
 void CStatusLabel::paintEvent(QPaintEvent *event)
 {
-    //if (m_bIsStart)
-    //{
-    //    // 通过标识位m_bLastGreen记录上次的状态，两种状态不断切换
-    //    if (!m_bLastGreen)
-    //    {
-    //        QPainter painter(this);
-    //        painter.setBrush(Qt::green);
-    //        painter.drawEllipse(QPoint(this->geometry().center().x()-10, this->geometry().center().y()-8), 6, 6);
-    //        m_bLastGreen = true;
-    //    }
-    //    else
-    //    {
-    //        m_bLastGreen = false;
-    //    }
+    if (m_bIsStart)
+    {
+        // 通过标识位m_bLastGreen记录上次的状态，两种状态不断切换
+        if (!m_bLastGreen)
+        {
+            QPainter painter(this);
+            painter.setBrush(Qt::green);
+            painter.drawEllipse(QPoint(this->geometry().center().x()-10, this->geometry().center().y()-8), 6, 6);
+            m_bLastGreen = true;
+        }
+        else
+        {
+            m_bLastGreen = false;
+        }
 
-    //}
-    //else
-    //{
-    //    m_bLastGreen = false;
-    //}
+    }
+    else
+    {
+        m_bLastGreen = false;
+    }
 
 }
 
