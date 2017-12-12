@@ -63,20 +63,5 @@
         <source>from ctk pluginFramework exception, reason :</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../library/ctkPluginManager/pluginmanagerImp.cpp" line="448"/>
-        <source>init interface:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../library/ctkPluginManager/pluginmanagerImp.cpp" line="448"/>
-        <source>gui failure</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../library/ctkPluginManager/pluginmanagerImp.cpp" line="461"/>
-        <source>initgui ctkPluginFramework exception, reason :</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 </TS>
