@@ -44,15 +44,13 @@ int main(int argc, char **argv)
 
     CollectorBase::init();
 
-    CPathBuilder oPathBuilder;
-
     QWaitCondition oCnd;
     QMutex oLocker;
     int iLogSize = 0;
 
     CollectTask oTask;
-    oTask.dirID = " {60c62861-de8d-4872-85e4-255a807ff57b}";
-    //oTask.dirID = argv[1];
+    //oTask.dirID = " {60c62861-de8d-4872-85e4-255a807ff57b}";
+    oTask.dirID = argv[1];
     DataBase::getInstance()->QueryCollectTask(oTask);
 
     CollectorBase *pCollect = new FtpCollector(oCnd, oLocker, iLogSize);
