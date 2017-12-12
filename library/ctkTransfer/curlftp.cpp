@@ -2,7 +2,6 @@
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QUrl>
-#include "ctkLog.h"
 
 #ifdef _WIN32
 #pragma comment(lib, "WS2_32")
@@ -120,26 +119,25 @@ static size_t throw_away(void *ptr, size_t size, size_t nmemb, void *data)
 
 //////////////////////////////////////////////////////////////////////////
 
-// modified by liubojun
-//CurlFtp::CurlFtp(CollectorBase *pBase)
-////: m_bConnected(false)
-//{
-//    initcurl();
-//
-//    m_pCoBase = pBase;
-//
-//    if (NULL != m_pCoBase)
-//    {
-//        connect(this, SIGNAL(emitLog(const QString &, int)), m_pCoBase, SLOT(emitLog(const QString &, int)));
-//    }
-//
-//
-//    m_pSourceCurl = curl_easy_init();
-//
-//    m_pDestCurl = curl_easy_init();
-//
-//    m_pRemoveDestCurl = curl_easy_init();
-//}
+CurlFtp::CurlFtp(CollectorBase *pBase)
+//: m_bConnected(false)
+{
+    initcurl();
+
+    m_pCoBase = pBase;
+
+    if (NULL != m_pCoBase)
+    {
+        connect(this, SIGNAL(emitLog(const QString &, int)), m_pCoBase, SLOT(emitLog(const QString &, int)));
+    }
+
+
+    m_pSourceCurl = curl_easy_init();
+
+    m_pDestCurl = curl_easy_init();
+
+    m_pRemoveDestCurl = curl_easy_init();
+}
 
 CurlFtp::~CurlFtp()
 {
@@ -209,11 +207,10 @@ int CurlFtp::getNewFiles(FileInfoList &fileList)
     m_lstDirs.append(QString::fromStdString(m_strRoot));
     while (!m_lstDirs.isEmpty())
     {
-        // modified by liubojun
-        //if (!m_pCoBase->m_bRun)
-        //{
-        //    break;
-        //}
+        if (!m_pCoBase->m_bRun)
+        {
+            break;
+        }
 
         m_strCurDir = m_lstDirs.takeFirst();
         //QSLOG_DEBUG(m_strCurDir);
@@ -433,33 +430,30 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
     //QSLOG_DEBUG(strInfo);
     //free(listInfo.memdata);
 
-    QString strDBPath;// modified by liubojun = qApp->applicationDirPath() + "/work/record/" + m_pCoBase->m_collectSet.dirID + "/record.index";
+    QString strDBPath = qApp->applicationDirPath()+ "/work/record/" + m_pCoBase->m_collectSet.dirID + "/record.index";
 
     // 当前目录数据库中记录的最后处理时间
     QString iLatestTime("");
 
-    //modified lbj
-    //QSLOG_DEBUG(QString::fromLocal8Bit("开始处理目录:%1， 收集时间范围:%2, 目录最后处理时间记录标识:%3").arg(QString::fromLocal8Bit(strDir.c_str())).arg(m_pCoBase->m_collectSet.col_timerange).arg(m_pCoBase->m_collectSet.recordLatestTime));
+    QSLOG_DEBUG(QString::fromLocal8Bit("开始处理目录:%1， 收集时间范围:%2, 目录最后处理时间记录标识:%3").arg(QString::fromLocal8Bit(strDir.c_str())).arg(m_pCoBase->m_collectSet.col_timerange).arg(m_pCoBase->m_collectSet.recordLatestTime));
 
     bool bHasFileUpdate = false;
-    // modified by liubojun
-    //if (m_pCoBase->m_collectSet.recordLatestTime)
-    //{
-    //    m_pCoBase->recordLatestTime(strDBPath, QString::fromLocal8Bit(strDir.c_str()), iLatestTime);
-    //    QSLOG_DEBUG(QString::fromLocal8Bit("目录:%1最后修改时间为:%2").arg(QString::fromLocal8Bit(strDir.c_str())).arg(iLatestTime));
-    //}
+    if (m_pCoBase->m_collectSet.recordLatestTime)
+    {
+        m_pCoBase->recordLatestTime(strDBPath, QString::fromLocal8Bit(strDir.c_str()), iLatestTime);
+        QSLOG_DEBUG(QString::fromLocal8Bit("目录:%1最后修改时间为:%2").arg(QString::fromLocal8Bit(strDir.c_str())).arg(iLatestTime));
+    }
 
     QString nMdfTime = parseMlsdInfo(strInfo, fileList, m_lstDirs, iLatestTime, bFtpSupportMLSD);
 
-    // modified by liubojun
-    //if (m_pCoBase->m_collectSet.recordLatestTime)
-    //{
-    //    QSLOG_DEBUG(QString::fromLocal8Bit("目录最后修改时间:%1").arg(nMdfTime));
-    //    if (nMdfTime > iLatestTime)
-    //    {
-    //        m_pCoBase->updateLatestTime(strDBPath, QString::fromLocal8Bit(strDir.c_str()), nMdfTime);
-    //    }
-    //}
+    if (m_pCoBase->m_collectSet.recordLatestTime)
+    {
+        QSLOG_DEBUG(QString::fromLocal8Bit("目录最后修改时间:%1").arg(nMdfTime));
+        if (nMdfTime > iLatestTime)
+        {
+            m_pCoBase->updateLatestTime(strDBPath, QString::fromLocal8Bit(strDir.c_str()), nMdfTime);
+        }
+    }
 
 
     //     if (m_strCurDirNewTime > m_strCurDirLastTime)
@@ -608,8 +602,7 @@ QString CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStr
                 continue;
             }
             // 新增加判断条件（记录目录最后修改时间，此处需要判断当前文件时间是否大于等于当前目录的保存上次处理最后修改时间，如果小于则不对该文件进行处理）
-            // modified by liubojun
-            //if (m_pCoBase->m_collectSet.recordLatestTime)
+            if (m_pCoBase->m_collectSet.recordLatestTime)
             {
 
                 if (!iLatestTime.isEmpty() && nMdfyTime <= iLatestTime)
@@ -646,19 +639,19 @@ QString CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStr
             }
 
             // 必须大于设置的时间范围才收集
-            // modified by liubojun
-            //if (m_pCoBase->m_collectSet.col_timerange != -1)
-            //{
-            //    // 分钟转秒
-            //    if (nMdfyTime < QDateTime::currentDateTime().addSecs(-m_pCoBase->m_collectSet.col_timerange*60).toString("yyyyMMddhhmmss"))
-            //    {
-            //        continue;
-            //    }
-            //}
+
+            if (m_pCoBase->m_collectSet.col_timerange != -1)
+            {
+                // 分钟转秒
+                if (nMdfyTime < QDateTime::currentDateTime().addSecs(-m_pCoBase->m_collectSet.col_timerange*60).toString("yyyyMMddhhmmss"))
+                {
+                    continue;
+                }
+            }
 
             // if (fInfo.strMdyTime)
-            // modified by liubojun
-            //if (m_pCoBase->filterFileName(fInfo)/* && fInfo.strMdyTime > m_strCurDirLastTime*/)
+
+            if (m_pCoBase->filterFileName(fInfo)/* && fInfo.strMdyTime > m_strCurDirLastTime*/)
             {
                 fInfo.strFilePath = (m_strCurDir + oneInfo.strFileName).toLocal8Bit().data();
                 fInfo.nFileSize = oneInfo.nFileSize;

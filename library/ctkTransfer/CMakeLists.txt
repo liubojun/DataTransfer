@@ -1,20 +1,32 @@
 ﻿#############################################################
 # sources
-SET(PROJECT_NAME ctkFtpTransfer)
+SET(PROJECT_NAME ctkTransfer)
 
 # 工程实现文件
 SET(SRCS
-    curlftp.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/curlftp.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/CollectorBase.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ftpCollector.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/shareddirCollector.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/DistributeFile.cpp
 )
 
 # 工程头文件
 SET(HDRS
-   curlftp.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/curlftp.h
+   ${RadarProjectInclude}/ctkTransfer/CollectorBase.h
+   ${RadarProjectInclude}/ctkTransfer/ftpCollector.h
+   ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/DistributeFile.h
 )
 
 #设置MOC相关变量
 SET(MOC_HDRS
-	curlftp.h
+	${CMAKE_CURRENT_SOURCE_DIR}/curlftp.h
+	${RadarProjectInclude}/ctkTransfer/CollectorBase.h
+	${RadarProjectInclude}/ctkTransfer/ftpCollector.h
+    ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
+	${CMAKE_CURRENT_SOURCE_DIR}/DistributeFile.h
 )
 
 IF (WITH_QT5)
@@ -27,8 +39,9 @@ QT4_WRAP_CPP(MOC_SRCS ${MOC_HDRS})
 INCLUDE_DIRECTORIES(
 					${RadarProjectInclude}
 					${RadarProjectInclude}/ctkPublicFun
+					${RadarProjectInclude}/ctkTransfer
 					${RadarProjectInclude}/org.radar.drawproduct
-					${RadarProjectInclude}/org.radar.dataadapter
+					#${RadarProjectInclude}/org.radar.dataadapter
 					${RadarProjectInclude}/QsLog
 					${RadarProjectInclude}/ctkProtocol
 					${RadarProjectInclude}/3dpart
@@ -52,6 +65,8 @@ IF (WIN32)
 		${VLD_LIB}	#VLD内存泄露检查
 		CTKPluginFramework	
 		ctkLogger
+		ctkPublicFun
+		RCF
 		Mpr
 		${CURL_LIBRARY}
 	)
@@ -64,8 +79,9 @@ ELSE (WIN32)
 		${VLD_LIB}
 		${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libctkLogger.so	#需要明确路径
         CTKPluginFramework
+		ctkPublicFun
+		RCF
 		${CURL_LIBRARY}
-        #	${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libCTKPluginFramework.so
 	)
 ENDIF (WIN32)
 

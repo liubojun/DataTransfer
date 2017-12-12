@@ -15,14 +15,43 @@
 #ifndef curlftp_H_
 #define curlftp_H_
 
-#include "curl/curl.h"
-#include <string>
-#include <QString>
-#include <QObject>
-
+#include "CollectorBase.h"
 #include "fileMsg.h"
-#include "commontypedef.h"
-using namespace std;
+#include "curl/curl.h"
+
+class CollectorBase;
+
+//////////////////////////////////////////////////////////////////////////
+
+// int get_file_size(FILE *file)
+// {
+//     int size = 0;
+//     fseek(file, 0L, SEEK_END);
+//     size = ftell(file);
+//     fseek(file, 0L, SEEK_SET);
+//     return size;
+// }
+//
+// void curl_set_upload_opt(CURL *curl, const char *url, const char *user_key, FILE *file)
+// {
+//     curl_easy_setopt(curl, CURLOPT_URL, url);
+//     curl_easy_setopt(curl, CURLOPT_USERPWD, user_key);
+//     curl_easy_setopt(curl, CURLOPT_READDATA, file);
+//     curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
+//     curl_easy_setopt(curl, CURLOPT_INFILESIZE, get_file_size(file));
+//     curl_easy_setopt(curl, CURLOPT_FTP_CREATE_MISSING_DIRS, 1);
+//     //	curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+// }
+
+// void curl_set_download_opt(CURL *curl, const char *url, const char *user_key, FILE *file)
+// {
+//     curl_easy_setopt(curl, CURLOPT_URL, url);
+//     curl_easy_setopt(curl, CURLOPT_USERPWD, user_key);
+//     curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
+//     //	curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+// }
+
+
 
 static size_t getDataFun(void *ptr, size_t size, size_t nmemb, void *stream)
 {
@@ -96,8 +125,7 @@ class CurlFtp : public QObject
 {
     Q_OBJECT
 public:
-    // modified by liubojun
-    //CurlFtp(CollectorBase *pBase=0);
+    CurlFtp(CollectorBase *pBase=0);
     ~CurlFtp();
 
     void setHostPort(const QString &strIP, const int &nPort);
@@ -163,8 +191,7 @@ private:
     // string m_strCurDirLastTime;	///< 当前目录记录的最后修改时间
     //string m_strCurDirNewTime;	///< 当前目录现在的最后修改时间
 
-    // modified by liubojun
-    //CollectorBase *m_pCoBase;
+    CollectorBase *m_pCoBase;
 
     int ftp_transfermode;
     int ftp_connectmode;

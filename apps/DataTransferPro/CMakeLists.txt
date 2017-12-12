@@ -7,11 +7,18 @@ SET(SRCS
 
 # .h文件
 SET(HDRS
-
+	${RadarProjectInclude}/ctkTransfer/CollectorBase.h
+	${RadarProjectInclude}/ctkTransfer/ftpCollector.h
+    ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
 )
 
 SET(MOC_HDRS
-
+	${RadarProjectInclude}/ctkTransfer/CollectorBase.h
+	${RadarProjectInclude}/ctkTransfer/ftpCollector.h
+    ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
+  
+  #${RadarProjectInclude}/interface/ILogPrint.h
+  
 )
 
 SET(UI
@@ -31,34 +38,21 @@ INCLUDE_DIRECTORIES(
 					${CTK_INCLUDE_DIRS}
 					${CMAKE_CURRENT_BINARY_DIR}		# 程序生成目录
 					${RadarProjectInclude}
-					${RadarProjectInclude}/org.radar.communication
-					${RadarProjectInclude}/org.radar.dataadapter
-					${RadarProjectInclude}/org.radar.radarmosaic
-					${RadarProjectInclude}/ctkPluginManager
-					${RadarProjectInclude}/interface/dataservice			
-					${RadarProjectInclude}/org.radar.dataclear
-					#${RadarProjectInclude}/org.radar.radarprocess
-					#${RadarProjectInclude}/org.radar.tlogP
-					${RadarProjectInclude}/org.common.filesystemwatcher
-					${RadarProjectInclude}/org.radar.datacollection
-					${RadarProjectInclude}/org.common.quartz
-					${RadarProjectInclude}/org.radar.filedistribute
-					${RadarProjectInclude}/org.radar.pathadapter
 					${RadarProjectInclude}/interface
 					${RadarProjectInclude}/QsLog
 					${RadarProjectInclude}/ctkPublicFun
 					${RadarProjectInclude}/ctkProtocol
+					${RadarProjectInclude}/ctkTransfer
 					${CURL_INCLUDE_DIR}
-					#${RadarProjectInclude}/3dpart/zeromq
 					${VLD_INCLUDE}
 					${RadarProjectInclude}/3dpart
 					${RadarProjectInclude}/3dpart/RCF-2.2.0.0/include
 				)
 
 
-IF (WIN32)
-    SET(CMAKE_CXX_FLAGS  /DWIN32 /D_WINDOWS /W3 /GR)
-ENDIF (WIN32)
+#IF (WIN32)
+#    SET(CMAKE_CXX_FLAGS  /DWIN32 /D_WINDOWS /W3 /GR)
+#ENDIF (WIN32)
 
 message(status "${CMAKE_CXX_FLAGS}")
 #设置需要翻译的源文件				
@@ -73,18 +67,17 @@ ADD_EXECUTABLE(${PROJECT_NAME} ${HDRS} ${SRCS} ${MOC_SRCS} ${UI_H} ${ICON_SRCS} 
 
 message(STATUS "CURL_LIBRARY == ${CURL_LIBRARY}")
 
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-            ${QT_QTMAIN_LIBRARY}
-            ${QT_QTCORE_LIBRARY}
-            ${QT_QTGUI_LIBRARY}
-            ${QT_QTUITOOLS_LIBRARY}
-            ctkLogger
-            ctkPublicFun
-            ctkPluginManager
-            ${VLD_LIB}
-            CTKPluginFramework
-            ${CURL_LIBRARY}
-            )
+TARGET_LINK_LIBRARIES(${PROJECT_NAME}
+        ${QT_QTMAIN_LIBRARY}
+        ${QT_QTCORE_LIBRARY}
+        ${QT_QTGUI_LIBRARY}
+        ${QT_QTUITOOLS_LIBRARY}
+        ctkLogger
+        ctkPublicFun
+		ctkTransfer
+        ${VLD_LIB}
+		RCF
+        )
 
 
 
