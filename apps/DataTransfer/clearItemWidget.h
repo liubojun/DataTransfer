@@ -23,7 +23,7 @@ public:
 private:
     Ui::clearItemWidget ui;
 
-    QMovie *m_pMovie;
-    //CStatusLabel *m_pStatusWnd;
+    //QMovie *m_pMovie;
+    CStatusLabel *m_pStatusWnd;
 };
 #endif // clearItemWidget_h__
