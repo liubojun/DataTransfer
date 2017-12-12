@@ -17,7 +17,6 @@
 
 #include <QObject>
 #include "ICtkPluginManager.h"
-#include "UIInterface.h"
 class pluginInfo;
 
 /**
@@ -54,13 +53,6 @@ public:
     }
 
     /**
-     * @brief  插件中界面初始化方法
-     * @param  UIInterface * in_pGuiInterace 主窗体抽象出的接口
-     * @return void：描述返回值
-     */
-    virtual void initgui(UIInterface *in_pGuiInterace) {}
-
-    /**
      * @brief  雷达服务插件初始化; 内部插件管理器对象指针.
      * @return ICtkPluginManager *：返回插件管理器对象地址.
      */
@@ -78,14 +70,17 @@ public:
         return true;
     }
 
-	/**
-	 * @brief: 加载插件基本信息
-	 * @return: void: 描述返回值
-	*/
-	virtual pluginInfo* loadPluginBaseInfo(){ return NULL; }
+    /**
+     * @brief: 加载插件基本信息
+     * @return: void: 描述返回值
+    */
+    virtual pluginInfo* loadPluginBaseInfo()
+    {
+        return NULL;
+    }
 signals:
-	void forbidden(bool); //true启用  false 禁用
-	void load(bool);	  //true加载  false 卸载
+    void forbidden(bool); //true启用  false 禁用
+    void load(bool);	  //true加载  false 卸载
 private:
     /// 插件管理器指针
     ICtkPluginManager *m_pManager;

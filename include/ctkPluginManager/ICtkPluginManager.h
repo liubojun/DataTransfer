@@ -21,7 +21,6 @@
 #include <QtPlugin>
 
 #include "typedefs.h"
-#include "UIInterface.h"
 
 
 class ctkPluginContext;
@@ -32,33 +31,31 @@ class pluginInfo;
 
 class ICtkPluginManager : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	virtual ~ICtkPluginManager() {}
+    virtual ~ICtkPluginManager() {}
 
-	virtual void init() = 0;
+    virtual void init() = 0;
 
-	virtual void initGui(UIInterface *guiInterface) = 0;
+    virtual void uninit() = 0;
 
-	virtual void uninit() = 0;
+    virtual ctkPluginFrameworkFactory *getCtkPluginFrameworkFactory() = 0;
 
-	virtual ctkPluginFrameworkFactory *getCtkPluginFrameworkFactory() = 0;
+    virtual ctkPluginContext *getPluginContext() = 0;
 
-	virtual ctkPluginContext *getPluginContext() = 0;
+    virtual ICtkPluginManager* instance() = 0;
 
-	virtual ICtkPluginManager* instance() = 0;
+    virtual QObject *getService(const QString &interfaceName) = 0;
 
-	virtual QObject *getService(const QString &interfaceName) = 0;
+    virtual QVector<pluginInfo*>& getLoadedPluginBaseInfo() = 0 ;
 
-	virtual QVector<pluginInfo*>& getLoadedPluginBaseInfo() = 0 ;
+    virtual LogInterface* GetMsgLogObj(LOGWIDGETTYPE logWT) = 0 ;
 
-	virtual LogInterface* GetMsgLogObj(LOGWIDGETTYPE logWT) = 0 ;
+    virtual void SetMsgLogObj(LogInterface* pLog, LOGWIDGETTYPE logWT) = 0 ;
 
-	virtual void SetMsgLogObj(LogInterface* pLog, LOGWIDGETTYPE logWT) = 0 ;
+    virtual IFileTransfer* GetTransferObj(TRANSFERSYSTEMTYPE TranOT) = 0;
 
-	virtual IFileTransfer* GetTransferObj(TRANSFERSYSTEMTYPE TranOT) = 0;
-
-	virtual void SetTransferObj(IFileTransfer* pTrans, TRANSFERSYSTEMTYPE TranOT) = 0;
+    virtual void SetTransferObj(IFileTransfer* pTrans, TRANSFERSYSTEMTYPE TranOT) = 0;
 };
 
 Q_DECLARE_INTERFACE(ICtkPluginManager, "ctkPluginManager.ICtkPluginManager")

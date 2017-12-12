@@ -51,12 +51,6 @@ public:
      */
     virtual void init();
 
-    /**
-    * @brief  初始化插件GUI界面
-    * @return void：描述返回值
-    */
-    virtual void initGui(UIInterface *guiInterface);
-
     virtual void uninit();
 
     virtual ctkPluginFrameworkFactory *getCtkPluginFrameworkFactory();

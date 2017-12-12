@@ -4,6 +4,8 @@
 #include "pathbuilder.h"
 
 #include "ctkPublicFun.h"
+#include "CltDispatch.h"
+#include "IDispatchTimer.h"
 #include <QSettings>
 
 
@@ -16,15 +18,6 @@ CollectManager::CollectManager(ICtkPluginManager *pCtkManager, QWaitCondition &i
 
 {
     m_bFirstReadTcXml = true;
-    //connectMsgServer();		//连接消息服务器
-
-    //m_pThread = QSharedPointer<QThread>(new QThread(this));
-    //QObject::connect(m_pThread.data(), SIGNAL(finished()), this, SLOT(deleteLater()));
-    //m_pThread->start();
-
-    //readThreadNum();
-
-    //QThreadPool::globalInstance()->setMaxThreadCount(8);
 }
 
 CollectManager::~CollectManager()
@@ -36,7 +29,6 @@ CollectManager::~CollectManager()
 }
 
 
-// QSharedPointer<CollectorBase> CollectManager::creatCollector(collection_type type)
 CollectorBase *CollectManager::creatCollector(collection_type type)
 {
     // QSharedPointer<CollectorBase> pCollect;
@@ -45,11 +37,11 @@ CollectorBase *CollectManager::creatCollector(collection_type type)
     {
     case SHARED_DIR:
         // pCollect = QSharedPointer<CollectorBase>(new SharedDirCollector(this, m_oCond, m_oLocker, m_iLogsize));
-        pCollect = new SharedDirCollector(this, m_oCond, m_oLocker, m_iLogsize);
+        pCollect = new SharedDirCollector(m_oCond, m_oLocker, m_iLogsize);
         break;
     case FTP:
         //pCollect = QSharedPointer<CollectorBase>(new FtpCollector(this, m_oCond, m_oLocker, m_iLogsize));
-        pCollect = new FtpCollector(this, m_oCond, m_oLocker, m_iLogsize);
+        pCollect = new FtpCollector(m_oCond, m_oLocker, m_iLogsize);
         break;
     default:
         break;
@@ -64,75 +56,6 @@ CollectorBase *CollectManager::creatCollector(collection_type type)
     return pCollect;
 }
 
-bool CollectManager::addCollect(const CollectSet &set)
-{
-//     if (!set.bEnable)
-//     {
-//         return false;
-//     }
-//
-//     QString strPath = QString::fromStdString(set.strPath);
-//     QFileInfo qfInfo(strPath);
-//     if (!qfInfo.isDir())
-//     {
-//         emit print(QStringLiteral("[%1]: 目录[%2]不能访问或不存在。").arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-//                    .arg(strPath));
-//
-//         //QSLOG_ERROR(QString("[%1] is not a dir.").arg(strPath));
-//         return false;
-//     }
-//
-//     if (m_pCollects.contains(set.strId))
-//     {
-//         QSLOG_ERROR("Same id.");
-//         return false;
-//     }
-//
-//     QSharedPointer<CollectorBase> pCollect = creatCollector(SHARED_DIR);
-//     // 绑定log信号槽
-//     connect(pCollect.data(), SIGNAL(print(const QString&)), this, SIGNAL(print(const QString&)));
-//     pCollect->setNameID(QString::fromStdString(set.strId));
-//     pCollect->setWatchType(watch_type(set.nWtype));
-//     pCollect->setUrl(strPath);
-//     pCollect->setQuartzRule(QString::fromStdString(set.strDispatch));
-//     FILENAME_TABLE fTable;
-//     ToFileTable(set.mapTypeRegs, fTable);
-//     pCollect->setFileNameRules(fTable);
-//     //pCollect->setQueNames(set.mapTypeRegs);
-//     pCollect->setQueNames(set.vecQueNames);
-//     ///pCollect->start(m_pThread);
-//
-//     m_pCollects[set.strId] = pCollect;
-
-    return true;
-}
-
-void CollectManager::delCollect(const string &strID)
-{
-//     if (!m_pCollects.contains(strID))
-//     {
-//         return;
-//     }
-//     // 停止收集
-//     QSharedPointer<CollectorBase> pCollect = m_pCollects.take(strID);
-//     if (!pCollect.isNull())
-//     {
-//         pCollect->stop();
-//     }
-//     // 删除时间
-//     delLastTime(strID);
-}
-
-void CollectManager::mdfyCollect(const CollectSet &set)
-{
-//     if (!m_pCollects.contains(set.strId))
-//     {
-//         return;
-//     }
-//     QSharedPointer<CollectorBase> pCollect = m_pCollects.take(set.strId);
-//     pCollect->stop();
-//     addCollect(set);
-}
 
 
 void CollectManager::ToFileTable(const std::map<string, NameMatchRule > &mapTypeRegs, FILENAME_TABLE &fileTable)
@@ -148,37 +71,6 @@ void CollectManager::ToFileTable(const std::map<string, NameMatchRule > &mapType
         fileTable[type].nDateTimeIndex = it->second.nTimeIndex;
     }
 }
-
-//bool CollectManager::connectMsgServer()
-//{
-//    QObject *op = m_pCtkManager->getService("IClientMessage");
-//    if (op == NULL)
-//    {
-//        return false;
-//    }
-//    //创建消息客户端
-//    m_pIClient = (qobject_cast<IClientMessage *>(op))->createClient();
-//    if (m_pIClient != NULL)
-//    {
-//        CPathBuilder pbd;
-//        QString qsXmlPath = pbd.getConfigPath() + "/ClientInfo.xml";
-//        if (QFile::exists(qsXmlPath))
-//        {
-//            ClientConfig cConfig;
-//            if (DeserializeXmlFile2Client(qsXmlPath.toLocal8Bit().data(), cConfig))
-//            {
-//                if (m_pIClient->connect(cConfig.m_sIP, cConfig.m_nPort))
-//                {
-//                    connect(m_pIClient.data(), SIGNAL(msgIncoming(const MSGSTRUCT&)), this, SLOT(onMsgResp()));
-//                    return true;
-//                }
-//            }
-//        }
-//    }
-//
-//    QSLOG_ERROR("CollectorBase failed to connectMsgServer");
-//    return false;
-//}
 
 bool CollectManager::TestSrcCollection(const TransferSet &set)
 {
@@ -214,21 +106,6 @@ bool CollectManager::TestDesCollection(const SendSet &set)
     return pCollect->testCollection();
 }
 
-void CollectManager::startAllCollection()
-{
-    emit print(QStringLiteral("[%1]: 启动所有收集任务...").arg(QDateTime::currentDateTime().toString(Qt::ISODate)));
-    int nCount = 0;
-    foreach (CollectSet set, m_lstCollectSet.lsSets)
-    {
-        if (addCollect(set))
-        {
-            nCount++;
-        }
-    }
-    emit print(QStringLiteral("[%1]: 共启动%2个收集任务。").arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-               .arg(nCount));
-}
-
 void CollectManager::stopAllCollection()
 {
     emit print(QStringLiteral("[%1]: 等待当前任务结束...").arg(QDateTime::currentDateTime().toString(Qt::ISODate)));
@@ -243,146 +120,12 @@ void CollectManager::stopAllCollection()
     QSLOG_INFO("All tasks have been finished.");
 }
 
-bool CollectManager::addTransCollect(const TransferSet &set, bool bFlag)
-{
-//     if (set.bEnable)
-//     {
-//         QSharedPointer<CollectorBase> pCollect = creatCollector((collection_type)set.nCollectWay);
-//         if (pCollect.isNull())
-//         {
-//             return false;
-//         }
-//         pCollect->setNameID(QString::fromLocal8Bit(set.strName.c_str()));
-//         pCollect->setWatchType(watch_type(set.nWatchWay));
-//         pCollect->setUrl(QString::fromLocal8Bit(set.strPath.c_str()));
-//         pCollect->setIP(QString::fromStdString(set.strIP));
-//         pCollect->setListenPort(set.nPort);
-//         pCollect->setUserAndPwd(QString::fromStdString(set.strUsr), QString::fromStdString(set.strPwd));
-//         pCollect->setCollectType(1);
-//         if (!set.vecRcvers.empty())
-//         {
-//             pCollect->setQuartzRule(QString::fromStdString(set.strDispatch));
-//             FILENAME_TABLE fTable;
-//             QStringList strlstTmp;
-//             foreach (string reg, set.vecRegs)
-//             {
-//                 strlstTmp.append(QString::fromStdString(reg));
-//             }
-//             fTable[X_TYPE].strNameReg = strlstTmp.at(0).toStdString();
-//             pCollect->setFileNameRules(fTable);
-//             pCollect->m_TransferSet = set;
-//             ///pCollect->start(m_pThread);
-//
-//             m_pCollects[set.strName] = pCollect;
-//         }
-//     }
-//
-//     if (bFlag)
-//     {
-//         m_lstTransSet.lsSets.push_back(set);
-//         TransferSetToXml(m_strCollectXmlPath.toLocal8Bit().data(), m_lstTransSet);
-//     }
-
-    return true;
-}
-
-void CollectManager::delTransCollect(const string &strID)
-{
-//     list<TransferSet>::iterator it = m_lstTransSet.lsSets.begin();
-//     for (; it != m_lstTransSet.lsSets.end(); it++)
-//     {
-//         if (it->strName == strID)
-//         {
-//             QSharedPointer<CollectorBase> pCollect = m_pCollects.take(strID);
-//             if (!pCollect.isNull())
-//             {
-//                 pCollect->stop();
-//                 pCollect->DeleteTcTime();
-//             }
-//             m_lstTransSet.lsSets.erase(it);		//若用remove方法，需要重载==
-//             TransferSetToXml(m_strCollectXmlPath.toLocal8Bit().data(), m_lstTransSet);
-//             break;
-//         }
-//     }
-}
-
-void CollectManager::mdfyTransCollect(const TransferSet &set)
-{
-//     list<TransferSet>::iterator it = m_lstTransSet.lsSets.begin();
-//     for (; it != m_lstTransSet.lsSets.end(); it++)
-//     {
-//         if (it->strName == set.strName)
-//         {
-//             QSharedPointer<CollectorBase> pCollect = m_pCollects.take(set.strName);
-//             if (!pCollect.isNull())
-//             {
-//                 pCollect->stop();
-//             }
-//             else
-//             {
-//                 pCollect = creatCollector((collection_type)set.nCollectWay);
-//             }
-//             pCollect->setNameID(QString::fromLocal8Bit(set.strName.c_str()));
-//             pCollect->setWatchType(watch_type(set.nWatchWay));
-//             pCollect->setUrl(QString::fromLocal8Bit(set.strPath.c_str()));
-//             pCollect->setIP(QString::fromStdString(set.strIP));
-//             pCollect->setListenPort(set.nPort);
-//             pCollect->setUserAndPwd(QString::fromStdString(set.strUsr), QString::fromStdString(set.strPwd));
-//             pCollect->setCollectType(1);
-//             if (!set.vecRcvers.empty() && set.bEnable)
-//             {
-//                 pCollect->setQuartzRule(QString::fromStdString(set.strDispatch));
-//                 FILENAME_TABLE fTable;
-//                 QStringList strlstTmp;
-//                 QString strTmp;
-//                 foreach (string reg, set.vecRegs)
-//                 {
-//                     strTmp = QString::fromStdString(reg);
-//                     if (!strTmp.trimmed().isEmpty())
-//                     {
-//                         strlstTmp.append(strTmp);
-//                     }
-//                 }
-//                 fTable[X_TYPE].strNameReg = strlstTmp.at(0).toStdString();
-//                 pCollect->setFileNameRules(fTable);
-//                 pCollect->m_TransferSet = set;
-//                 ///pCollect->start(m_pThread);
-//             }
-//             m_pCollects[set.strName] = pCollect;
-//             //////////////////////////////////////////////////////////////////////////
-//
-//             *it = set;
-//             //TransferSetToXml(m_strCollectXmlPath.toStdString(), m_lstTransSet);
-//             TransferSetToXml(m_strCollectXmlPath.toLocal8Bit().data(), m_lstTransSet);
-//
-//             return;		// erase后，it自增，不能用return
-//         }
-//     }
-//     // 没找到，认为是新增
-//     if (it == m_lstTransSet.lsSets.end())
-//     {
-//         addTransCollect(set);
-//     }
-}
-
 
 void CollectManager::onMsgResp()
 {
     m_msgLock.unlock();
 }
 
-bool CollectManager::readThreadNum()
-{
-    CPathBuilder pb;
-    QString strTmp = pb.getConfigPath() + "/threadNum.ini";
-    QSettings ini(strTmp, QSettings::IniFormat);
-    m_vtbMaxNum = ini.value("VTB/num").toInt();
-    if (m_vtbMaxNum < 1)
-    {
-        m_vtbMaxNum = 3;
-    }
-    return true;
-}
 
 bool CollectManager::TestDispatch(const QString &str)
 {
@@ -395,18 +138,12 @@ bool CollectManager::TestDispatch(const QString &str)
 
 bool CollectManager::addSyncTransfer(const CollectTask &set)
 {
-    // QSharedPointer<CollectorBase> pCollect = creatCollector((collection_type)set.collectType);
     CollectorBase *pCollect = creatCollector((collection_type)set.collectType);
-    // if (pCollect.isNull())
     if (NULL == pCollect)
     {
         QSLOG_ERROR("Fail to creatCollector.");
         return false;
     }
-    //connect(pCollect.data(), SIGNAL(showLog(const QString&, const QString&)), this, SIGNAL(showLog(const QString&, const QString&)));
-    //connect(pCollect.data(), SIGNAL(showLog(const CollectTask&, const QString&, int)), this, SIGNAL(showLog(const CollectTask&, const QString&, int)));
-    //connect(pCollect.data(), SIGNAL(taskState(const CollectTask&, int, int)), this, SIGNAL(taskState(const CollectTask&, int, int)));
-    //connect(pCollect.data(), SIGNAL(startGif(const QString&, bool)), this, SIGNAL(startGif(const QString&, bool)));
 
     connect(pCollect, SIGNAL(showLog(const CollectTask&, const QString&, int)), this, SIGNAL(showLog(const CollectTask&, const QString&, int)));
     connect(pCollect, SIGNAL(taskState(const CollectTask&, int, int)), this, SIGNAL(taskState(const CollectTask&, int, int)));
@@ -414,7 +151,8 @@ bool CollectManager::addSyncTransfer(const CollectTask &set)
     pCollect->setCollectTask(set);
     if (set.enable)
     {
-        pCollect->start();
+        addCollector2TimeTable(pCollect);
+        //pCollect->start();
     }
     m_pCollects[set.dirID] = pCollect;
 
@@ -447,6 +185,8 @@ bool CollectManager::mdfySyncTransfer(const CollectTask &set)
         pCollect->stop();
         addSyncTransfer(set);
         pCollect->deleteLater();
+
+        // 停止与该收集任务相关的各项内容
     }
 
     return true;
@@ -470,12 +210,59 @@ void CollectManager::onEnable(const QString &taskID, bool bEnable)
     {
         if (bEnable)
         {
-            it.value()->reStart();
+            //it.value()->reStart();
+            addCollector2TimeTable(it.value());
         }
         else
         {
             it.value()->stop();
+            stopCollector(it.value());
         }
+    }
+}
+
+void CollectManager::addCollector2TimeTable(CollectorBase *in_pBaseCollector)
+{
+    QMutexLocker m_oGuard(&m_oDispatchLocker);
+    QObject *op = m_pCtkManager->getService("IDispatchTimer");
+    IDispatchTimer *iDt = qobject_cast<IDispatchTimer *>(op);
+    if (iDt)
+    {
+        QSharedPointer<CltDispatch> cDispatch = QSharedPointer<CltDispatch>(new CltDispatch(in_pBaseCollector));
+        QSharedPointer<QObject> m_pTimerObj;
+        bool bFlag = iDt->SetDispatchTimer(in_pBaseCollector->getCollectTask().dispatch.toStdString(),
+                                           cDispatch.data(),
+                                           QSharedPointer<TimerCallBackParam>(new TimerCallBackParam()), m_pTimerObj);
+        if (bFlag)
+        {
+            m_oDispatchers.insert(in_pBaseCollector->getIdentify(), cDispatch);
+            m_oTimerObjs.insert(in_pBaseCollector->getIdentify(), m_pTimerObj);
+            connect(in_pBaseCollector, SIGNAL(showIdentify(QString)), this, SLOT(removeCollectorFromTimeTable(QString)));
+        }
+        else
+        {
+            QSLOG_ERROR(QString("FtpCollector SetDispatchTimer failed: %1"));
+        }
+
+    }
+}
+
+void CollectManager::removeCollectorFromTimeTable(QString in_identify)
+{
+    QMutexLocker m_oGuard(&m_oDispatchLocker);
+    m_oDispatchers.remove(in_identify);
+    m_oTimerObjs.remove(in_identify);
+    //m_oWorkers.remove(in_identify);
+}
+
+void CollectManager::stopCollector(CollectorBase *in_pBaseCollector)
+{
+    QMutexLocker m_oGuard(&m_oDispatchLocker);
+    QObject *op = m_pCtkManager->getService("IDispatchTimer");
+    if (op != NULL)
+    {
+        IDispatchTimer *iDt = qobject_cast<IDispatchTimer *>(op);
+        iDt->stopDispatchTimer(m_oTimerObjs[in_pBaseCollector->getIdentify()]);
     }
 }
 

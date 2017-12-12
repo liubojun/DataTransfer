@@ -26,6 +26,7 @@ using namespace std;
 #include <QMutex>
 #include <QProcess>
 #include <QWaitCondition>
+#include <QUuid>
 #include "commontypedef.h"
 #include "ctkLog.h"
 #include "../ctkProtocol/fileMsg.h"
@@ -76,6 +77,16 @@ public:
     {
         m_collectSet = task;
         m_bRun = (task.enable==1) ? true : false;
+    }
+
+    const CollectTask &getCollectTask() const
+    {
+        return m_collectSet;
+    }
+
+    QString getIdentify()
+    {
+        return m_oId.toString();
     }
 
     /**
@@ -181,6 +192,8 @@ signals:
     void startGif(const QString&, bool);
 
     void begin();
+
+    void showIdentify(QString id);
 
 public slots:
     /**
@@ -380,6 +393,9 @@ protected:
 
     RCF::RcfInitDeinit m_oRcfInit;
     RcfClient<I_LogPrint> m_oRcfClient;
+
+    // 当前收集器的唯一标识
+    QUuid m_oId;
 
     //QSharedPointer<QProcess> m_oDataTransferPro;
 };

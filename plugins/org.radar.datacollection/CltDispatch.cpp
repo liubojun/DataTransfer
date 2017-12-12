@@ -21,15 +21,8 @@ void CltDispatch::Dispatch(const QSharedPointer<TimerCallBackParam> &data)
         return;
     }
     //QSLOG_DEBUG("DISPATHCH1");
-    QTimer::singleShot(0, this, SLOT(dowork()));
-    //if (m_bHasFinished)
-    //{
-    //    QTimer::singleShot(0, this, SLOT(dowork()));
-    //}
-    //else
-    //{
-    //    QSLOG_DEBUG(QStringLiteral("之前任务还未结束，本次任务不做处理."));
-    //}
+    QtConcurrent::run(m_pParent, &CollectorBase::getNewFiles);
+    //QTimer::singleShot(0, this, SLOT(dowork()));
 }
 
 void CltDispatch::dowork()

@@ -59,8 +59,8 @@ signals:
 
 private:
     QSharedPointer<QObject> m_pTimerObject;
+
     QList<QSharedPointer<CltDispatch> > m_oProcessors;
-    //static bool m_bContoMS;		///< 是否连接客服端
 
     /**
      * @brief  获取本机IP地址
@@ -70,33 +70,11 @@ private:
     //void getIpaddr(QString &strIP);
     QString m_strIPaddr;
 
-    /**
-    * @brief  插件中界面初始化方法
-    * @param  UIInterface * in_pGuiInterace 主窗体抽象出的接口
-    * @return void：无
-    */
-    virtual void initgui(UIInterface *in_pGuiInterace);
-
     void startComCollection();
 
     void stopComCollection();
 
-    void createLogView();
-
-private slots:
-
-    void collectControl(bool bFlag);
-    void showLogView(bool bFlag);
-    void resetLogView();
-
 private:
-    UIInterface *m_pGui;							///< gui界面线程对象
-    QSharedPointer<QAction> m_pActControl;			///< 控制菜单项
-    QSharedPointer<QAction> m_pActView;				///< 日志视图菜单项
-    QSharedPointer<ILogWidget>	m_pLogView;			///< 日志窗
-
-    //CollectSetDlg *m_csDlg;							///< 单站收集设置界面
-
     QSharedPointer<CollectManager>	m_pComCollector;	///< 通用收集器
 };
 

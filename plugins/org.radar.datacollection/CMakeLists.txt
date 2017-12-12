@@ -4,43 +4,26 @@ SET(PLUGIN_export_directive "org_radar_datacollection_EXPORT")
 
 set(PLUGIN_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/datacollectionActivator.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/CollectorBase.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/shareddirCollector.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/ftpCollector.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/streamCollector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/datacollectionImp.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/CltDispatch.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/CollectHistory.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/toVtbThread.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/curlftp.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/collectSetDlg.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/CollectManager.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/DistributeFile.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/ftpdownload.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/filewatcher.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/CltDispatch.cpp
+
 )
 
 set(PLUGIN_HDRS
   ${CMAKE_CURRENT_SOURCE_DIR}/datacollectionActivator.h
   ${CMAKE_CURRENT_SOURCE_DIR}/datacollectionImp.h
   ${CMAKE_CURRENT_SOURCE_DIR}/CltDispatch.h
-  #${CMAKE_CURRENT_SOURCE_DIR}/toVtbThread.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/curlftp.h
-  #${CMAKE_CURRENT_SOURCE_DIR}/collectSetDlg.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/DistributeFile.h
-  #${CMAKE_CURRENT_SOURCE_DIR}/ftpdownload.h
-  #${CMAKE_CURRENT_SOURCE_DIR}/filewatcher.h
   ${RadarProjectInclude}/interface/IBaseInterface.h
   ${RadarProjectInclude}/org.radar.datacollection/IDataCollection.h
-  ${RadarProjectInclude}/org.radar.datacollection/CollectorBase.h
-  ${RadarProjectInclude}/org.radar.datacollection/shareddirCollector.h
-  ${RadarProjectInclude}/org.radar.datacollection/ftpCollector.h
-  ${RadarProjectInclude}/org.radar.datacollection/streamCollector.h
-  #${RadarProjectInclude}/org.radar.datacollection/CollectHistory.h
   ${RadarProjectInclude}/org.radar.datacollection/CollectManager.h
   ${RadarProjectInclude}/org.radar.datacollection/ICollectManager.h
   ${RadarProjectInclude}/org.common.quartz/DispatchInterface.h
   ${RadarProjectInclude}/interface/ILogPrint.h
+  ${RadarProjectInclude}/ctkTransfer/CollectorBase.h
+  ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
+  ${RadarProjectInclude}/ctkTransfer/ftpCollector.h
+  ${RadarProjectInclude}/ctkTransfer/streamCollector.h
 )
 
 # Files which should be processed by Qts moc
@@ -48,22 +31,17 @@ set(PLUGIN_MOC_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/datacollectionActivator.h
   ${CMAKE_CURRENT_SOURCE_DIR}/datacollectionImp.h
   ${CMAKE_CURRENT_SOURCE_DIR}/CltDispatch.h
-  #${CMAKE_CURRENT_SOURCE_DIR}/collectSetDlg.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/curlftp.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/DistributeFile.h
-  #${CMAKE_CURRENT_SOURCE_DIR}/filewatcher.h
   ${RadarProjectInclude}/interface/IBaseInterface.h
   ${RadarProjectInclude}/interface/ILogWidget.hpp
   ${RadarProjectInclude}/org.radar.datacollection/IDataCollection.h
   ${RadarProjectInclude}/org.common.quartz/DispatchInterface.h
-  ${RadarProjectInclude}/org.radar.datacollection/CollectorBase.h
-  ${RadarProjectInclude}/org.radar.datacollection/shareddirCollector.h
-  ${RadarProjectInclude}/org.radar.datacollection/ftpCollector.h
-  ${RadarProjectInclude}/org.radar.datacollection/streamCollector.h
-  #${RadarProjectInclude}/org.radar.datacollection/CollectHistory.h
   ${RadarProjectInclude}/org.radar.datacollection/CollectManager.h
   ${RadarProjectInclude}/org.radar.datacollection/ICollectManager.h
   ${RadarProjectInclude}/interface/ILogPrint.h
+  ${RadarProjectInclude}/ctkTransfer/CollectorBase.h
+  ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
+  ${RadarProjectInclude}/ctkTransfer/ftpCollector.h
+  ${RadarProjectInclude}/ctkTransfer/streamCollector.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -93,12 +71,9 @@ INCLUDE_DIRECTORIES(
 					${RadarProjectInclude}/ctkPublicFun
 					${RadarProjectInclude}/QsLog
 					${RadarProjectInclude}/3dpart
-					${RadarProjectInclude}/3dpart/zeromq
 					${RadarProjectInclude}/3dpart/Common
-					#${RadarProjectInclude}/3dpart/qftp
 					${RadarProjectInclude}/ctkProtocol
-					${RadarProjectInclude}/org.radar.radarmosaic
-					${RadarProjectInclude}/org.radar.filedistribute
+					${RadarProjectInclude}/ctkTransfer
 					${RadarProjectInclude}/3dpart
 					${RadarProjectInclude}/3dpart/RCF-2.2.0.0/include
 					${CURL_INCLUDE_DIR}
@@ -133,6 +108,7 @@ ctkMacroBuildPlugin(
   ${QT_QTGUI_LIBRARY}
   #Mpr.lib
   ${CURL_LIBRARY}
+  ctkTransfer
 )
 
 

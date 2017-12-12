@@ -18,18 +18,9 @@ class ICollectManager : public ILogPrint
 {
     Q_OBJECT
 public:
-
-    // ICollectManager(QWaitCondition &in_oCondition, QMutex &in_oLocker);
-
     virtual ~ICollectManager() {}
 
     virtual CollectorBase *creatCollector(collection_type type) = 0;
-
-    virtual bool addCollect(const CollectSet &set) = 0;
-    virtual void delCollect(const string &strID) = 0;
-    virtual void mdfyCollect(const CollectSet &set) = 0;
-
-    virtual void startAllCollection() = 0;
 
     virtual void stopAllCollection() = 0;
 
@@ -38,9 +29,9 @@ public:
 
 signals:
     void newTransFile(const TransferSet &tSet);
-    //void showLog(const QString &dirName, const QString &info);
+
     void showLog(const CollectTask &task, const QString &info, int type);
-    //void doWork(const QString &taskID);
+
     void taskState(const CollectTask&, int, int);
     void startGif(const QString&, bool);
 
@@ -49,9 +40,6 @@ public slots:
     virtual void onEnable(const QString&, bool) = 0;
 
 public:
-    virtual bool addTransCollect(const TransferSet &set, bool bFlag=true) = 0;
-    virtual void delTransCollect(const string &strID) = 0;
-    virtual void mdfyTransCollect(const TransferSet &set) = 0;
 
     virtual bool addSyncTransfer(const CollectTask &set) = 0;
 

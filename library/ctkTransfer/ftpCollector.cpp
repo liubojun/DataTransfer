@@ -22,7 +22,9 @@ FtpCollector::~FtpCollector()
 
 int FtpCollector::start()
 {
+    m_bRun = true;
     /*QObject *op = m_pCtkManager->getService("IDispatchTimer");
+    QObject *op = in_pService;
     IDispatchTimer *iDt = qobject_cast<IDispatchTimer *>(op);
     if (iDt)
     {

@@ -15,6 +15,7 @@
 
 class CollectorBase;
 class IClient;
+class CltDispatch;
 
 typedef QMap<QString, CollectorBase* >::const_iterator MyIterator;
 
@@ -33,14 +34,6 @@ public:
     // QSharedPointer<CollectorBase> creatCollector(collection_type type);
     virtual CollectorBase *creatCollector(collection_type type);
 
-    bool readThreadNum();
-
-    bool addCollect(const CollectSet &set);
-    void delCollect(const string &strID);
-    void mdfyCollect(const CollectSet &set);
-
-    void startAllCollection();
-
     void stopAllCollection();
 
     int m_vtbMaxNum;		///< 标准化vtb的线程数
@@ -48,9 +41,6 @@ public:
     //////////////////////////////////////////////////////////////////////////
     // 数据传输相关
 public:
-    bool addTransCollect(const TransferSet &set, bool bFlag=true);
-    void delTransCollect(const string &strID);
-    void mdfyTransCollect(const TransferSet &set);
 
     virtual bool addSyncTransfer(const CollectTask &set);
     virtual bool mdfySyncTransfer(const CollectTask &set);
@@ -88,6 +78,13 @@ private slots:
     virtual void onDoWork(const QString &taskID);
     virtual void onEnable(const QString&, bool);
 
+    /**
+     * @brief  将当前收集任务相关的信息从时间表中移除
+     * @param  QString in_identify：收集任务唯一标识
+     * @return void：无
+    */
+    void removeCollectorFromTimeTable(QString in_identify);
+
 private:
 
 
@@ -102,6 +99,21 @@ private:
     */
     bool connectMsgServer();
 
+    /**
+     * @brief  将当前收集任务加入到时间表中
+     * @param  CollectorBase *in_pBaseCollector：收集任务
+     * @return void：无
+     */
+    void addCollector2TimeTable(CollectorBase *in_pBaseCollector);
+
+    /**
+    * @brief  停止收集任务
+    * @param  CollectorBase *in_pBaseCollector：收集任务
+    * @return void：无
+    */
+    void stopCollector(CollectorBase *in_pBaseCollector);
+
+
 private:
     QString m_strTimeXmlPath;
     QString m_strCollectXmlPath;
@@ -113,6 +125,18 @@ private:
     QWaitCondition &m_oCond;
     QMutex &m_oLocker;
     int &m_iLogsize;
+
+    // 保存当前示例创建的所有的调度器
+    QMap<QString, QSharedPointer<CltDispatch> > m_oDispatchers;
+
+    // 配套调度器的时间
+    QMap<QString, QSharedPointer<QObject> > m_oTimerObjs;
+
+    // 配套调度器的线程
+    // QMap<QString, QSharedPointer<QThread> > m_oWorkers;
+
+    // 配套调度器控制锁
+    QMutex m_oDispatchLocker;
 };
 
 #endif

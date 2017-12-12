@@ -37,6 +37,8 @@ CollectorBase::CollectorBase(QWaitCondition &in_oCond, QMutex &in_oLocker, int &
     //m_oThread.start();
     //this->moveToThread(&m_oThread);
     connect(this, SIGNAL(begin()), this, SLOT(onBegined()));
+
+    m_oId = QUuid::createUuid();
 }
 
 CollectorBase::~CollectorBase()
@@ -45,7 +47,7 @@ CollectorBase::~CollectorBase()
     //m_oThread.quit();
     //m_oThread.wait();
     //m_oThread.terminate();
-
+    emit showIdentify(m_oId.toString());
 
 }
 

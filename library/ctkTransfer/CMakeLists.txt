@@ -41,6 +41,7 @@ INCLUDE_DIRECTORIES(
 					${RadarProjectInclude}/ctkPublicFun
 					${RadarProjectInclude}/ctkTransfer
 					${RadarProjectInclude}/org.radar.drawproduct
+					${RadarProjectInclude}/org.common.quartz
 					#${RadarProjectInclude}/org.radar.dataadapter
 					${RadarProjectInclude}/QsLog
 					${RadarProjectInclude}/ctkProtocol
