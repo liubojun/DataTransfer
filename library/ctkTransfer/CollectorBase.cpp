@@ -174,11 +174,14 @@ QString CollectorBase::getDestFilePath(const QString &srcFileFullPath, const QSt
         destPath = CPathBuilder::getFinalPathFromUrl(destPath, dt).at(0);
     }
 
+    // 根据配置的规则，替换目录的目标名称
+    destPath = CPathBuilder::getFinalPathFromUrlV2(destPath, fileName);
+
     if (destPath.right(1) != "/")
     {
         destPath += "/";
     }
-
+    QSLOG_DEBUG(destPath);
     return destPath;
 }
 

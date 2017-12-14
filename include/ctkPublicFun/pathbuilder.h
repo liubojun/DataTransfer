@@ -109,6 +109,14 @@ public:
     static QStringList getFinalPathFromUrl(const QString &path, QDateTime in_oDt);
 
     /**
+     * @brief  根据规则从文件名中替换目录变量规则
+     * @param[in]  const QString &path 路径（可能包含变量）
+     * @param[in]  const QString &filename 文件名
+     * @return QT_NAMESPACE::QString：返回组装的url
+     */
+    static QString getFinalPathFromUrlV2(const QString &path, const QString &filename);
+
+    /**
      * @brief  从URL以及文件目录中获取时间
      * @param[in]  const QString &rule 规则
      * @param[in]  const QString &path 路径

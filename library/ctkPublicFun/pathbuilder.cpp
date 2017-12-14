@@ -726,3 +726,57 @@ int CPathBuilder::setChildProcessEnv()
     return 0;
 }
 
+QString CPathBuilder::getFinalPathFromUrlV2(const QString &path, const QString &filename)
+{
+    QStringList each_paths = path.split("/");
+    for (int k = 0; k < each_paths.size(); ++k)
+    {
+        QString &partUrl = each_paths[k];
+        //%On-m   - means the range n to m of characters from original
+        //        file name.n = '^' - from the beginning
+        //        m = '$' - to the end
+        int index1 = partUrl.indexOf("%O");
+        int index2 = partUrl.indexOf("-", index1);
+        if (-1 != index1 && -1 != index2 && index1 < index2)
+        {
+            // 截取之间的内容
+            int iStartIndex = partUrl.mid(index1 + 2, index2 - index1 - 2).toInt();
+            int iMoveIndex = index2+1 ;
+            for (; iMoveIndex < partUrl.length(); ++iMoveIndex)
+            {
+                if (partUrl.at(iMoveIndex) < '0' || partUrl.at(iMoveIndex) > '9')
+                {
+                    break;
+                }
+            }
+
+            // 得到EndIndex位置
+            int iEndIndex = partUrl.mid(index2 + 1, iMoveIndex - index2 - 1).toInt();
+
+            // 根据startIndex以及endIndex，从原始文件名中截取内容
+            if (iEndIndex <= filename.length())
+            {
+                QString strFinalUrl = filename.mid(iStartIndex, iEndIndex - iStartIndex);
+                // 替换index1到iMoveIndex之间的内容
+                partUrl.replace(index1, iMoveIndex - index1, strFinalUrl);
+                //qDebug() << partUrl;
+            }
+
+        }
+    }
+
+    QString finalUrl;
+    foreach(QString str, each_paths)
+    {
+        if (str.trimmed().isEmpty())
+        {
+            continue;
+        }
+        finalUrl.append(str).append("/");
+    }
+    if (path.startsWith("/"))
+    {
+        finalUrl.prepend("/");
+    }
+    return finalUrl;
+}
