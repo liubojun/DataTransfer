@@ -12,24 +12,24 @@ enum ICONTYPE
 {
     // 正常灰化
     FILE_FILE_S=0,
-    FTP_FILE_S,
-    FILE_FTP_S,
-    FTP_FTP_S,
+    FTP_FILE_S=1,
+    FILE_FTP_S=2,
+    FTP_FTP_S=3,
     // 正常
-    FILE_FILE,
-    FTP_FILE,
-    FILE_FTP,
-    FTP_FTP,
+    FILE_FILE=4,
+    FTP_FILE=5,
+    FILE_FTP=6,
+    FTP_FTP=7,
     // 灰化且不正常
-    FILE_FILE_SE,
-    FTP_FILE_SE,
-    FILE_FTP_SE,
-    FTP_FTP_SE,
+    FILE_FILE_SE=8,
+    FTP_FILE_SE=9,
+    FILE_FTP_SE=10,
+    FTP_FTP_SE=11,
     // 不正常
-    FILE_FILE_E,
-    FTP_FILE_E,
-    FILE_FTP_E,
-    FTP_FTP_E
+    FILE_FILE_E=12,
+    FTP_FILE_E=13,
+    FILE_FTP_E=14,
+    FTP_FTP_E=15
 };
 
 class MyItemWidget : public QWidget
@@ -40,6 +40,7 @@ public:
     ~MyItemWidget();
 
     void SetName(const QString &strName);
+    void SetIcon(int colType, int sendType, int enable, int normal);
     void SetIcon(const ICONTYPE &icon);
     void SetState(const QString &state, bool bShow);
     void SetHighlight(bool bFlag);

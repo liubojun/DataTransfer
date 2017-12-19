@@ -222,7 +222,7 @@ bool MainWindow::addCollect(const CollectTask &task, bool bDb)
     tUser.taskID = task.dirID;
     m_sqlite->QueryUserInfo(tUser);
 
-    int nIcon = task.collectType + /*cUser.user.sendType * 2 +*/ task.enable * 4;
+    int nIcon = task.collectType + tUser.lstUser.at(0).user.sendType * 2 + task.enable * 4;
     // 在左侧列表显示
     QListWidgetItem *pItem = new QListWidgetItem(COLLECTITEM);
     ui.listWidget->addItem(pItem);
@@ -937,7 +937,10 @@ void MainWindow::onClearLog()
 
 void MainWindow::setTaskIcon(const CollectTask &task, int sendWay, int normal)
 {
-    int nIcon = task.collectType + sendWay * 2 + task.enable * 4 + normal * 8;
+    TaskUser tUser;
+    tUser.taskID = task.dirID;
+    m_sqlite->QueryUserInfo(tUser);
+    int nIcon = task.collectType + tUser.lstUser.at(0).user.sendType * 2 + task.enable * 4 + normal * 8;
     QMap<QListWidgetItem*, QString>::const_iterator it = m_ItemTask.begin();
     while (it != m_ItemTask.end())
     {

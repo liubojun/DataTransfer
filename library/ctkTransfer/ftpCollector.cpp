@@ -67,6 +67,17 @@ void FtpCollector::getNewFiles()
     //    return;
     //}
 
+    if (!readSet())
+    {
+        return;
+    }
+
+    m_bRun = (bool)m_collectSet.enable;
+    if (!m_bRun)
+    {
+        return;
+    }
+
     // 使用共享内存，查看当前的QProcess是否存在，如果存在的话，则无需再次启动针对该目录ID的收集任务
     if (!checkProcessFinished(m_collectSet.dirID))
     {

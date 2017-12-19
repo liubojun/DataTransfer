@@ -46,6 +46,11 @@ void MyItemWidget::SetHighlight(bool bFlag)
 
 }
 
+void MyItemWidget::SetIcon(int colType, int sendType, int enable, int normal)
+{
+
+}
+
 void MyItemWidget::SetIcon(const ICONTYPE &icon)
 {
     QPixmap pix;

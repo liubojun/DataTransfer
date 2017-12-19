@@ -1030,7 +1030,7 @@ int CurlFtp::deleteFtpFile(const char *url, const char *user_pwd, const string &
 
     //char szCmd[1024] = "DELE ";
     //strcat(szCmd, filename.c_str());
-    QString szCmd = QString("DELE ").arg(filename.c_str());
+    QString szCmd = QString("DELE %1").arg(filename.c_str());
     curl_easy_setopt(m_pRemoveDestCurl, CURLOPT_URL, url);
     curl_easy_setopt(m_pRemoveDestCurl, CURLOPT_USERPWD, user_pwd);
     struct curl_slist *headerlist = NULL;
@@ -1046,7 +1046,7 @@ int CurlFtp::deleteFtpFile(const char *url, const char *user_pwd, const string &
     if (CURLE_OK != res)
     {
         /* we failed */
-        QSLOG_ERROR(QString("remote file exists, remove remote file failure.").append(filename.c_str()));
+        QSLOG_ERROR(QString("remote file exists, remove remote file %1 failure, error reason: %2").arg(filename.c_str()).arg(curl_easy_strerror(res)));
         curl_slist_free_all(headerlist);
         return -1;
     }
