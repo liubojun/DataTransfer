@@ -378,7 +378,7 @@ void MainWindow::addLog(const CollectTask &task, const QString &info, int infoTy
 
 void MainWindow::print(const string &dirName, const string &dirId, const string &info, int infoType)
 {
-    QSLOG_DEBUG("PRINT2");
+    //QSLOG_DEBUG("PRINT2");
     if (m_logNum >= 500)
     {
         // 清空tablewidget的内容

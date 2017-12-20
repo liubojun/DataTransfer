@@ -66,7 +66,7 @@ void FtpCollector::getNewFiles()
     //    QSLOG_DEBUG("Last ftp collect isn't finished.");
     //    return;
     //}
-
+    QSLOG_DEBUG("get new files from ftp server.");
     if (!readSet())
     {
         return;
@@ -85,9 +85,10 @@ void FtpCollector::getNewFiles()
         return;
     }
 
-    emit print(QStringLiteral("[%1]: 开始收集任务 %2[%3]").arg(QDateTime::currentDateTime().toString(Qt::ISODate)).arg(m_collectSet.dirName)
-               .arg(m_collectSet.rltvPath));
-
+    QString strLogInfo(QStringLiteral("[%1]: 开始收集任务 %2[%3]").arg(QDateTime::currentDateTime().toString(Qt::ISODate)).arg(m_collectSet.dirName)
+                       .arg(m_collectSet.rltvPath));
+    emit print(strLogInfo);
+    QSLOG_DEBUG(strLogInfo);
     bool bConnect = true;
     // 先测试源路径是否正常
     bConnect = testFtpConnection(m_collectSet.ip, m_collectSet.port, m_collectSet.loginUser, m_collectSet.loginPass, m_collectSet.ftp_transferMode, m_collectSet.ftp_connectMode);

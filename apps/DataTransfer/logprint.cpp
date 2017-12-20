@@ -24,7 +24,7 @@ LogPrintImpl::~LogPrintImpl()
 
 void LogPrintImpl::print(const string &dirName, const string &dirId, const string &info, int infoType)
 {
-    QSLOG_DEBUG("PRINT1");
+    // QSLOG_DEBUG("PRINT1");
     emit showLog(dirName, dirId, info, infoType);
     //m_pWnd->print(dirName, dirId, info, infoType);
 }
