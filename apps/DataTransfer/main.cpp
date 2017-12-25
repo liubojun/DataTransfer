@@ -255,7 +255,7 @@ int main(int argc, char **argv)
     CPathBuilder::setChildProcessEnv();
 
     // 设置工作的线程池
-    QThreadPool::globalInstance()->setMaxThreadCount(QThreadPool::globalInstance()->maxThreadCount() + 4);
+    QThreadPool::globalInstance()->setMaxThreadCount(QThreadPool::globalInstance()->maxThreadCount());
 
     QSLOG_INFO(QString("START DATA TRANSFER PROGRAM, max thread count %1").arg(QThreadPool::globalInstance()->maxThreadCount()));
     //std::cout << "START DATA TRANSFER PROGRAM" << std::endl;

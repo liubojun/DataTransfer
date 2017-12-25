@@ -1,4 +1,5 @@
 ﻿#include "curlftp.h"
+#include "record.h"
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QUrl>
@@ -205,6 +206,15 @@ int CurlFtp::getNewFiles(FileInfoList &fileList)
 
     m_lstDirs.clear();
     m_lstDirs.append(QString::fromStdString(m_strRoot));
+
+
+    // modified by liubojun @20171225
+    CDirRecord oRecordSet(m_pCoBase->m_collectSet.dirName);
+
+    if (m_pCoBase->m_collectSet.recordLatestTime)
+    {
+        oRecordSet.loadLatestFileSize();
+    }
     while (!m_lstDirs.isEmpty())
     {
         if (!m_pCoBase->m_bRun)
@@ -221,7 +231,12 @@ int CurlFtp::getNewFiles(FileInfoList &fileList)
         //QSLOG_DEBUG(m_strCurDir);
 //          QDateTime qdtime = QDateTime::fromTime_t(m_pCoBase->m_pTsctTime->mapDirTime[m_strCurDir.toStdString()]);
 //          m_strCurDirLastTime = qdtime.toString("yyyyMMddHHmmss").toStdString();
-        listFiles(m_strCurDir.toLocal8Bit().data(), fileList);
+        listFiles(m_strCurDir.toLocal8Bit().data(), fileList, oRecordSet);
+    }
+
+    if (m_pCoBase->m_collectSet.recordLatestTime)
+    {
+        oRecordSet.reflush();
     }
 
     emit done();
@@ -352,7 +367,7 @@ bool CurlFtp::connectToHost(const char *url, const char *user_pwd, int timeout)
     return true;
 }
 
-void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
+void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList, CDirRecord &in_record)
 {
     // 暂时注释
     CURLcode res;
@@ -430,30 +445,31 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
     //QSLOG_DEBUG(strInfo);
     //free(listInfo.memdata);
 
-    QString strDBPath = qApp->applicationDirPath()+ "/work/record/" + m_pCoBase->m_collectSet.dirID + "/record.index";
+    // QString strDBPath = qApp->applicationDirPath()+ "/work/record/" + m_pCoBase->m_collectSet.dirID + "/record.index";
 
     // 当前目录数据库中记录的最后处理时间
-    QString iLatestTime("");
+    // QString iLatestTime("");
 
     QSLOG_DEBUG(QString::fromLocal8Bit("开始处理目录:%1， 收集时间范围:%2, 目录最后处理时间记录标识:%3").arg(QString::fromLocal8Bit(strDir.c_str())).arg(m_pCoBase->m_collectSet.col_timerange).arg(m_pCoBase->m_collectSet.recordLatestTime));
 
     bool bHasFileUpdate = false;
-    if (m_pCoBase->m_collectSet.recordLatestTime)
-    {
-        m_pCoBase->recordLatestTime(strDBPath, QString::fromLocal8Bit(strDir.c_str()), iLatestTime);
-        QSLOG_DEBUG(QString::fromLocal8Bit("目录:%1最后修改时间为:%2").arg(QString::fromLocal8Bit(strDir.c_str())).arg(iLatestTime));
-    }
+    //if (m_pCoBase->m_collectSet.recordLatestTime)
+    //{
+    //    //in_record.loadLatestFileSize();
+    //    //m_pCoBase->recordLatestTime(strDBPath, QString::fromLocal8Bit(strDir.c_str()), iLatestTime);
+    //    //QSLOG_DEBUG(QString::fromLocal8Bit("目录:%1最后修改时间为:%2").arg(QString::fromLocal8Bit(strDir.c_str())).arg(iLatestTime));
+    //}
 
-    QString nMdfTime = parseMlsdInfo(strInfo, fileList, m_lstDirs, iLatestTime, bFtpSupportMLSD);
+    QString nMdfTime = parseMlsdInfo(QString::fromLocal8Bit(strDir.c_str()), strInfo, fileList, m_lstDirs, in_record, bFtpSupportMLSD);
 
-    if (m_pCoBase->m_collectSet.recordLatestTime)
-    {
-        QSLOG_DEBUG(QString::fromLocal8Bit("目录最后修改时间:%1").arg(nMdfTime));
-        if (nMdfTime > iLatestTime)
-        {
-            m_pCoBase->updateLatestTime(strDBPath, QString::fromLocal8Bit(strDir.c_str()), nMdfTime);
-        }
-    }
+    //if (m_pCoBase->m_collectSet.recordLatestTime)
+    //{
+    //    QSLOG_DEBUG(QString::fromLocal8Bit("目录最后修改时间:%1").arg(nMdfTime));
+    //    //if (nMdfTime > iLatestTime)
+    //    //{
+    //    //    m_pCoBase->updateLatestTime(strDBPath, QString::fromLocal8Bit(strDir.c_str()), nMdfTime);
+    //    //}
+    //}
 
 
     //     if (m_strCurDirNewTime > m_strCurDirLastTime)
@@ -463,7 +479,7 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList)
     //}
 }
 
-QString CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringList &dirList, const QString & iLatestTime, bool bFtpSupportMSDL)
+QString CurlFtp::parseMlsdInfo(const QString &rootPath, const QString &info, FileInfoList &fileList, QStringList &dirList, CDirRecord &in_record, bool bFtpSupportMSDL)
 {
     // 当前目录的最新时间列表
     //QString strFileListPath = qApp->applicationDirPath() + "/work/record/" + m_pCoBase->m_collectSet.dirID + "/latestFileList.xml";
@@ -564,36 +580,38 @@ QString CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStr
 
         }
 
-        QString nMdfyTime("");
-        if (oneInfo.strMdfyTime.length() >= 14)
-        {
-            nMdfyTime = oneInfo.strMdfyTime.mid(0, 14);
-        }
-        else
-        {
-            QSLOG_ERROR("oneInfo.strMdfyTime length is incorrect.");
-            continue;
-        }
-        //nMdfyTime = oneInfo.strMdfyTime.mid(0, 14);// QDateTime::fromString(oneInfo.strMdfyTime.mid(0, 14), "yyyyMMddhhmmss").toTime_t();
+        // ftp获取的时间格式不定，如果使用增量轮训，可能会出现问题，所以在ftp收集模式下，应该禁用根据收集时间段收集配置
+        //QString nMdfyTime("");
+        //if (oneInfo.strMdfyTime.length() >= 14)
+        //{
+        //    nMdfyTime = oneInfo.strMdfyTime.mid(0, 14);
+        //}
+        //else
+        //{
+        //    QSLOG_ERROR("oneInfo.strMdfyTime length is incorrect.");
+        //    continue;
+        //}
+
         // LIST命令只能获取到分钟，所以出现分钟一样的文件，应该与目标目录下进行比较
-        if (nMdfyTime > iLastModifiedTime)
-        {
-            iLastModifiedTime = nMdfyTime;
-        }
+        //if (nMdfyTime > iLastModifiedTime)
+        //{
+        //    iLastModifiedTime = nMdfyTime;
+        //}
 
         if (oneInfo.nType == 1)
         {
             FileInfo fInfo;
             fInfo.strFileName = oneInfo.strFileName.toLocal8Bit().data();
-            if (oneInfo.strMdfyTime.length() >= 14)
-            {
-                fInfo.strMdyTime = oneInfo.strMdfyTime.toStdString().substr(0, 14);
-            }
-            else
-            {
-                QSLOG_ERROR("oneInfo.strMdfyTime length is incorrect.");
-                continue;
-            }
+            fInfo.nFileSize = oneInfo.nFileSize;
+            //if (oneInfo.strMdfyTime.length() >= 14)
+            //{
+            //    fInfo.strMdyTime = oneInfo.strMdfyTime.toStdString().substr(0, 14);
+            //}
+            //else
+            //{
+            //    QSLOG_ERROR("oneInfo.strMdfyTime length is incorrect.");
+            //    continue;
+            //}
 
 
             // 增加针对.tmp临时文件结尾的收集文件进行过滤
@@ -604,50 +622,30 @@ QString CurlFtp::parseMlsdInfo(const QString &info, FileInfoList &fileList, QStr
             // 新增加判断条件（记录目录最后修改时间，此处需要判断当前文件时间是否大于等于当前目录的保存上次处理最后修改时间，如果小于则不对该文件进行处理）
             if (m_pCoBase->m_collectSet.recordLatestTime)
             {
+                in_record.updateLatestFileSize(rootPath + QString::fromLocal8Bit(fInfo.strFileName.c_str()), fInfo.strMdyTime.c_str(), fInfo.nFileSize);
 
-                if (!iLatestTime.isEmpty() && nMdfyTime <= iLatestTime)
+                if (!in_record.checkIsNewFile(rootPath + QString::fromLocal8Bit(fInfo.strFileName.c_str()), fInfo.strMdyTime.c_str(), fInfo.nFileSize))
                 {
                     continue;
                 }
-
-                //time_t ifiletime_t = nMdfyTime;
-                //if (iLatestTime != -9999 && ifiletime_t < iLatestTime)
+                //in_record.updateLatestFileSize(QString::fromLocal8Bit(fInfo.strFileName.c_str()), fInfo.strMdyTime.c_str(), fInfo.nFileSize);
+                //if (!iLatestTime.isEmpty() && nMdfyTime <= iLatestTime)
                 //{
                 //    continue;
                 //}
-                //else if (ifiletime_t == iLatestTime)
-                //{
-                //    // 需要判断当前的文件名是否在记录的latestFileList.xml列表中
-                //    if (m_pCoBase->containsFile(t_oLatestFileList, oneInfo.strFileName))
-                //    {
-                //        continue;
-                //    }
-                //}
 
-                //if (ifiletime_t > iRecordMaxTime)
-                //{
-                //    iRecordMaxTime = ifiletime_t;
-                //    t_oNewLatestFiles.clear();
-                //    t_oNewLatestFiles.push_back(oneInfo.strFileName.toLocal8Bit().toStdString());
-                //    listUpdate = true;
-                //}
-                //else if (ifiletime_t == iRecordMaxTime)
-                //{
-                //    t_oNewLatestFiles.push_back(oneInfo.strFileName.toLocal8Bit().toStdString());
-                //    listUpdate = true;
-                //}
             }
 
             // 必须大于设置的时间范围才收集
 
-            if (m_pCoBase->m_collectSet.col_timerange != -1)
-            {
-                // 分钟转秒
-                if (nMdfyTime < QDateTime::currentDateTime().addSecs(-m_pCoBase->m_collectSet.col_timerange*60).toString("yyyyMMddhhmmss"))
-                {
-                    continue;
-                }
-            }
+            //if (m_pCoBase->m_collectSet.col_timerange != -1)
+            //{
+            //    // 分钟转秒
+            //    if (nMdfyTime < QDateTime::currentDateTime().addSecs(-m_pCoBase->m_collectSet.col_timerange*60).toString("yyyyMMddhhmmss"))
+            //    {
+            //        continue;
+            //    }
+            //}
 
             // if (fInfo.strMdyTime)
 

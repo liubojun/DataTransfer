@@ -29,6 +29,7 @@ using namespace QtConcurrent;
 class CltDispatch;
 class IFileWatcher;
 class CurlFtp;
+class CDirRecord;
 
 class DLL_EXPORT_CLASS_DECL SharedDirCollector : public CollectorBase
 {
@@ -54,7 +55,7 @@ public:
 
 public slots:
     virtual int stop();
-    void onCheckDir(QSet<QString>);
+    //void onCheckDir(QSet<QString>);
     //void fileCreated(const QString &strFilePath);
 public:
     /**
@@ -70,7 +71,8 @@ public:
     virtual bool testCollection();
 
     void syncTransfer();
-    void getSynclessFiles(QString strDir, bool bSubdir);
+
+    void getSynclessFiles(QString strDir, bool bSubdir, CDirRecord &oRecord);
 
     // 相同返回true，不同返回false
     bool compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi, TransTask &tTask);

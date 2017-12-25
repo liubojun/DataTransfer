@@ -3,6 +3,7 @@
 #include "pathbuilder.h"
 #include "ctkLog.h"
 #include "pathbuilder.h"
+#include "record.h"
 #include <time.h>
 //#ifdef _WIN32
 //#include <WinNetWk.h>
@@ -170,7 +171,16 @@ void SharedDirCollector::getNewFiles()
         emit startGif(m_collectSet.dirID, true);
         QTime tt;
         tt.start();
-        getSynclessFiles(m_collectSet.rltvPath, m_collectSet.subdirFlag);
+        CDirRecord oRecord(m_collectSet.dirName);
+        if (m_collectSet.recordLatestTime)
+        {
+            oRecord.loadLatestFileSize();
+        }
+        getSynclessFiles(m_collectSet.rltvPath, m_collectSet.subdirFlag, oRecord);
+        if (m_collectSet.recordLatestTime)
+        {
+            oRecord.reflush();
+        }
         emit startGif(m_collectSet.dirID, false);
         QSLOG_INFO(QString("[%1] finish to getNewFiles, cost time: %2.").arg(m_collectSet.dirName).arg(tt.elapsed()/1000.f));
     }
@@ -608,7 +618,7 @@ void SharedDirCollector::syncTransfer()
 
 }
 
-void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
+void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir, CDirRecord &oRecord)
 {
     if (m_tUser.lstUser.empty()/* && !readSet()*/)
     {
@@ -636,36 +646,36 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
     //QSLOG_DEBUG(QString("list " + strDir + " ,time=%1").arg(tt.elapsed() / 1000.f));
 
 
-    QString strDBPath = qApp->applicationDirPath() + "/work/record/" + m_collectSet.dirID + "/record.index";
+    //QString strDBPath = qApp->applicationDirPath() + "/work/record/" + m_collectSet.dirID + "/record.index";
 
     // 当前目录的最新时间列表
     //QString strFileListPath = qApp->applicationDirPath() + "/work/record/" + m_collectSet.dirID + "/latestFileList.xml";
     //list<string> t_oLatestFileList = initilizeLatestFileLists(strFileListPath);
 
     // 当前目录数据库中记录的最后处理时间
-    QString iLatestTime("");
+    //QString iLatestTime("");
 
-    QSLOG_DEBUG(QStringLiteral("开始处理目录:%1， 收集时间范围:%2, 目录最后处理时间记录标识:%3").arg(strDir).arg(m_collectSet.col_timerange).arg(m_collectSet.recordLatestTime));
+    //QSLOG_DEBUG(QStringLiteral("开始处理目录:%1， 收集时间范围:%2, 目录最后处理时间记录标识:%3").arg(strDir).arg(m_collectSet.col_timerange).arg(m_collectSet.recordLatestTime));
 
     bool bHasFileUpdate = false;
-    if (m_collectSet.recordLatestTime)
-    {
-        recordLatestTime(strDBPath, strDir, iLatestTime);
+    //if (m_collectSet.recordLatestTime)
+    //{
+    //    recordLatestTime(strDBPath, strDir, iLatestTime);
 
-        QString iMaxtime = QFileInfo(strDir).lastModified().toString("yyyyMMddhhmmss");
+    //    QString iMaxtime = QFileInfo(strDir).lastModified().toString("yyyyMMddhhmmss");
 
-        QSLOG_DEBUG(QStringLiteral("当前处理目录最后修改时间:time_t[%1], datetime[%2],数据库记录最后修改时间:time_t[%3], datetime[%4]").arg(iMaxtime).
-                    arg(iMaxtime).arg(iLatestTime).arg(iMaxtime));
-        if (iMaxtime <= iLatestTime)
-        {
-            QSLOG_DEBUG(QStringLiteral("当前目录[%1]下没有文件更新").arg(strDir));
+    //    QSLOG_DEBUG(QStringLiteral("当前处理目录最后修改时间:time_t[%1], datetime[%2],数据库记录最后修改时间:time_t[%3], datetime[%4]").arg(iMaxtime).
+    //                arg(iMaxtime).arg(iLatestTime).arg(iMaxtime));
+    //    if (iMaxtime <= iLatestTime)
+    //    {
+    //        QSLOG_DEBUG(QStringLiteral("当前目录[%1]下没有文件更新").arg(strDir));
 
-        }
-        else
-        {
-            bHasFileUpdate = true;
-        }
-    }
+    //    }
+    //    else
+    //    {
+    //        bHasFileUpdate = true;
+    //    }
+    //}
 
     // 测试 wujun
     bHasFileUpdate = true;
@@ -673,7 +683,7 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
     QDateTime qdtCollect = QDateTime::currentDateTime().addSecs(-m_collectSet.col_timerange*60);
 
     // modified by liubojun @20170604
-    QString iRecordMaxTime = iLatestTime;
+    //QString iRecordMaxTime = iLatestTime;
 
     // 新的最新文件列表
     //list<string> t_oNewLatestFiles = t_oLatestFileList;
@@ -706,31 +716,17 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
                     				}*/
 
                     QString ifiletime_t = qf.lastModified().toString("yyyyMMddhhmmss");
-                    if (!iRecordMaxTime.isEmpty() && ifiletime_t < iLatestTime)
+                    //if (!iRecordMaxTime.isEmpty() && ifiletime_t < iLatestTime)
+                    //{
+                    //    continue;
+                    //}
+                    oRecord.updateLatestFileSize(qf.absoluteFilePath(), ifiletime_t, qf.size());
+
+                    if (!oRecord.checkIsNewFile(qf.absoluteFilePath(), ifiletime_t, qf.size()))
                     {
                         continue;
                     }
-                    //else if (ifiletime_t == iLatestTime)
-                    //{
-                    //    // 需要判断当前的文件名是否在记录的latestFileList.xml列表中
-                    //    if (containsFile(t_oLatestFileList, qf.absoluteFilePath()))
-                    //    {
-                    //        continue;
-                    //    }
-                    //}
 
-                    //if (ifiletime_t > iRecordMaxTime)
-                    //{
-                    //    iRecordMaxTime = ifiletime_t;
-                    //    t_oNewLatestFiles.clear();
-                    //    t_oNewLatestFiles.push_back(qf.absoluteFilePath().toLocal8Bit().toStdString());
-                    //    listUpdate = true;
-                    //}
-                    //else if (ifiletime_t == iRecordMaxTime)
-                    //{
-                    //    t_oNewLatestFiles.push_back(qf.absoluteFilePath().toLocal8Bit().toStdString());
-                    //    listUpdate = true;
-                    //}
                 }
 
                 // 必须大于设置的时间范围才收集
@@ -765,27 +761,23 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir)
 
     // 判断是否需要记录当前目录的最后处理时间
     // 记录当前目录最后修改时间
-    if (m_collectSet.recordLatestTime)
-    {
-        //time_t iMaxtime = QFileInfo(strDir).lastModified().toTime_t();
-        //if (iMaxtime > iLatestTime)
-        if (iRecordMaxTime > iLatestTime)
-        {
-            updateLatestTime(strDBPath, strDir, iRecordMaxTime);
-        }
+    //if (m_collectSet.recordLatestTime)
+    //{
+    //    //time_t iMaxtime = QFileInfo(strDir).lastModified().toTime_t();
+    //    //if (iMaxtime > iLatestTime)
+    //    if (iRecordMaxTime > iLatestTime)
+    //    {
+    //        updateLatestTime(strDBPath, strDir, iRecordMaxTime);
+    //    }
 
-        //if (listUpdate)
-        //{
-        //    updateLatestFileLists(strFileListPath, t_oNewLatestFiles);
-        //}
-    }
+    //}
 
     // 入库
 
     // 遍历子目录
     for (int i=0; i<lstSubDir.size(); ++i)
     {
-        getSynclessFiles(lstSubDir.at(i), bSubdir);
+        getSynclessFiles(lstSubDir.at(i), bSubdir, oRecord);
     }
 }
 
@@ -938,13 +930,13 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
     return tTask.userInfo.empty();
 }
 
-void SharedDirCollector::onCheckDir(QSet<QString> lstPath)
-{
-    foreach (QString strPath, lstPath)
-    {
-        getSynclessFiles(strPath, false);
-    }
-}
+//void SharedDirCollector::onCheckDir(QSet<QString> lstPath)
+//{
+//    foreach (QString strPath, lstPath)
+//    {
+//        getSynclessFiles(strPath, false);
+//    }
+//}
 
 //void SharedDirCollector::fileCreated(const QString &strFilePath)
 //{

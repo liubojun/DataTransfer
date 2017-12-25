@@ -32,6 +32,9 @@ public:
 
 public slots:
     virtual int stop();
+
+    // 接收到子进程退出消息
+    void stoprcv(int exitcode, QProcess::ExitStatus status);
 public:
     virtual void getNewFiles();
 
@@ -53,6 +56,8 @@ private:
     QSharedPointer<CurlFtp> m_pCftp;	///< libcurl ftp 测试
 
     FileInfoList m_fileList;
+
+    bool m_bChildProcessRunning;	// 子进程运行标识
 };
 
 #endif

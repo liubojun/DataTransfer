@@ -9,6 +9,7 @@ SET(SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/ftpCollector.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/shareddirCollector.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/DistributeFile.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/record.cpp
 )
 
 # 工程头文件
@@ -18,6 +19,7 @@ SET(HDRS
    ${RadarProjectInclude}/ctkTransfer/ftpCollector.h
    ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
    ${CMAKE_CURRENT_SOURCE_DIR}/DistributeFile.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/record.h
 )
 
 #设置MOC相关变量
@@ -27,6 +29,7 @@ SET(MOC_HDRS
 	${RadarProjectInclude}/ctkTransfer/ftpCollector.h
     ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
 	${CMAKE_CURRENT_SOURCE_DIR}/DistributeFile.h
+	${CMAKE_CURRENT_SOURCE_DIR}/record.h
 )
 
 IF (WITH_QT5)

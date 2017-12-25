@@ -59,6 +59,11 @@ int FtpCollector::stop()
     return 0;
 }
 
+void FtpCollector::stoprcv(int exitcode, QProcess::ExitStatus status)
+{
+    m_bChildProcessRunning = false;
+}
+
 void FtpCollector::getNewFiles()
 {
     //if (!m_bFinish)
@@ -69,12 +74,14 @@ void FtpCollector::getNewFiles()
     QSLOG_DEBUG("get new files from ftp server.");
     if (!readSet())
     {
+        QSLOG_ERROR("query database error.");
         return;
     }
 
     m_bRun = (bool)m_collectSet.enable;
     if (!m_bRun)
     {
+        QSLOG_DEBUG("task is stopped.");
         return;
     }
 
@@ -97,8 +104,10 @@ void FtpCollector::getNewFiles()
     {
         m_nLineState = 1;
         emit taskState(m_collectSet, 0, m_nLineState);
+        QSLOG_DEBUG("test ftp error");
         return;
     }
+    QSLOG_DEBUG("test ftp success.");
 
     // 如果连接是正常的话
     m_nLineState = 0;
@@ -106,9 +115,23 @@ void FtpCollector::getNewFiles()
 
     emit startGif(m_collectSet.dirID, true);
     //m_oDataTransferPro = QSharedPointer<QProcess>(new QProcess());
+    QProcess oProcess;
+    oProcess.start("DataTransferPro", QStringList() << m_collectSet.dirID);
 
-    QProcess::execute("DataTransferPro", QStringList() << m_collectSet.dirID);
+    // 初始化，设置子进程运行标识
+
+    m_bChildProcessRunning = true;
+    connect(&oProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(stoprcv(int, QProcess::ExitStatus)));
+    QSLOG_DEBUG("start data transfer pro");
+    //oProcess.waitForFinished();
+    while (m_bChildProcessRunning)
+    {
+        QCoreApplication::processEvents();
+        QThread::sleep(1);
+    }
+    //QProcess::execute("DataTransferPro", QStringList() << m_collectSet.dirID);
     emit startGif(m_collectSet.dirID, false);
+    QSLOG_DEBUG("finish process.");
 
     return;
 

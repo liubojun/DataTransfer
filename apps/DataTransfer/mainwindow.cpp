@@ -158,6 +158,7 @@ void MainWindow::initialize()
     qRegisterMetaType<CollectTask>("CollectTask");
     qRegisterMetaType<QSet<QString> >("QSet<QString>");
     qRegisterMetaType<string>("string");
+    qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
 
     // 启动收集任务
     startCollect();

@@ -326,6 +326,24 @@ public:
     void recordLatestTime(const QString &dburl, const QString &dir, QString &latesttime);
 
     /**
+     * @brief  查询目录的上一次处理的文件的列表以及文件
+     *         考虑到远程的ftp服务器的版本差异，获取远程的文件的时间不太靠谱
+     *		   只能通过大小来进行比对，如果本次获取的大小与上一次的发生了差异，则可以认为文件被更新了
+     * @param  const QString &url 需要查询的目录
+     * @return QMap<QString, int>：文件列表以及对应的文件大小
+     */
+    QMap<QString, int> queryLatestFileSize(const QString &url);
+
+    /**
+     * @brief  更新目录的上一次处理的文件的列表以及文件
+     *         考虑到远程的ftp服务器的版本差异，获取远程的文件的时间不太靠谱
+     *		   只能通过大小来进行比对，如果本次获取的大小与上一次的发生了差异，则可以认为文件被更新了
+     * @param  const QString &url 需要查询的目录
+     * @param  QMap<QString, int>：文件列表以及对应的文件大小
+     * @return bool：更新成功，返回true，失败返回false
+     */
+    bool updateLatestFileSize(const QString &url, const QMap<QString, int> &oFileSizeInfo);
+    /**
      * @brief  记录目录的最后处理时间
      * @param  const QString & dburl 记录文件所在的地址
      * @param  const QString & dir 目录

@@ -20,7 +20,7 @@
 #include "curl/curl.h"
 
 class CollectorBase;
-
+class CDirRecord;
 //////////////////////////////////////////////////////////////////////////
 
 // int get_file_size(FILE *file)
@@ -143,8 +143,9 @@ public:
 
     int getNewFiles(FileInfoList &fileList);
 
-    void listFiles(const string &strDir, FileInfoList &fileList);
-    QString parseMlsdInfo(const QString &info, FileInfoList &fileList, QStringList &dirList, const QString & iLatestTime, bool bFtpSupportMSDL);
+    void listFiles(const string &strDir, FileInfoList &fileList, CDirRecord &in_oRecord);
+
+    QString parseMlsdInfo(const QString &rootPath, const QString &info, FileInfoList &fileList, QStringList &dirList, CDirRecord &in_record, bool bFtpSupportMSDL);
 
     /**
      * @brief 连接远程目录

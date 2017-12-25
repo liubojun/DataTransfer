@@ -181,7 +181,7 @@ QString CollectorBase::getDestFilePath(const QString &srcFileFullPath, const QSt
     {
         destPath += "/";
     }
-    QSLOG_DEBUG(destPath);
+    //QSLOG_DEBUG(destPath);
     return destPath;
 }
 
@@ -305,6 +305,59 @@ bool CollectorBase::checkProcessFinished(const QString &dirId)
     //    return true;
     //}
     //return false;
+}
+
+QMap<QString, int> CollectorBase::queryLatestFileSize(const QString &url)
+{
+    QMap<QString, int> retMap;
+    QString strDBPath = qApp->applicationDirPath() + "/work/record/" + m_collectSet.dirID + "/record.txt";
+    // 文件格式说明
+    // 首行为文件数
+    // 从第二行开始，按照：文件全路径,文件大小 的方式进行存储
+    QFile file(strDBPath);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        QSLOG_ERROR("open file failure:" + file.errorString());
+        return retMap;
+    }
+
+    QTextStream stream(&file);
+    QString strLine = stream.readLine();
+    QString strContent = stream.readAll();
+    int startIndex = 0;
+    int endIndex = 0;
+    while (-1 != (endIndex = strContent.indexOf("\n", startIndex)))
+    {
+        QString strLine = strContent.mid(startIndex, endIndex).trimmed();
+        QStringList strData = strLine.split(",");
+        QString filename = strData.at(0);
+        int filesize = strData.at(1).toInt();
+        retMap.insert(filename, filesize);
+    }
+
+    return retMap;
+}
+
+bool CollectorBase::updateLatestFileSize(const QString &url, const QMap<QString, int> &oFileSizeInfo)
+{
+    QString strDBPath = qApp->applicationDirPath() + "/work/record/" + m_collectSet.dirID + "/record.txt";
+    // 文件格式说明
+    // 首行为文件数
+    // 从第二行开始，按照：文件全路径,文件大小 的方式进行存储
+    QFile file(strDBPath);
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        QSLOG_ERROR("open file failure:" + file.errorString());
+        return false;
+    }
+
+    QTextStream stream(&file);
+    stream << oFileSizeInfo.size();
+    for (QMap<QString, int>::const_iterator iter = oFileSizeInfo.begin(); iter != oFileSizeInfo.end(); ++iter)
+    {
+        stream << iter.key() << "," << iter.value();
+    }
+    return true;
 }
 
 

@@ -32,7 +32,11 @@ int main(int argc, char **argv)
     QString strLockPath = app.applicationDirPath() + "/lock/";
 
     QLockFile oMem(strLockPath + argv[1]);
-    oMem.lock();
+    if (!oMem.lock())
+    {
+        QSLOG_ERROR(QString("lock file is already in use").arg(argv[1]));
+        return -1;
+    }
 
     CChangeName::init_rename_rules((app.applicationDirPath() + "/config/rename.rule").toStdString().c_str());
 
@@ -62,6 +66,6 @@ int main(int argc, char **argv)
     delete pCollect;
 
     ////QSLOG_RELEASE
-    //oMem.unlock();
+    oMem.unlock();
     return 0;
 }
