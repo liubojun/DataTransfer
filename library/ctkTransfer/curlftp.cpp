@@ -183,7 +183,7 @@ int CurlFtp::setCommOpt()
     return 0;
 }
 
-int CurlFtp::getNewFiles(FileInfoList &fileList)
+int CurlFtp::getNewFiles(FileInfoList &fileList, CDirRecord &in_record)
 {
     // 每次都去连接
     //char url[512] = {0};
@@ -207,14 +207,6 @@ int CurlFtp::getNewFiles(FileInfoList &fileList)
     m_lstDirs.clear();
     m_lstDirs.append(QString::fromStdString(m_strRoot));
 
-
-    // modified by liubojun @20171225
-    CDirRecord oRecordSet(m_pCoBase->m_collectSet.dirName);
-
-    if (m_pCoBase->m_collectSet.recordLatestTime)
-    {
-        oRecordSet.loadLatestFileSize();
-    }
     while (!m_lstDirs.isEmpty())
     {
         if (!m_pCoBase->m_bRun)
@@ -231,12 +223,7 @@ int CurlFtp::getNewFiles(FileInfoList &fileList)
         //QSLOG_DEBUG(m_strCurDir);
 //          QDateTime qdtime = QDateTime::fromTime_t(m_pCoBase->m_pTsctTime->mapDirTime[m_strCurDir.toStdString()]);
 //          m_strCurDirLastTime = qdtime.toString("yyyyMMddHHmmss").toStdString();
-        listFiles(m_strCurDir.toLocal8Bit().data(), fileList, oRecordSet);
-    }
-
-    if (m_pCoBase->m_collectSet.recordLatestTime)
-    {
-        oRecordSet.reflush();
+        listFiles(m_strCurDir.toLocal8Bit().data(), fileList, in_record);
     }
 
     emit done();
@@ -622,9 +609,9 @@ QString CurlFtp::parseMlsdInfo(const QString &rootPath, const QString &info, Fil
             // 新增加判断条件（记录目录最后修改时间，此处需要判断当前文件时间是否大于等于当前目录的保存上次处理最后修改时间，如果小于则不对该文件进行处理）
             if (m_pCoBase->m_collectSet.recordLatestTime)
             {
-                in_record.updateLatestFileSize(rootPath + QString::fromLocal8Bit(fInfo.strFileName.c_str()), fInfo.strMdyTime.c_str(), fInfo.nFileSize);
+                in_record.updateLatestFileSize(rootPath, QString::fromLocal8Bit(fInfo.strFileName.c_str()), fInfo.strMdyTime.c_str(), fInfo.nFileSize);
 
-                if (!in_record.checkIsNewFile(rootPath + QString::fromLocal8Bit(fInfo.strFileName.c_str()), fInfo.strMdyTime.c_str(), fInfo.nFileSize))
+                if (!in_record.checkIsNewFile(rootPath, QString::fromLocal8Bit(fInfo.strFileName.c_str()), fInfo.strMdyTime.c_str(), fInfo.nFileSize))
                 {
                     continue;
                 }

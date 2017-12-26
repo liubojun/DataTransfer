@@ -511,7 +511,7 @@ void CollectSetDlg::onRemoteColTest()
             if (url.isLocalFile())
             {
                 //QSLOG_DEBUG("==============");
-                QDir qdir(ui.le_RelvPath->text());
+                QDir qdir(strUrl);
                 if (qdir.exists())
                 {
                     emit testok(strUrl);

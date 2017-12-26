@@ -141,7 +141,7 @@ public:
     // 是否需要递归遍历子目录标识
     void setSubDirFlag(bool flag);
 
-    int getNewFiles(FileInfoList &fileList);
+    int getNewFiles(FileInfoList &fileList, CDirRecord &in_record);
 
     void listFiles(const string &strDir, FileInfoList &fileList, CDirRecord &in_oRecord);
 

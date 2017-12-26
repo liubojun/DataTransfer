@@ -720,9 +720,9 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir, CDirReco
                     //{
                     //    continue;
                     //}
-                    oRecord.updateLatestFileSize(qf.absoluteFilePath(), ifiletime_t, qf.size());
+                    oRecord.updateLatestFileSize(qf.absolutePath(), qf.fileName(), ifiletime_t, qf.size());
 
-                    if (!oRecord.checkIsNewFile(qf.absoluteFilePath(), ifiletime_t, qf.size()))
+                    if (!oRecord.checkIsNewFile(qf.absolutePath(), qf.fileName(), ifiletime_t, qf.size()))
                     {
                         continue;
                     }

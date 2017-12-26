@@ -45,34 +45,46 @@ void CDirRecord::loadLatestFileSize()
     }
 
     QTextStream stream(&file);
+    //stream.setCodec("GB2312");
     QString strLine = stream.readLine();
-    stream.readLine();
-    //QString strContent = stream.readAll();
-    //int startIndex = 0;
-    //int endIndex = 0;
+    dir2filetable_t oTempDirTable;
+    QString oTempDir;
     while (!stream.atEnd())
     {
         strLine = stream.readLine();
         QStringList strData = strLine.split(",");
-        QString filename = strData.at(0);
-        QString filetime = strData.at(1);
-        int filesize = strData.at(2).toInt();
-        m_oMemLastFileInfo.insert(filename, recordFileInfo_t(filename, filetime, filesize));
-    }
-    //while (-1 != (endIndex = strContent.indexOf(NEWLINEFLAG, startIndex)))
-    //{
-    //    QString strLine = strContent.mid(startIndex, endIndex).trimmed();
-    //    QStringList strData = strLine.split(",");
-    //    QString filename = strData.at(0);
-    //    QString filetime = strData.at(1);
-    //    int filesize = strData.at(2).toInt();
-    //    m_oMemLastFileInfo.insert(filename, recordFileInfo_t(filename, filetime, filesize));
-    //    startIndex = endIndex+1;
-    //}
+        if (strLine.startsWith("dir="))
+        {
+            //保存当前dir,创建一个dir2filetable_t对象
+            oTempDir = strData.at(0).mid(4);
 
+            oTempDirTable.clear();
+            //oTempDirTable.insert(strDir, recordFileInfo_t());
+        }
+        else if (strLine.startsWith("NNNN"))
+        {
+            // 创建一个dir2filetable_t对象
+            m_oMemLastFileInfo.insert(oTempDir, oTempDirTable);
+            oTempDirTable.clear();
+            oTempDir.clear();
+        }
+        else if (strLine.startsWith(" "))
+        {
+            continue;
+        }
+        else
+        {
+            QString filename = strData.at(0);
+            QString filetime = strData.at(1);
+            int filesize = strData.at(2).toInt();
+            oTempDirTable.insert(filename, recordFileInfo_t(filename, filetime, filesize));
+        }
+
+
+    }
 }
 
-bool CDirRecord::updateLatestFileSize(const QMap<QString, recordFileInfo_t> &oFileSizeInfo)
+bool CDirRecord::updateLatestFileSize(memfiletable_t &oFileSizeInfo)
 {
     // 文件格式说明
     // 首行为文件数
@@ -84,45 +96,103 @@ bool CDirRecord::updateLatestFileSize(const QMap<QString, recordFileInfo_t> &oFi
         return false;
     }
 
+    int iTotalFileCount = 0;
+    for (memfiletable_t::const_iterator iter = oFileSizeInfo.begin(); iter != oFileSizeInfo.end(); ++iter)
+    {
+        iTotalFileCount += iter->count();
+    }
+
     QTextStream stream(&file);
-    stream << oFileSizeInfo.size() << ","
-           << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:ss:mm")
-           << NEWLINEFLAG;
-    stream << "format:filepath,lastmodifiedtime,filesize"
+    //stream.setCodec("GB2312");
+    stream << "totaldircount=" << oFileSizeInfo.size() << ","
+           << "totalfilecount=" << iTotalFileCount << ","
+           << "lastprocesstime=" << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:ss:mm")
            << NEWLINEFLAG;
 
-    for (QMap<QString, recordFileInfo_t>::const_iterator iter = oFileSizeInfo.begin(); iter != oFileSizeInfo.end(); ++iter)
+    //stream << "format:filepath,lastmodifiedtime,filesize"
+    //       << NEWLINEFLAG;
+
+    for (memfiletable_t::const_iterator iter = oFileSizeInfo.begin(); iter != oFileSizeInfo.end(); ++iter)
     {
-        stream << iter.key() << "," << iter.value().m_strFileDt << "," << iter.value().m_iFileSize << NEWLINEFLAG;
+        stream << "dir=" << iter.key() << "," << "filecount=" << iter->count() << NEWLINEFLAG;
+        for (dir2filetable_t::const_iterator subiter = iter->begin(); subiter != iter->end(); ++subiter)
+        {
+            stream << subiter->m_strFileName << "," << subiter->m_strFileDt << "," << subiter->m_iFileSize << NEWLINEFLAG;
+        }
+        stream << "NNNN" << NEWLINEFLAG;
+
     }
     return true;
 }
 
-void CDirRecord::updateLatestFileSize(const QString &filename, const QString &dt, int ifilesize)
+void CDirRecord::updateLatestFileSize(const QString &dir, const QString &filename, const QString &dt, int ifilesize)
 {
-    m_oMemThisFileInfo.insert(filename, recordFileInfo_t(filename, dt, ifilesize));
+    memfiletable_t::iterator iter = m_oMemThisFileInfo.find(dir);
+    if (iter != m_oMemThisFileInfo.end())
+    {
+        dir2filetable_t::iterator subiter = iter->find(filename);
+        if (subiter == iter->end())
+        {
+            recordFileInfo_t fi;
+            iter->insert(filename, recordFileInfo_t(filename, dt, ifilesize));
+        }
+    }
+    else
+    {
+        dir2filetable_t dir2table;
+        dir2table.insert(filename, recordFileInfo_t(filename, dt, ifilesize));
+        m_oMemThisFileInfo.insert(dir, dir2table);
+    }
 }
 
-bool CDirRecord::checkIsNewFile(const QString &url, const QString &dt, int size)
+bool CDirRecord::checkIsNewFile(const QString &dir, const QString &fn, const QString &dt, int size)
 {
-    QMap<QString, recordFileInfo_t>::iterator iter = m_oMemLastFileInfo.find(url);
+    memfiletable_t::iterator iter = m_oMemLastFileInfo.find(dir);
     if (iter != m_oMemLastFileInfo.end())
     {
-        // 查找其他属性
-        if (dt != iter->m_strFileDt)
+        dir2filetable_t::iterator subiter = iter->find(fn);
+        if (subiter != iter->end())
+        {
+            // 查找其他属性
+            if (dt != subiter->m_strFileDt)
+            {
+                return true;
+            }
+
+            if (size != subiter->m_iFileSize)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        else
         {
             return true;
         }
-
-        if (size != iter->m_iFileSize)
-        {
-            return true;
-        }
-
-        return false;
     }
+    else
+    {
+        return true;
+    }
+    //QMap<QString, recordFileInfo_t>::iterator iter = m_oMemLastFileInfo.find(url);
+    //if (iter != m_oMemLastFileInfo.end())
+    //{
+    //    // 查找其他属性
+    //    if (dt != iter->m_strFileDt)
+    //    {
+    //        return true;
+    //    }
 
-    return true;
+    //    if (size != iter->m_iFileSize)
+    //    {
+    //        return true;
+    //    }
+
+    //    return false;
+    //}
+
+    //return true;
 }
 
 void CDirRecord::reflush()

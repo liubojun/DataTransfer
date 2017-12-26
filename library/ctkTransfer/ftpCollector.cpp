@@ -5,6 +5,7 @@
 #include "DistributeFile.h"
 #include "change_name.h"
 #include "curlftp.h"
+#include "record.h"
 
 #include <QElapsedTimer>
 #include <QCoreApplication>
@@ -132,67 +133,7 @@ void FtpCollector::getNewFiles()
     //QProcess::execute("DataTransferPro", QStringList() << m_collectSet.dirID);
     emit startGif(m_collectSet.dirID, false);
     QSLOG_DEBUG("finish process.");
-
     return;
-
-    if (!readSet())
-    {
-        return;
-    }
-
-    m_bRun = (bool)m_collectSet.enable;
-    if (!m_bRun)
-    {
-        return;
-    }
-
-    // E:/workspace/DataTransfer/DataTransfer_code_20170831/vs2013/apps/DataTransfer/%T-1H%t%y/%t%m/%td
-    // modified by liubojun. 支持按照特定时间获取数据
-    QStringList rootPaths = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
-    for (int i = 0; i < rootPaths.size(); ++i)
-    {
-        m_collectSet.rltvPath = rootPaths.at(i);
-        m_pCftp->setHostPort(m_collectSet.ip, m_collectSet.port);
-        m_pCftp->setUserPwd(m_collectSet.loginUser, m_collectSet.loginPass);
-        m_pCftp->setRootPath(m_collectSet.rltvPath);
-        m_pCftp->setFtpTransferMode(m_collectSet.ftp_transferMode);
-        m_pCftp->setFtpConnectMode(m_collectSet.ftp_connectMode);
-        m_pCftp->setSubDirFlag(m_collectSet.subdirFlag);
-
-        emit print(QStringLiteral("[%1]: 开始收集任务 %2[%3]").arg(QDateTime::currentDateTime().toString(Qt::ISODate)).arg(m_collectSet.dirName)
-                   .arg(m_collectSet.rltvPath));
-
-        bool bConnect = true;
-        // 先测试源路径是否正常
-        bConnect = testFtpConnection(m_collectSet.ip, m_collectSet.port, m_collectSet.loginUser, m_collectSet.loginPass, m_collectSet.ftp_transferMode, m_collectSet.ftp_connectMode);
-
-        if (!bConnect)
-        {
-            m_nLineState = 1;
-            emit taskState(m_collectSet, 0, m_nLineState);
-            return;
-        }
-
-        if (bConnect)
-        {
-            m_nLineState = 0;
-            emit taskState(m_collectSet, 0, m_nLineState);
-            emit startGif(m_collectSet.dirID, true);
-            m_bFinish = false;
-            m_fileList.clear();	//清空新文件列表
-
-            m_pCftp->getNewFiles(m_fileList);
-            emit startGif(m_collectSet.dirID, false);
-        }
-        else
-        {
-            m_nLineState = 1;
-            emit taskState(m_collectSet, 0, m_nLineState);
-        }
-    }
-
-    return;
-
 
 }
 
@@ -213,6 +154,14 @@ void FtpCollector::getNewFiles(const CollectTask &in_oTask)
     if (!readSet())
     {
         return;
+    }
+
+    // modified by liubojun @20171225
+    CDirRecord oRecordSet(m_collectSet.dirName);
+
+    if (m_collectSet.recordLatestTime)
+    {
+        oRecordSet.loadLatestFileSize();
     }
 
     // E:/workspace/DataTransfer/DataTransfer_code_20170831/vs2013/apps/DataTransfer/%T-1H%t%y/%t%m/%td
@@ -250,7 +199,7 @@ void FtpCollector::getNewFiles(const CollectTask &in_oTask)
             m_bFinish = false;
             m_fileList.clear();	//清空新文件列表
 
-            m_pCftp->getNewFiles(m_fileList);
+            m_pCftp->getNewFiles(m_fileList, oRecordSet);
             //emit startGif(m_collectSet.dirID, false);
         }
         else
@@ -258,6 +207,11 @@ void FtpCollector::getNewFiles(const CollectTask &in_oTask)
             m_nLineState = 1;
             emit taskState(m_collectSet, 0, m_nLineState);
         }
+    }
+
+    if (m_collectSet.recordLatestTime)
+    {
+        oRecordSet.reflush();
     }
 }
 

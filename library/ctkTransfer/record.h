@@ -20,7 +20,18 @@ typedef struct RecordFileInfo
 
     }
 
+    RecordFileInfo()
+    {
+
+    }
+
 } recordFileInfo_t;
+
+// 在内存中维护的文件名+文件属性列表
+typedef QMap<QString, recordFileInfo_t> dir2filetable_t;
+
+// 在内存中维护的目录名+当前目录下的文件信息
+typedef QMap<QString, dir2filetable_t> memfiletable_t;
 
 class CDirRecord
 {
@@ -38,22 +49,24 @@ public:
     * @brief  更新目录的上一次处理的文件的列表以及文件
     *         考虑到远程的ftp服务器的版本差异，获取远程的文件的时间不太靠谱
     *		   只能通过大小来进行比对，如果本次获取的大小与上一次的发生了差异，则可以认为文件被更新了
+    * @param  const QString &dir 目录名
     * @param  const QString &filename 文件名
     * @param  const QString &dt 文件最后修改时间
     * @param  const QString &ifilesize 文件大小
     * @return void
     */
-    void updateLatestFileSize(const QString &filename, const QString &dt, int ifilesize);
+    void updateLatestFileSize(const QString &dir, const QString &filename, const QString &dt, int ifilesize);
 
     /**
      * @brief  检查当前文件是否在上次处理的文件列表中
      *		   根据文件名，文件的最后修改时间，以及文件的大小属性来判断
-     * @param  const QString &url 文件全路径
+     * @param  const QString &dir 文件目录
+     * @param  const QString &fn 文件名
      * @param  const QString &dt 文件时间
      * @param  int size 文件大小
      * @return bool：如果在上次处理的列表中，返回false,否则返回true
      */
-    bool checkIsNewFile(const QString &url, const QString &dt, int size);
+    bool checkIsNewFile(const QString &dir, const QString &fn, const QString &dt, int size);
 
     /**
      * @brief  查询目录的上一次处理的文件的列表以及文件，加载到内存中
@@ -74,16 +87,18 @@ private:
      * @brief  更新目录的上一次处理的文件的列表以及文件
      *         考虑到远程的ftp服务器的版本差异，获取远程的文件的时间不太靠谱
      *		   只能通过大小来进行比对，如果本次获取的大小与上一次的发生了差异，则可以认为文件被更新了
-     * @param  QMap<QString, int>：文件列表以及对应的文件大小
+     * @param  memfiletable_t：文件列表以及对应的文件大小
      * @return bool：更新成功，返回true，失败返回false
      */
-    bool updateLatestFileSize(const QMap<QString, recordFileInfo_t> &oFileSizeInfo);
+    bool updateLatestFileSize(memfiletable_t &oFileSizeInfo);
 
 private:
     QString m_strUrl;
 
-    QMap<QString, RecordFileInfo> m_oMemLastFileInfo;
+    memfiletable_t m_oMemLastFileInfo;
+    //QMap<QString, RecordFileInfo> m_oMemLastFileInfo;
 
-    QMap<QString, RecordFileInfo> m_oMemThisFileInfo;
+    memfiletable_t m_oMemThisFileInfo;
+    //QMap<QString, RecordFileInfo> m_oMemThisFileInfo;
 };
 #endif // record_h__
