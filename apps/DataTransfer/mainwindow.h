@@ -176,6 +176,7 @@ private:
     QAction *m_pEditAct;
     QAction *m_pAddAct;
     QAction *m_pTrayAct;
+    QAction *m_pSet;			// 系统设置
     QAction *m_pClearAct;
     QAction *m_pUserInfoAct;		///< 用户管理设置
 

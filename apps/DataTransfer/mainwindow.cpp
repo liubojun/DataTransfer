@@ -62,6 +62,7 @@ void MainWindow::InitUI()
 
     m_pClearAct = new QAction(QIcon(":/clear.png"), QStringLiteral("清空"), this);
     m_pTrayAct = new QAction(QIcon(":/back.png"), QStringLiteral("后台"), this);
+    m_pSet = new QAction(QIcon(":/set.png"), QStringLiteral("设置"), this);
 
     ui.toolBar->addAction(m_pOpenSrcAct);
     ui.toolBar->addAction(m_pOpenDstAct);
@@ -77,6 +78,8 @@ void MainWindow::InitUI()
     ui.toolBar->addSeparator();
     ui.toolBar->addAction(m_pClearAct);
     ui.toolBar->addAction(m_pTrayAct);
+    ui.toolBar->addSeparator();
+    ui.toolBar->addAction(m_pSet);
 
     ui.tableWidget->setColumnWidth(0, 110);
     ui.tableWidget->setColumnWidth(1, 140);
