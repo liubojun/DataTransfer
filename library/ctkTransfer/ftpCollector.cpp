@@ -117,8 +117,8 @@ void FtpCollector::getNewFiles()
     emit startGif(m_collectSet.dirID, true);
     //m_oDataTransferPro = QSharedPointer<QProcess>(new QProcess());
     QProcess oProcess;
-    setProcess(&oProcess);
-    connect(&oProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(readOutput()));
+    //setProcess(&oProcess);
+    //connect(&oProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(readOutput()));
     oProcess.start("DataTransferPro", QStringList() << m_collectSet.dirID);
 
     // 初始化，设置子进程运行标识
