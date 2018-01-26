@@ -9,16 +9,6 @@ SET(SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/selUserDlg.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/listItemWidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/userItem.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/DataBase.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/Indirect.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/DistributeUserInfo.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/MinimizedWin.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/DataBase.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/TransferMonitor.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/MyApplication.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/TaskThread.cpp
-  #${CMAKE_CURRENT_SOURCE_DIR}/ConToMsg.cpp
-  #${MYQML}
   ${CMAKE_CURRENT_SOURCE_DIR}/dataclearDlg.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/clearItemWidget.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/regexpression.cpp
@@ -26,19 +16,18 @@ SET(SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/status.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/quartz.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/logprint.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/systemset.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/baseset.cpp
 )
 
 # .h文件
 SET(HDRS
-  #${CMAKE_CURRENT_SOURCE_DIR}/CollectionInfo.h
-  #${RadarProjectInclude}/interface/IBaseInterface.h
   ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
   ${CMAKE_CURRENT_SOURCE_DIR}/collectSetDlg.h
   ${CMAKE_CURRENT_SOURCE_DIR}/userInfoDlg.h
   ${CMAKE_CURRENT_SOURCE_DIR}/selUserDlg.h
   ${CMAKE_CURRENT_SOURCE_DIR}/listItemWidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/userItem.h
-  #${CMAKE_CURRENT_SOURCE_DIR}/DataBase.h
   ${CMAKE_CURRENT_SOURCE_DIR}/dataclearDlg.h
   ${CMAKE_CURRENT_SOURCE_DIR}/clearItemWidget.h
   ${CMAKE_CURRENT_SOURCE_DIR}/regexpression.h
@@ -46,27 +35,18 @@ SET(HDRS
   ${CMAKE_CURRENT_SOURCE_DIR}/status.h
   ${CMAKE_CURRENT_SOURCE_DIR}/quartz.h
   ${CMAKE_CURRENT_SOURCE_DIR}/logprint.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/systemset.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/baseset.h
 )
 
 SET(MOC_HDRS
 	${RadarProjectInclude}/interface/IBaseInterface.h
-	#${RadarProjectInclude}/interface/IFileTransfer.h
 	${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
 	${CMAKE_CURRENT_SOURCE_DIR}/collectSetDlg.h
 	${CMAKE_CURRENT_SOURCE_DIR}/userInfoDlg.h
 	${CMAKE_CURRENT_SOURCE_DIR}/selUserDlg.h
 	${CMAKE_CURRENT_SOURCE_DIR}/listItemWidget.h
 	${CMAKE_CURRENT_SOURCE_DIR}/userItem.h
-	#${CMAKE_CURRENT_SOURCE_DIR}/DataBase.h
-	#${CMAKE_CURRENT_SOURCE_DIR}/CollectionInfo.h
-	#${CMAKE_CURRENT_SOURCE_DIR}/Indirect.h
-	#${CMAKE_CURRENT_SOURCE_DIR}/DistributeUserInfo.h
-	#${CMAKE_CURRENT_SOURCE_DIR}/MinimizedWin.h
-	#${CMAKE_CURRENT_SOURCE_DIR}/DataBase.h
-	#${CMAKE_CURRENT_SOURCE_DIR}/TransferMonitor.h
-	#${CMAKE_CURRENT_SOURCE_DIR}/MyApplication.h
-	#${CMAKE_CURRENT_SOURCE_DIR}/TaskThread.h
-	#${CMAKE_CURRENT_SOURCE_DIR}/ConToMsg.h
 	${CMAKE_CURRENT_SOURCE_DIR}/dataclearDlg.h
 	${CMAKE_CURRENT_SOURCE_DIR}/clearItemWidget.h
 	${CMAKE_CURRENT_SOURCE_DIR}/regexpression.h
@@ -74,6 +54,8 @@ SET(MOC_HDRS
 	${CMAKE_CURRENT_SOURCE_DIR}/status.h
 	${CMAKE_CURRENT_SOURCE_DIR}/quartz.h
 	${CMAKE_CURRENT_SOURCE_DIR}/logprint.h
+	${CMAKE_CURRENT_SOURCE_DIR}/systemset.h
+	${CMAKE_CURRENT_SOURCE_DIR}/baseset.h
 )
 
 SET(UI
@@ -87,6 +69,8 @@ SET(UI
 	${CMAKE_CURRENT_SOURCE_DIR}/ui/clearItemWidget.ui
 	${CMAKE_CURRENT_SOURCE_DIR}/ui/RegularExpression.ui
 	${CMAKE_CURRENT_SOURCE_DIR}/ui/renameDlg.ui
+	${CMAKE_CURRENT_SOURCE_DIR}/ui/systemset.ui
+	${CMAKE_CURRENT_SOURCE_DIR}/ui/baseset.ui
 	)
 
 SET (ICON_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/Transfer.rc)

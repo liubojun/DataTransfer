@@ -410,7 +410,7 @@ protected:
     int &m_iLogsize;
 
     RCF::RcfInitDeinit m_oRcfInit;
-    RcfClient<I_LogPrint> m_oRcfClient;
+    RcfClient<I_LogPrint> *m_oRcfClient;
 
     // 当前收集器的唯一标识
     QUuid m_oId;

@@ -25,7 +25,7 @@ CollectorBase::CollectorBase(QWaitCondition &in_oCond, QMutex &in_oLocker, int &
     : m_oCond(in_oCond),
       m_oLocker(in_oLocker),
       m_iLogsize(in_iLogsize),
-      m_oRcfClient(RCF::TcpEndpoint(50001)),
+      //m_oRcfClient(RCF::TcpEndpoint(50001)),
       QObject(pParent)		//从QObject继承的类需要写pParent!!
 {
     m_bFinish = true;
@@ -39,6 +39,9 @@ CollectorBase::CollectorBase(QWaitCondition &in_oCond, QMutex &in_oLocker, int &
     connect(this, SIGNAL(begin()), this, SLOT(onBegined()));
 
     m_oId = QUuid::createUuid();
+    int threadnum, logport;
+    DataBase::getInstance()->queryBaseInfo(threadnum, logport);
+    m_oRcfClient = new RcfClient<I_LogPrint>(RCF::TcpEndpoint(logport));
 }
 
 CollectorBase::~CollectorBase()
@@ -48,6 +51,8 @@ CollectorBase::~CollectorBase()
     //m_oThread.wait();
     //m_oThread.terminate();
     emit showIdentify(m_oId.toString());
+    delete m_oRcfClient;
+    m_oRcfClient = NULL;
 
 }
 
@@ -122,9 +127,10 @@ void CollectorBase::emitLog(const QString &info, int infoType)
 
     try
     {
-        m_oRcfClient.print(m_collectSet.dirName.toLocal8Bit().toStdString(),
-                           m_collectSet.dirID.toLocal8Bit().toStdString(),
-                           info.toLocal8Bit().toStdString(), infoType);
+        //printf("111111111111111111\n");
+        m_oRcfClient->print(m_collectSet.dirName.toLocal8Bit().toStdString(),
+                            m_collectSet.dirID.toLocal8Bit().toStdString(),
+                            info.toLocal8Bit().toStdString(), infoType);
     }
     catch (std::exception &ex)
     {

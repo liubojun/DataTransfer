@@ -47,8 +47,12 @@ public:
     // 相同返回true，不同返回false
     bool compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransTask &tTask);
 
+    void setProcess(QProcess *in_pro);
+
 private slots:
     void ftpDone();
+
+    void readOutput();
 
 private:
     QSharedPointer<QObject> m_pTimerObj;
@@ -58,6 +62,8 @@ private:
     FileInfoList m_fileList;
 
     bool m_bChildProcessRunning;	// 子进程运行标识
+
+    QProcess *m_pro;
 };
 
 #endif

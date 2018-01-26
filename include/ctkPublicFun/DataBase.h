@@ -74,6 +74,35 @@ public:
     */
     bool updateDirLatestTime(const QString &db, const QString &dir, const QString &latesttime);
 
+    /**
+     * @brief:查询当前可用线程数以及日志监听端口
+     * @param: int & threadNum 可用线程数
+     * @param: int &logPort 日志监听端口
+     * @return:bool 查询成功，返回true，失败返回false
+     */
+    bool queryBaseInfo(int &threadNum, int &logPort);
+
+    /**
+     * @brief:更新基本信息
+     * @param: int threadNum 线程数目
+     * @param: int logPort 日志端口
+     * @return:bool 更新成功，返回true，失败返回false
+     */
+    bool updateBaseInfo(int threadNum, int logPort);
+
+    /**
+     * @brief:查询日志监听端口号
+     * @param: int & portNum 日志监听端口号
+     * @return:bool 查询成功，返回true，失败返回false
+     */
+    bool queryLogListenPort(int &portNum);
+
+    /**
+     * @brief:更新日志监听端口，更新完毕后，需重启
+     * @param: int portNum 日志监听端口号
+     * @return:bool 更新成功，返回true，失败返回false
+     */
+    bool updateLogListemPort(int portNum);
 
     /**
      * @brief  初始化处理

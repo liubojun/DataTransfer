@@ -4,8 +4,11 @@
 
 #include <QTimer>
 
-LogPrintImpl::LogPrintImpl(MainWindow *in_pWnd) : m_pWnd(in_pWnd), server(RCF::TcpEndpoint(50001))
+LogPrintImpl::LogPrintImpl(MainWindow *in_pWnd) : m_pWnd(in_pWnd)//, server(RCF::TcpEndpoint(50001))
 {
+    int threadnum, logport;
+    DataBase::getInstance()->queryBaseInfo(threadnum, logport);
+    server = new RCF::RcfServer(RCF::TcpEndpoint(logport));
     connect(this, SIGNAL(showLog(const string &, const string &, const string &, int)), m_pWnd,
             SLOT(print(const string &, const string &, const string &, int)));
     m_oThread.start();
@@ -14,7 +17,8 @@ LogPrintImpl::LogPrintImpl(MainWindow *in_pWnd) : m_pWnd(in_pWnd), server(RCF::T
 
 LogPrintImpl::LogPrintImpl()
 {
-
+    delete server;
+    server = NULL;
 }
 
 LogPrintImpl::~LogPrintImpl()
@@ -36,7 +40,7 @@ void LogPrintImpl::run()
 
 void LogPrintImpl::stop()
 {
-    server.stop();
+    server->stop();
 }
 
 void LogPrintImpl::start()
@@ -48,8 +52,8 @@ void LogPrintImpl::start()
         //server.setThreadPool(tpPtr);
 
 
-        server.bind<I_LogPrint>(*this);
-        server.start();
+        server->bind<I_LogPrint>(*this);
+        server->start();
     }
     catch (std::exception &ex)
     {

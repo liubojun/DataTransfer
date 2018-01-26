@@ -119,7 +119,7 @@ void QLogger::print( const QString &level, const QString& msg, const char* file 
 #endif
     }
     qDebug( "%s", m.toUtf8().constData() );
-    //std::cout << m.toStdString() << std::endl;
+    std::cout << m.toStdString() << std::endl;
 
     //将log写入文件
     //if (level == "Debug" )

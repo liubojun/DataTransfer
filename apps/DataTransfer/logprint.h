@@ -37,7 +37,7 @@ signals:
 private:
     MainWindow *m_pWnd;
     RCF::RcfInitDeinit rcfInit;
-    RCF::RcfServer server;
+    RCF::RcfServer *server;
     QThread m_oThread;
 };
 

@@ -111,6 +111,8 @@ private slots:
     void onProperty();
     // 清空日志
     void onClearLog();
+    // 系统设置
+    void onSystemSet();
 
     void onSelectTask(int index);
 

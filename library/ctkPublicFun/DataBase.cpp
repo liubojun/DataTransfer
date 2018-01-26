@@ -11,6 +11,8 @@
 DataBase *DataBase::s_db = NULL;
 QMutex DataBase::m_oMutex;
 
+#define MAGIC_NUM 20180124
+
 //QString g_tbDirCol[] = {"DIRID", "DIRNAME", "ENABLE", "COLLECTTYPE", "FTPTRANSFERMODE", "FTPCONNECTMODE", "RLTVPATH", "DISPATCH",
 //                        "FILETEMPLATE", "SUBDIRCHECK", "MOVEFLAG", "COLTIMERANGE", "RECORDLATESTTIME", "COMPARE_CONTENT", "LOGINUSER", "LOGINPASS",
 //                        "IP", "PORT"
@@ -109,6 +111,12 @@ DataBase::DataBase()
                "[CONPUT] INT, "
                "[MAXTRYCOUNS] INT,"
                "CONSTRAINT [] PRIMARY KEY ([USERID]))");
+
+    checkTable("T_GLOBALINFO", "CREATE TABLE [T_GLOBALINFO] ("
+               "[PROGRAMID] INT,"
+               "[THREADNUM] INT,"
+               "[LOGPORT] INT,"
+               "CONSTRAINT [] PRIMARY KEY ([PROGRAMID]) ON CONFLICT FAIL)");
 
 }
 
@@ -963,3 +971,166 @@ bool DataBase::deleteClearTask(const QString &name)
 
     return false;
 }
+
+bool DataBase::queryBaseInfo(int &threadNum, int &logPort)
+{
+    try
+    {
+        if (!ConnectDB())
+        {
+            return false;
+        }
+
+        QSqlQuery query(m_db);
+        QString sql;
+        bool res;
+        // 先删除收集任务表
+        // sql = QString("SELECT THREADNUM, LOGPORT FROM T_GLOBALINFO WHERE PROGRAMID = %1").arg(MAGIC_NUM);
+        sql = QString("SELECT THREADNUM, LOGPORT FROM T_GLOBALINFO WHERE PROGRAMID = :PROGRAMID");
+        query.prepare(sql);
+        query.bindValue(":PROGRAMID", MAGIC_NUM);
+        res = query.exec();
+        if (res)
+        {
+            if (query.next())
+            {
+                threadNum = query.value(0).toInt();
+                logPort = query.value(1).toInt();
+                return true;
+            }
+            else
+            {
+                threadNum = 4;
+                logPort = 50001;
+                return false;
+            }
+
+            QSLOG_ERROR(QString("Error: %1").arg(query.lastError().text()));
+        }
+    }
+    catch (std::exception &e)
+    {
+        QSLOG_ERROR(QStringLiteral("Error：") + QString(e.what()));
+    }
+
+    return false;
+}
+
+
+bool DataBase::updateBaseInfo(int threadNum, int logPort)
+{
+    try
+    {
+        if (!ConnectDB())
+        {
+            return false;
+        }
+
+        QSqlQuery query(m_db);
+        QString sql;
+        bool res;
+
+        // 先删除收集任务表
+        // sql = QString("REPLACE INTO T_GLOBALINFO(PROGRAMID,THREADNUM, LOGPORT) VALUES(%1, %2)").arg(MAGIC_NUM).arg(threadNum);
+        sql = QString("REPLACE INTO T_GLOBALINFO(PROGRAMID,THREADNUM, LOGPORT) VALUES(:PROGRAMID,:THREADNUM, :LOGPORT)");
+        if (!query.prepare(sql))
+        {
+            QSLOG_ERROR(QString("Error: %1").arg(query.lastError().text()));
+            return false;
+        }
+
+        query.bindValue(":PROGRAMID", MAGIC_NUM);
+        query.bindValue(":THREADNUM", threadNum);
+        query.bindValue(":LOGPORT", logPort);
+        res = query.exec();
+        if (res)
+        {
+            return true;
+        }
+
+        QSLOG_ERROR(QString("Error: %1").arg(query.lastError().text()));
+    }
+    catch (std::exception &e)
+    {
+        QSLOG_ERROR(QStringLiteral("Error：") + QString(e.what()));
+    }
+
+    return false;
+}
+
+//bool DataBase::queryLogListenPort(int &portNum)
+//{
+//    try
+//    {
+//        if (!ConnectDB())
+//        {
+//            return false;
+//        }
+//
+//        QSqlQuery query(m_db);
+//        QString sql;
+//        bool res;
+//        // 先删除收集任务表
+//        sql = QString("SELECT LOGPORT FROM T_GLOBALINFO WHERE PROGRAMID = %1").arg(MAGIC_NUM);
+//        res = query.exec(sql);
+//        if (res)
+//        {
+//            if (query.next())
+//            {
+//                portNum = query.value(0).toInt();
+//                return true;
+//            }
+//            else
+//            {
+//                return false;
+//            }
+//
+//            QSLOG_ERROR(QString("Error: %1").arg(query.lastError().text()));
+//        }
+//    }
+//    catch (std::exception &e)
+//    {
+//        QSLOG_ERROR(QStringLiteral("Error：") + QString(e.what()));
+//    }
+//
+//    return false;
+//}
+
+//bool DataBase::updateLogListemPort(int portNum)
+//{
+//    try
+//    {
+//        if (!ConnectDB())
+//        {
+//            return false;
+//        }
+//
+//        QSqlQuery query(m_db);
+//        QString sql;
+//        bool res;
+//
+//        // 先删除收集任务表
+//        sql = QString("REPLACE INTO T_GLOBALINFO(PROGRAMID, THREADNUM, LOGPORT) VALUES(:PROGRAMID, :THREADNUM, :LOGPORT)");// .arg(MAGIC_NUM).arg(portNum);
+//
+//        if (!query.prepare(sql))
+//        {
+//            QSLOG_ERROR(QString("Error: %1").arg(query.lastError().text()));
+//            return false;
+//        }
+//        query.bindValue(":PROGRAMID", MAGIC_NUM);
+//        query.bindValue(":THREADNUM", threadNum);
+//        res = query.exec(sql);
+//        if (res)
+//        {
+//            return true;
+//        }
+//
+//        QSLOG_ERROR(QString("Error: %1").arg(query.lastError().text()));
+//    }
+//    catch (std::exception &e)
+//    {
+//        QSLOG_ERROR(QStringLiteral("Error：") + QString(e.what()));
+//    }
+//
+//    return false;
+//}

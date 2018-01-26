@@ -14,6 +14,7 @@
 #include "clearItemWidget.h"
 #include "pathbuilder.h"
 #include "IDispatchTimer.h"
+#include "systemset.h"
 //#include "quartz.h"
 //--
 
@@ -96,6 +97,7 @@ void MainWindow::InitUI()
     connect(m_pEditAct, SIGNAL(triggered()), this, SLOT(onProperty()));
     connect(m_pClearAct, SIGNAL(triggered()), this, SLOT(onClearLog()));
     connect(m_pTrayAct, SIGNAL(triggered()), this, SLOT(hideWin()));
+    connect(m_pSet, SIGNAL(triggered()), this, SLOT(onSystemSet()));
     connect(ui.listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(onSelectTask(int)));
     // 初始化状态栏
     m_pRunTime = new QLabel(QStringLiteral("运行时长："));
@@ -1148,4 +1150,10 @@ void MainWindow::onClearTaskEnd(const QString &dir)
             break;
         }
     }
+}
+
+void MainWindow::onSystemSet()
+{
+    CSystemSetDlg oSetDlg;
+    oSetDlg.exec();
 }

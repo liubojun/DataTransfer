@@ -117,6 +117,8 @@ void FtpCollector::getNewFiles()
     emit startGif(m_collectSet.dirID, true);
     //m_oDataTransferPro = QSharedPointer<QProcess>(new QProcess());
     QProcess oProcess;
+    setProcess(&oProcess);
+    connect(&oProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(readOutput()));
     oProcess.start("DataTransferPro", QStringList() << m_collectSet.dirID);
 
     // 初始化，设置子进程运行标识
@@ -373,5 +375,16 @@ bool FtpCollector::compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransT
 int FtpCollector::reStart()
 {
     return start();
+}
+
+void FtpCollector::setProcess(QProcess *in_pro)
+{
+    m_pro = in_pro;
+}
+
+void FtpCollector::readOutput()
+{
+    QByteArray content = m_pro->readAllStandardOutput();
+    emit print(content);
 }
 
