@@ -433,6 +433,7 @@ struct CollectTask
     QString	rltvPath;
     QString dispatch;
     QString fileTemplate;
+    QString subDirTemplate;
     int		subdirFlag;
     int		moveFlag;
     int     col_timerange;	///< 收集时间范围，单位：分钟
@@ -460,8 +461,10 @@ struct TaskUser
 struct TransTask
 {
     CollectTask		collectSet;
-    QList<UserInfo> userInfo;
-    QList<QString> dstFilePath;
+    //QList<UserInfo> userInfo;
+    //QList<QString> dstFilePath;
+    UserInfo userInfo;
+    QString dstFilePath;
     QString fileName;
     QString srcFileFullPath;
     QString strDestFileName; // 目标目录下的文件有可能经过重命名了

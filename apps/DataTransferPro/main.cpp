@@ -16,13 +16,13 @@
 #include "DataBase.h"
 #include "CollectorBase.h"
 #include "ftpCollector.h"
+#include "subdirfilter.h"
 
 // 单进程模式完成一次数据的收集、分发
 // DataTransferPro 收集目录ID
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
-
     //if (argc != 2)
     //{
     //    QSLOG_ERROR("param num incorrect!");

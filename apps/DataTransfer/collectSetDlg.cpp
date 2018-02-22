@@ -13,6 +13,8 @@
 #include "QsLog/ctkLog.h"
 #include "renameDlg.h"
 #include "change_name.h"
+#include "subdirfilter.h"
+#include "subdirtemplateedit.h"
 //#include "curlftp.h"
 
 CollectSetDlg::CollectSetDlg(int flag, QDialog *parent /*= NULL*/)
@@ -67,12 +69,24 @@ void CollectSetDlg::InitUI()
     connect(ui.btn_rename_edit, SIGNAL(clicked()), this, SLOT(onRenameRuleEdit()));
     connect(ui.comboBox_sendUser, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(onSendUserChange(const QString &)));
     connect(ui.compare_content, SIGNAL(stateChanged(int)), this, SLOT(onCompareContent(int)));
+
+    connect(ui.pbt_subdirfilter, SIGNAL(clicked()), this, SLOT(onSubDirFilterEdit()));
     // added by liubojun @20171112,支持分发换名
     std::vector<std::string> rules = CChangeName::get_rules();
 
     for (size_t i = 0; i < rules.size(); ++i)
     {
         ui.comboBox_rename->addItem(QString::fromLocal8Bit(rules[i].c_str()));
+    }
+
+    // 子目录过滤
+    CSubDirFilter oSubDirFilter;
+    oSubDirFilter.init();
+    QStringList strRules = oSubDirFilter.getAllRuleId();
+
+    foreach(QString strRule, strRules)
+    {
+        ui.cbx_subdirfilter->addItem(strRule);
     }
 
     // 从数据库读取分发用户
@@ -209,6 +223,7 @@ bool CollectSetDlg::onApply()
     oSendUser.rename_rule = ui.comboBox_rename->currentText();
     m_selUser.lstUser.append(oSendUser);
 
+    cSet.subDirTemplate = ui.cbx_subdirfilter->currentText();
 
     //// 临时屏蔽
     //// 更新收集用户表
@@ -391,6 +406,8 @@ void CollectSetDlg::showTask(const CollectTask &task)
     //    ui.listWidget->setItemWidget(pItem, pUser);
     //    pItem->setSizeHint(QSize(pUser->rect().width(), pUser->rect().height()));
     //}
+
+    ui.cbx_subdirfilter->setCurrentText(task.subDirTemplate);
 }
 
 void CollectSetDlg::onSendUserDel(const QString &user)
@@ -655,4 +672,10 @@ void CollectSetDlg::onCompareContent(int state)
         QTimer::singleShot(3000, this, SLOT(onTestResultTimeout()));
     }
 
+}
+
+void CollectSetDlg::onSubDirFilterEdit()
+{
+    CSubDirTemplateUi oSubDir;
+    oSubDir.exec();
 }

@@ -205,7 +205,11 @@ int CurlFtp::getNewFiles(FileInfoList &fileList, CDirRecord &in_record)
     //////////////////////////////////////////////////////////////////////////
 
     m_lstDirs.clear();
-    m_lstDirs.append(QString::fromStdString(m_strRoot));
+    DIRLEVEL oDirLevel;
+    oDirLevel.dir = QString::fromStdString(m_strRoot);
+    oDirLevel.level = 0;	// 根目录层级为0
+    m_lstDirs.append(oDirLevel);
+    m_oSubDirFilter.init();
 
     while (!m_lstDirs.isEmpty())
     {
@@ -216,14 +220,14 @@ int CurlFtp::getNewFiles(FileInfoList &fileList, CDirRecord &in_record)
 
         m_strCurDir = m_lstDirs.takeFirst();
         //QSLOG_DEBUG(m_strCurDir);
-        if (m_strCurDir.length() >= 1 && m_strCurDir.right(1) != "/")
+        if (m_strCurDir.dir.length() >= 1 && m_strCurDir.dir.right(1) != "/")
         {
-            m_strCurDir += "/";
+            m_strCurDir.dir += "/";
         }
         //QSLOG_DEBUG(m_strCurDir);
 //          QDateTime qdtime = QDateTime::fromTime_t(m_pCoBase->m_pTsctTime->mapDirTime[m_strCurDir.toStdString()]);
 //          m_strCurDirLastTime = qdtime.toString("yyyyMMddHHmmss").toStdString();
-        listFiles(m_strCurDir.toLocal8Bit().data(), fileList, in_record);
+        listFiles(m_strCurDir.dir.toLocal8Bit().data(), fileList, in_record);
     }
 
     emit done();
@@ -466,7 +470,7 @@ void CurlFtp::listFiles(const string &strDir, FileInfoList &fileList, CDirRecord
     //}
 }
 
-QString CurlFtp::parseMlsdInfo(const QString &rootPath, const QString &info, FileInfoList &fileList, QStringList &dirList, CDirRecord &in_record, bool bFtpSupportMSDL)
+QString CurlFtp::parseMlsdInfo(const QString &rootPath, const QString &info, FileInfoList &fileList, QList<DIRLEVEL> &dirList, CDirRecord &in_record, bool bFtpSupportMSDL)
 {
     // 当前目录的最新时间列表
     //QString strFileListPath = qApp->applicationDirPath() + "/work/record/" + m_pCoBase->m_collectSet.dirID + "/latestFileList.xml";
@@ -638,7 +642,7 @@ QString CurlFtp::parseMlsdInfo(const QString &rootPath, const QString &info, Fil
 
             if (m_pCoBase->filterFileName(fInfo)/* && fInfo.strMdyTime > m_strCurDirLastTime*/)
             {
-                fInfo.strFilePath = (m_strCurDir + oneInfo.strFileName).toLocal8Bit().data();
+                fInfo.strFilePath = (m_strCurDir.dir + oneInfo.strFileName).toLocal8Bit().data();
                 fInfo.nFileSize = oneInfo.nFileSize;
                 fileList.push_back(fInfo);
 
@@ -651,8 +655,21 @@ QString CurlFtp::parseMlsdInfo(const QString &rootPath, const QString &info, Fil
         else if (oneInfo.nType == 2 && m_subDirFlag)
         {
             // 如果需要遍历子目录
-            QString strPath = m_strCurDir + oneInfo.strFileName + "/";
-            dirList.append(strPath);
+            QString strPath = m_strCurDir.dir + oneInfo.strFileName + "/";
+            DIRLEVEL oDirLevel;
+            oDirLevel.dir = strPath;
+            oDirLevel.level = m_strCurDir.level + 1;
+
+            // modified by liubojun @20180222,针对北京民航张睿之现场反馈问题提出的新需求
+            // 在此处加入过滤条件，支持针对子目录的模糊匹配
+            if (m_oSubDirFilter.match(m_strSubDirTemplate, oneInfo.strFileName, oDirLevel.level))
+            {
+                dirList.append(oDirLevel);
+            }
+            else
+            {
+                QSLOG_DEBUG(QString("subdir %1 is not match the rule").arg(oDirLevel.dir));
+            }
         }
     }
 
@@ -1545,4 +1562,9 @@ void CurlFtp::setFtpConnectMode(int mode)
 void CurlFtp::setSubDirFlag(bool flag)
 {
     m_subDirFlag = flag;
+}
+
+void CurlFtp::setSubDirTemplateId(const QString &templateId)
+{
+    m_strSubDirTemplate = templateId;
 }

@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>424</width>
-    <height>489</height>
+    <width>498</width>
+    <height>492</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>收集分发设置</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>收集策略</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <property name="spacing">
@@ -201,22 +201,12 @@
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <property name="spacing">
-         <number>16</number>
-        </property>
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <property name="spacing">
-           <number>16</number>
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>文件模板：</string>
           </property>
-          <item>
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>文件模板：</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         </widget>
         </item>
         <item>
          <widget class="QLineEdit" name="lineEdit_4"/>
@@ -233,6 +223,40 @@
            <string>测试</string>
           </property>
          </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_11">
+        <item>
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>子目录过滤：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cbx_subdirfilter"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbt_subdirfilter">
+          <property name="text">
+           <string>编辑</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_12">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>

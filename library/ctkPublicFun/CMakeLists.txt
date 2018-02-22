@@ -11,6 +11,7 @@ SET(SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/DataBase.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/change_name.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/get_rename_rules.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/subdirfilter.cpp
 )
 
 # 工程头文件
@@ -26,6 +27,7 @@ SET(HDRS
 	${RadarProjectInclude}/ctkPublicFun/DataBase.h
 	${RadarProjectInclude}/ctkPublicFun/change_name.h
 	${RadarProjectInclude}/ctkPublicFun/logprotocol.h
+	${RadarProjectInclude}/ctkPublicFun/subdirfilter.h
 )
 
 #设置MOC相关变量

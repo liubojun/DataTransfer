@@ -18,6 +18,7 @@
 #include "CollectorBase.h"
 #include "fileMsg.h"
 #include "curl/curl.h"
+#include "subdirfilter.h"
 
 class CollectorBase;
 class CDirRecord;
@@ -119,6 +120,12 @@ struct MemoryData
     }
 };
 
+typedef struct
+{
+    QString dir;	// 目录
+    int level;		// 所属子目录层级，根目录为0，子目录依次递增
+} DIRLEVEL;
+
 //////////////////////////////////////////////////////////////////////////
 
 class CurlFtp : public QObject
@@ -141,11 +148,18 @@ public:
     // 是否需要递归遍历子目录标识
     void setSubDirFlag(bool flag);
 
+    /**
+     * @brief: 设置子目录模板ID
+     * @param: const QString & templateId 模板ID
+     * @return:void 无
+     */
+    void setSubDirTemplateId(const QString &templateId);
+
     int getNewFiles(FileInfoList &fileList, CDirRecord &in_record);
 
     void listFiles(const string &strDir, FileInfoList &fileList, CDirRecord &in_oRecord);
 
-    QString parseMlsdInfo(const QString &rootPath, const QString &info, FileInfoList &fileList, QStringList &dirList, CDirRecord &in_record, bool bFtpSupportMSDL);
+    QString parseMlsdInfo(const QString &rootPath, const QString &info, FileInfoList &fileList, QList<DIRLEVEL> &dirList, CDirRecord &in_record, bool bFtpSupportMSDL);
 
     /**
      * @brief 连接远程目录
@@ -185,10 +199,15 @@ private:
     string m_strRoot;
     bool m_subDirFlag;	// 是否需要递归遍历子目录
 
+    QString m_strSubDirTemplate;	// 子目录匹配模板ID
+
     // bool m_bConnected;			///< 是否登录ftp服务器
 
-    QStringList m_lstDirs;		///< 等待遍历的目录
-    QString m_strCurDir;		///< 当前ftp目录
+    QList<DIRLEVEL> m_lstDirs;  ///< 等待遍历的目录
+    //QStringList m_lstDirs;		///< 等待遍历的目录
+    DIRLEVEL m_strCurDir;		///< 当前ftp目录
+
+    CSubDirFilter m_oSubDirFilter;	// 子目录过滤器
     // string m_strCurDirLastTime;	///< 当前目录记录的最后修改时间
     //string m_strCurDirNewTime;	///< 当前目录现在的最后修改时间
 

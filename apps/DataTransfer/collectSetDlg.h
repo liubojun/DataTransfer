@@ -58,6 +58,9 @@ private slots:
     // 是否启用文本内容比较
     void onCompareContent(int state);
 
+    // 编辑子目录过滤弹窗
+    void onSubDirFilterEdit();
+
 signals:
     void commit(const CollectTask &task);
 

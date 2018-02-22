@@ -178,6 +178,7 @@ void FtpCollector::getNewFiles(const CollectTask &in_oTask)
         m_pCftp->setFtpTransferMode(m_collectSet.ftp_transferMode);
         m_pCftp->setFtpConnectMode(m_collectSet.ftp_connectMode);
         m_pCftp->setSubDirFlag(m_collectSet.subdirFlag);
+        m_pCftp->setSubDirTemplateId(m_collectSet.subDirTemplate);
 
         emit print(QStringLiteral("[%1]: 开始收集任务 %2[%3]").arg(QDateTime::currentDateTime().toString(Qt::ISODate)).arg(m_collectSet.dirName)
                    .arg(m_collectSet.rltvPath));
@@ -365,11 +366,14 @@ bool FtpCollector::compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransT
             }
         }
 
-        tTask.userInfo.append(cUser.user);
-        tTask.dstFilePath.append(dstFilePath);
+        tTask.userInfo = cUser.user;
+        //tTask.userInfo.append(cUser.user);
+        //tTask.dstFilePath.append(dstFilePath);
+        tTask.dstFilePath = dstFilePath;
     }
 
-    return tTask.userInfo.empty();
+    // return tTask.userInfo.empty();
+    return tTask.userInfo.userID.isEmpty();
 }
 
 int FtpCollector::reStart()

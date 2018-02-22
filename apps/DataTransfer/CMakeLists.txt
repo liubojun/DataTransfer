@@ -18,6 +18,7 @@ SET(SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/logprint.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/systemset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/baseset.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/subdirtemplateedit.cpp
 )
 
 # .h文件
@@ -37,6 +38,7 @@ SET(HDRS
   ${CMAKE_CURRENT_SOURCE_DIR}/logprint.h
   ${CMAKE_CURRENT_SOURCE_DIR}/systemset.h
   ${CMAKE_CURRENT_SOURCE_DIR}/baseset.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/subdirtemplateedit.h
 )
 
 SET(MOC_HDRS
@@ -56,6 +58,7 @@ SET(MOC_HDRS
 	${CMAKE_CURRENT_SOURCE_DIR}/logprint.h
 	${CMAKE_CURRENT_SOURCE_DIR}/systemset.h
 	${CMAKE_CURRENT_SOURCE_DIR}/baseset.h
+	${CMAKE_CURRENT_SOURCE_DIR}/subdirtemplateedit.h
 )
 
 SET(UI
@@ -71,6 +74,7 @@ SET(UI
 	${CMAKE_CURRENT_SOURCE_DIR}/ui/renameDlg.ui
 	${CMAKE_CURRENT_SOURCE_DIR}/ui/systemset.ui
 	${CMAKE_CURRENT_SOURCE_DIR}/ui/baseset.ui
+	${CMAKE_CURRENT_SOURCE_DIR}/ui/subdirtemplateedit.ui
 	)
 
 SET (ICON_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/Transfer.rc)

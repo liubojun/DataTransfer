@@ -29,8 +29,10 @@ protected:
      * @param  SendAcctInfo & userInfo：分发用户信息
      * @return bool：成功返回true
      */
-    bool sendToDir(const char *fullPath, TransTask &task, int userIndex);
-    bool sendToFtp(const char *fullPath, TransTask &userInfo, int userIndex);
+    bool sendToDir(const char *fullPath, TransTask &task);
+    bool sendToFtp(const char *fullPath, TransTask &userInfo);
+    //bool sendToDir(const char *fullPath, TransTask &task, int userIndex);
+    //bool sendToFtp(const char *fullPath, TransTask &userInfo, int userIndex);
 
     //bool writeKeyIv(const QString &fileName, KeyIv &keyiv);
 

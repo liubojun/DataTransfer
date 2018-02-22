@@ -923,11 +923,14 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
             }
         }
 
-        tTask.userInfo.append(cUser.user);
-        tTask.dstFilePath.append(dstFilePath);
+        //tTask.userInfo.append(cUser.user);
+        //tTask.dstFilePath.append(dstFilePath);
+        tTask.userInfo = (cUser.user);
+        tTask.dstFilePath = (dstFilePath);
     }
 
-    return tTask.userInfo.empty();
+    // return tTask.userInfo.empty();
+    return tTask.userInfo.userID.isEmpty();
 }
 
 //void SharedDirCollector::onCheckDir(QSet<QString> lstPath)

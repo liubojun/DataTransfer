@@ -218,7 +218,7 @@ bool DataBase::QueryCollectTask(CollectTask &task)
 
         QSqlQuery query(m_db);
         QString sql = QString("SELECT DIRID, DIRNAME, ENABLE, COLLECTTYPE, FTPTRANSFERMODE, FTPCONNECTMODE, RLTVPATH, DISPATCH,"
-                              "FILETEMPLATE, SUBDIRCHECK, MOVEFLAG, COLTIMERANGE, RECORDLATESTTIME, COMPARE_CONTENT, LOGINUSER, LOGINPASS,"
+                              "FILETEMPLATE, SUBDIRTEMPLATE, SUBDIRCHECK, MOVEFLAG, COLTIMERANGE, RECORDLATESTTIME, COMPARE_CONTENT, LOGINUSER, LOGINPASS,"
                               "IP, PORT from T_DIR_COL where DIRID = '%1'").arg(task.dirID);
         bool res = query.exec(sql);
         if (!res)
@@ -237,6 +237,7 @@ bool DataBase::QueryCollectTask(CollectTask &task)
             task.rltvPath = query.value(index++).toString();
             task.dispatch = query.value(index++).toString();
             task.fileTemplate = query.value(index++).toString();
+            task.subDirTemplate = query.value(index++).toString();
             task.subdirFlag = query.value(index++).toInt();
             task.moveFlag = query.value(index++).toInt();
             task.col_timerange = query.value(index++).toInt();
@@ -536,10 +537,10 @@ bool DataBase::InsertCollectTask(const CollectTask &task)
 
         QSqlQuery query(m_db);
         QString sql = QString("REPLACE INTO T_DIR_COL(DIRID, DIRNAME, ENABLE, COLLECTTYPE, FTPTRANSFERMODE, FTPCONNECTMODE, RLTVPATH, DISPATCH,"
-                              "FILETEMPLATE, SUBDIRCHECK, MOVEFLAG, COLTIMERANGE, RECORDLATESTTIME, COMPARE_CONTENT, LOGINUSER, LOGINPASS,"
+                              "FILETEMPLATE, SUBDIRTEMPLATE, SUBDIRCHECK, MOVEFLAG, COLTIMERANGE, RECORDLATESTTIME, COMPARE_CONTENT, LOGINUSER, LOGINPASS,"
                               "IP, PORT)"
                               "VALUES(:DIRID, :DIRNAME, :ENABLE, :COLLECTTYPE, :FTPTRANSFERMODE, :FTPCONNECTMODE, :RLTVPATH, :DISPATCH,"
-                              ":FILETEMPLATE, :SUBDIRCHECK, :MOVEFLAG, :COLTIMERANGE, :RECORDLATESTTIME, :COMPARE_CONTENT, :LOGINUSER, :LOGINPASS,"
+                              ":FILETEMPLATE, :SUBDIRTEMPLATE ,:SUBDIRCHECK, :MOVEFLAG, :COLTIMERANGE, :RECORDLATESTTIME, :COMPARE_CONTENT, :LOGINUSER, :LOGINPASS,"
                               ":IP, :PORT)");
         query.prepare(sql);
         query.bindValue(":DIRID", task.dirID);
@@ -551,6 +552,7 @@ bool DataBase::InsertCollectTask(const CollectTask &task)
         query.bindValue(":RLTVPATH", task.rltvPath);
         query.bindValue(":DISPATCH", task.dispatch);
         query.bindValue(":FILETEMPLATE", task.fileTemplate);
+        query.bindValue(":SUBDIRTEMPLATE", task.subDirTemplate);
         query.bindValue(":SUBDIRCHECK", task.subdirFlag);
         query.bindValue(":MOVEFLAG", task.moveFlag);
         query.bindValue(":COLTIMERANGE", task.col_timerange);

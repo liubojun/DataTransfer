@@ -103,16 +103,17 @@ void DistributeFile::transfer(TransTask &task)
         }
     }
 
-    if (0 == task.userInfo.size())
-    {
-        QSLOG_DEBUG(QStringLiteral("当前收集任务未配置分发用户"));
-    }
+    // modified by liubojun @20180205
+    //if (0 == task.userInfo.size())
+    //{
+    //    QSLOG_DEBUG(QStringLiteral("当前收集任务未配置分发用户"));
+    //}
     // 遍历分发用户
-    QSLOG_INFO(QString("user num is %1").arg(QString::number(task.userInfo.size())));
-    for (int i=0; i<task.userInfo.size(); ++i)
+    //QSLOG_INFO(QString("user num is %1").arg(QString::number(task.userInfo.size())));
+    //for (int i=0; i<task.userInfo.size(); ++i)
     {
-        const UserInfo &user = task.userInfo.at(i);
-
+        //const UserInfo &user = task.userInfo.at(i);
+        const UserInfo &user = task.userInfo;
         // 2.加密压缩
         //int nIndex = 0;
         //QString strFileFullPath("");
@@ -132,11 +133,13 @@ void DistributeFile::transfer(TransTask &task)
         bool bRes = false;
         if (0 == user.sendType)		//目录分发
         {
-            bRes = sendToDir(fileData.filename,  task, i);
+            // bRes = sendToDir(fileData.filename,  task, i);
+            bRes = sendToDir(fileData.filename, task);
         }
         else if (1 == user.sendType)	//ftp分发
         {
-            bRes = sendToFtp(fileData.filename, task, i);
+            //bRes = sendToFtp(fileData.filename, task, i);
+            bRes = sendToFtp(fileData.filename, task);
         }
         else
         {
@@ -232,7 +235,8 @@ QString DistributeFile::getHostFromFileName(const QString& r_strFullPathFileName
     return ret;
 }
 
-bool DistributeFile::sendToDir(const char *fullPath, TransTask &taskInfo, int userIndex)
+//bool DistributeFile::sendToDir(const char *fullPath, TransTask &taskInfo, int userIndex)
+bool DistributeFile::sendToDir(const char *fullPath, TransTask &taskInfo)
 {
 
     if (fullPath == NULL)
@@ -241,7 +245,7 @@ bool DistributeFile::sendToDir(const char *fullPath, TransTask &taskInfo, int us
     }
     //QSLOG_INFO(QString::fromLocal8Bit("send to dir : %1").arg(QString::fromLocal8Bit(fullPath)));
 
-    QString strSendPath = taskInfo.dstFilePath.at(userIndex);
+    QString strSendPath = taskInfo.dstFilePath;//.at(userIndex);
     QDir qDir;
     if (!qDir.exists(strSendPath))
     {
@@ -256,7 +260,7 @@ bool DistributeFile::sendToDir(const char *fullPath, TransTask &taskInfo, int us
     // QString strFullPath = strSendPath + taskInfo.fileName;
     QString strFullPath = strSendPath + taskInfo.strDestFileName;
     // 目标临时文件路径
-    QString strTmpName = strFullPath + taskInfo.userInfo.at(userIndex).sendSuffix;
+    QString strTmpName = strFullPath + taskInfo.userInfo.sendSuffix;//taskInfo.userInfo.at(userIndex).sendSuffix;
 
     //////////////////////////////////////////////////////////////////////////
     //string strUsr = userInfo.m_strSendUserName.toLocal8Bit().data();
@@ -273,17 +277,20 @@ bool DistributeFile::sendToDir(const char *fullPath, TransTask &taskInfo, int us
     //sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
 
     int bRet = -1;
-    if (taskInfo.userInfo.at(userIndex).conput)	// 断点续传
+    // if (taskInfo.userInfo.at(userIndex).conput)	// 断点续传
+    if (taskInfo.userInfo.conput)
     {
         bRet = m_oCurlFtp.conputFileToDir(url.toLocal8Bit().toStdString().c_str(), NULL,
                                           taskInfo.strDestFileName.toLocal8Bit().data(), fullPath,
-                                          taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
+                                          // taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
+                                          taskInfo.userInfo.sendSuffix.toAscii().data());
     }
     else
     {
         bRet = m_oCurlFtp.uploadFileToDir(url.toLocal8Bit().toStdString().c_str(), NULL,
                                           taskInfo.strDestFileName.toLocal8Bit().data(), fullPath,
-                                          taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
+                                          // taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
+                                          taskInfo.userInfo.sendSuffix.toAscii().data());
     }
     if (bRet != 0)
     {
@@ -355,14 +362,21 @@ bool DistributeFile::sendToDir(const char *fullPath, TransTask &taskInfo, int us
 //    return wFile.rename(fileName);
 //}
 
-bool DistributeFile::sendToFtp(const char *fullPath, TransTask &task, int userIndex)
+// bool DistributeFile::sendToFtp(const char *fullPath, TransTask &task, int userIndex)
+bool DistributeFile::sendToFtp(const char *fullPath, TransTask &task)
 {
-    string strIp =  task.userInfo.at(userIndex).ip.toStdString();
-    int nPort = task.userInfo.at(userIndex).port;
-    string strUsr = task.userInfo.at(userIndex).lgUser.toLocal8Bit().toStdString();
-    string strPwd = task.userInfo.at(userIndex).lgPass.toLocal8Bit().toStdString();
+    //string strIp =  task.userInfo.at(userIndex).ip.toStdString();
+    //int nPort = task.userInfo.at(userIndex).port;
+    //string strUsr = task.userInfo.at(userIndex).lgUser.toLocal8Bit().toStdString();
+    //string strPwd = task.userInfo.at(userIndex).lgPass.toLocal8Bit().toStdString();
+    //// 相对路径
+    //string strPath = task.dstFilePath.at(userIndex).toLocal8Bit().toStdString();
+    string strIp = task.userInfo.ip.toStdString();
+    int nPort = task.userInfo.port;
+    string strUsr = task.userInfo.lgUser.toLocal8Bit().toStdString();
+    string strPwd = task.userInfo.lgPass.toLocal8Bit().toStdString();
     // 相对路径
-    string strPath = task.dstFilePath.at(userIndex).toLocal8Bit().toStdString();
+    string strPath = task.dstFilePath.toLocal8Bit().toStdString();
     //char ftpUrl[512] = {0};
     //char usrPwd[100] = {0};
     QString ftpUrl = QString("ftp://%1:%2%3").arg(strIp.c_str()).arg(nPort).arg(strPath.c_str());
@@ -371,19 +385,22 @@ bool DistributeFile::sendToFtp(const char *fullPath, TransTask &task, int userIn
     //sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
 
     int bRet = -1;
-    if (task.userInfo.at(userIndex).conput)	// 断点续传
+    // if (task.userInfo.at(userIndex).conput)	// 断点续传
+    if (task.userInfo.conput)	// 断点续传
     {
         bRet = m_oCurlFtp.conputFileToFtp(ftpUrl.toLocal8Bit().toStdString().c_str(),
                                           usrPwd.toLocal8Bit().toStdString().c_str()
                                           , task.strDestFileName.toLocal8Bit().toStdString().c_str(),
-                                          fullPath, task.userInfo.at(userIndex).sendSuffix.toStdString().c_str());
+                                          // fullPath, task.userInfo.at(userIndex).sendSuffix.toStdString().c_str());
+                                          fullPath, task.userInfo.sendSuffix.toStdString().c_str());
     }
     else
     {
         bRet = m_oCurlFtp.uploadFileToFtp(ftpUrl.toLocal8Bit().toStdString().c_str(),
                                           usrPwd.toLocal8Bit().toStdString().c_str(),
                                           task.strDestFileName.toLocal8Bit().toStdString().c_str(),
-                                          fullPath, task.userInfo.at(userIndex).sendSuffix.toStdString().c_str());
+                                          // fullPath, task.userInfo.at(userIndex).sendSuffix.toStdString().c_str());
+                                          fullPath, task.userInfo.sendSuffix.toStdString().c_str());
     }
     if (bRet != 0)
     {
