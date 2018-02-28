@@ -23,11 +23,12 @@
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
-    //if (argc != 2)
-    //{
-    //    QSLOG_ERROR("param num incorrect!");
-    //    return -1;
-    //}
+
+    if (argc != 2)
+    {
+        QSLOG_ERROR("param num incorrect!");
+        return -1;
+    }
 
     QString strLockPath = app.applicationDirPath() + "/lock/";
 
@@ -40,7 +41,7 @@ int main(int argc, char **argv)
 
     CChangeName::init_rename_rules((app.applicationDirPath() + "/config/rename.rule").toStdString().c_str());
 
-    QSLOG_INFO("START DATA TRANSFER PROGRAM");
+    QSLOG_DEBUG("START DATA TRANSFER PROGRAM");
 
     //用于支持中文路径
     QTextCodec *codec = QTextCodec::codecForLocale();

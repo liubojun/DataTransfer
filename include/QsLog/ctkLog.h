@@ -88,29 +88,31 @@ private:
     // Parameter: const char * function
     // Parameter: int line
     //************************************
-    void print(const QString &level, const QString& msg, const char* file = NULL, const char* function = NULL, int line = -1 );
+    void print(const QString &level, const QString& msg, const char* file = NULL, const char* function = NULL, int line = -1);
 
-	void backOldLogFile(const QString &in_strFilePath);
+    QString print2(const QString& msg, const char* file = NULL, const char* function = NULL, int line = -1);
 
-	// 获取日志文件大小
-	inline qint64 getLogFileSize(const QString & in_strFile)
-	{
-		return QFile(in_strFile).size();
-	}
+    void backOldLogFile(const QString &in_strFilePath);
+
+    // 获取日志文件大小
+    inline qint64 getLogFileSize(const QString & in_strFile)
+    {
+        return QFile(in_strFile).size();
+    }
 
 private:
     // logging mechanism to file
     //QsLogging::Logger& logger;
 
-	QMutex m_oLocker;
+    QMutex m_oLocker;
 
-	QString m_strAppName;
+    QString m_strAppName;
 
-	QString m_strLogPath;
+    QString m_strLogPath;
 
-	int m_iLogSize;
+    int m_iLogSize;
 
-	int m_iLogNum;
+    int m_iLogNum;
 
     static QLogger *s_instance;
     static QList<OutPutFunPtr> m_printer;
@@ -121,8 +123,8 @@ private:
 #define QSLOG_SET_PRINTFUNCTION(Ptr)  QLogger::setOutFunPtr(ptr)
 
 #define QSLOG_DEBUG(str) QLogger::getInstance()->printDebug(QString(str), __FILE__, __FUNCTION__, __LINE__)
-#define QSLOG_INFO(str)  QLogger::getInstance()->printInfo(QString(str), __FILE__, __FUNCTION__, __LINE__)
-#define QSLOG_ERROR(str) QLogger::getInstance()->printError(QString(str), __FILE__, __FUNCTION__, __LINE__)
+#define QSLOG_INFO(str)  // QLogger::getInstance()->printInfo(QString(str), __FILE__, __FUNCTION__, __LINE__)
+#define QSLOG_ERROR(str) // QLogger::getInstance()->printError(QString(str), __FILE__, __FUNCTION__, __LINE__)
 
 #define QSLOG_RELEASE \
 	if (NULL != QLogger::getInstance()) \

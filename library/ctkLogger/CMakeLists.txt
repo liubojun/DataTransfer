@@ -22,6 +22,7 @@ QT4_WRAP_CPP(MOC_SRCS ${MOC_HDRS})
 #添加依赖的头文件的路径
 INCLUDE_DIRECTORIES(
 					${RadarProjectInclude}/QsLog
+					${LOG4CPP_INCLUDE_DIR}
 					${VLD_INCLUDE}
 					)
 
@@ -34,6 +35,8 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
   ${QT_QTCORE_LIBRARY}
   #${QT_QTGUI_LIBRARY} 
   ${QT_UITOOLS_LIBRARY}
+  ws2_32.lib
+  ${LOG4CPP_LIBRARY}
   ${VLD_LIB}
 )
 

@@ -83,6 +83,7 @@ DataBase::DataBase()
                "[RLTVPATH] VARCHAR(100), "
                "[DISPATCH] VARCHAR(50), "
                "[FILETEMPLATE] VARCHAR(50), "
+			   "[SUBDIRTEMPLATE] VARCHAR2(20), "
                "[SUBDIRCHECK] INT, "
                "[MOVEFLAG] INT, "
                "[COLTIMERANGE] INT, "
