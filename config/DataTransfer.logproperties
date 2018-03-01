@@ -10,8 +10,8 @@ log4cpp.appender.rootAppender.layout.ConversionPattern=%d [%p] %m%n
 
 
 log4cpp.appender.A3=RollingFileAppender
-log4cpp.appender.A3.fileName=log/DataTransfer.log
-log4cpp.appender.A3.maxFileSize=2000000
+log4cpp.appender.A3.fileName=DataTransfer.log
+log4cpp.appender.A3.maxFileSize=10000000
 log4cpp.appender.A3.maxBackupIndex=10
 log4cpp.appender.A3.layout=PatternLayout
 log4cpp.appender.A3.layout.ConversionPattern=%d : %t [%p]  %m%n 
