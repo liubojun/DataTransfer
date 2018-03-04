@@ -17,7 +17,7 @@ public:
     static DataBase *getInstance();
     ~DataBase();
 
-    bool ConnectDB();
+    bool ConnectDB(QSqlDatabase &io_db);
     bool InitDB();
 
     void QueryCollectTask(QList<CollectTask> &colTasks);
@@ -118,8 +118,8 @@ private:
     static DataBase *s_db;
     static QMutex m_oMutex;
 
-    bool	m_bDB;				///< true表示已连接
-    QSqlDatabase m_db;
+    //bool	m_bDB;				///< true表示已连接
+    //QSqlDatabase m_db;
     QString m_dbName;
     QString m_dbPath;
 

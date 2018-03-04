@@ -14,6 +14,10 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QSharedMemory>
 
+#ifdef WITH_MEM_CHECK
+#include "vld.h"
+#endif
+
 // 初始化静态成员（自定义类对象，该类必须有默认构造函数）
 TransCollectTimeList CollectorBase::m_lstTCtime;
 bool CollectorBase::m_bReadTime = false;
@@ -203,6 +207,7 @@ void CollectorBase::onBegined()
 {
     // 将该函数丢到子线程中执行，防止阻塞主线程
     QtConcurrent::run(QThreadPool::globalInstance(), this, &CollectorBase::getNewFiles);
+
     //getNewFiles();
 }
 
@@ -258,19 +263,18 @@ bool CollectorBase::readSet()
         QSLOG_ERROR("Fail to QueryUserInfo.");
         return false;
     }
-
     return true;
 }
 
-void CollectorBase::recordLatestTime(const QString &dburl, const QString &dir, QString &latesttime)
-{
-    DataBase::getInstance()->queryDirLatestTime(dburl, dir, latesttime);
-}
+//void CollectorBase::recordLatestTime(const QString &dburl, const QString &dir, QString &latesttime)
+//{
+//    DataBase::getInstance()->queryDirLatestTime(dburl, dir, latesttime);
+//}
 
-void CollectorBase::updateLatestTime(const QString &dburl, const QString &dir, const QString &latesttime)
-{
-    DataBase::getInstance()->updateDirLatestTime(dburl, dir, latesttime);
-}
+//void CollectorBase::updateLatestTime(const QString &dburl, const QString &dir, const QString &latesttime)
+//{
+//    DataBase::getInstance()->updateDirLatestTime(dburl, dir, latesttime);
+//}
 
 
 bool CollectorBase::containsFile(list<string> &files, const QString &file)
@@ -365,6 +369,19 @@ bool CollectorBase::updateLatestFileSize(const QString &url, const QMap<QString,
     }
     return true;
 }
+
+QString CollectorBase::getTaskLockFilePath(const QString &dirId)
+{
+    QString strLockPath = qApp->applicationDirPath() + "/lock/";
+    QDir oLockDir(strLockPath);
+    if (!oLockDir.exists())
+    {
+        oLockDir.mkpath(strLockPath);
+    }
+    return strLockPath + dirId;
+}
+
+
 
 
 // void CollectorBase::setEnable(bool bFlag)

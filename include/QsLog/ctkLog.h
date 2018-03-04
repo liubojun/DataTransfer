@@ -123,8 +123,8 @@ private:
 #define QSLOG_SET_PRINTFUNCTION(Ptr)  QLogger::setOutFunPtr(ptr)
 
 #define QSLOG_DEBUG(str) QLogger::getInstance()->printDebug(QString(str), __FILE__, __FUNCTION__, __LINE__)
-#define QSLOG_INFO(str)  // QLogger::getInstance()->printInfo(QString(str), __FILE__, __FUNCTION__, __LINE__)
-#define QSLOG_ERROR(str) // QLogger::getInstance()->printError(QString(str), __FILE__, __FUNCTION__, __LINE__)
+#define QSLOG_INFO(str)  QLogger::getInstance()->printInfo(QString(str), __FILE__, __FUNCTION__, __LINE__)
+#define QSLOG_ERROR(str) QLogger::getInstance()->printError(QString(str), __FILE__, __FUNCTION__, __LINE__)
 
 #define QSLOG_RELEASE \
 	if (NULL != QLogger::getInstance()) \

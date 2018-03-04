@@ -399,7 +399,7 @@ void MainWindow::print(const string &dirName, const string &dirId, const string 
     QMutexLocker guard(&m_oLocker2);
     QDateTime qDT = QDateTime::currentDateTime();
     QString strTime = qDT.toString("MM-dd hh:mm:ss");
-    QTableWidgetItem *pItem = new QTableWidgetItem(strTime);;
+    QTableWidgetItem *pItem = NULL;
     if (1 == infoType)
     {
         pItem = new QTableWidgetItem(QIcon(":/01.png"), strTime);

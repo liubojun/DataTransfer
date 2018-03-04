@@ -51,7 +51,7 @@ public:
 private:
     Ui::itemWidget ui;
     QMovie *m_pMovie;
-    CStatusLabel *m_pStatusWnd;
+    //CStatusLabel *m_pStatusWnd;
 
     QIcon m_icon;
     QString m_name;

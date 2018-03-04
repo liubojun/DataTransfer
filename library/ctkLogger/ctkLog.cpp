@@ -16,9 +16,21 @@
 #include <QLockFile>
 
 #include "ctkLog.h"
+#include <string>
+#include <log4cplus/loggingmacros.h>
+#include <log4cplus/configurator.h>
+#include <log4cplus/helpers/loglog.h>
+#include <log4cplus/helpers/stringhelper.h>
+#include <log4cplus/helpers/fileinfo.h>
+#include <log4cplus/loggingmacros.h>
 
-#include <log4cpp/Category.hh>
-#include <log4cpp/PropertyConfigurator.hh>
+
+using namespace std;
+using namespace log4cplus;
+using namespace log4cplus::helpers;
+
+//#include <log4cpp/Category.hh>
+//#include <log4cpp/PropertyConfigurator.hh>
 
 //#include "QsLogThread.h"
 QLogger *QLogger::s_instance = NULL;
@@ -68,13 +80,13 @@ QLogger::QLogger( qint64 size /* = 10M */, qint64 num /* = 10 */ )
     //logger.addDestination(fileDestination);
 
     std::string initFileName = QString("%1/config/%2.logproperties").arg(qApp->applicationDirPath()).arg(m_strAppName).toStdString();
-    log4cpp::PropertyConfigurator::configure(initFileName);
+    //log4cpp::PropertyConfigurator::configure(initFileName);
 
-    log4cpp::Category& root = log4cpp::Category::getRoot();
+    //log4cpp::Category& root = log4cpp::Category::getRoot();
 
-    log4cpp::Category& sub1 =
-        log4cpp::Category::getInstance(std::string("sub1"));
-
+    //log4cpp::Category& sub1 =
+    //log4cpp::Category::getInstance(std::string("sub1"));
+    PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(initFileName.c_str()));
 
 }
 
@@ -94,9 +106,10 @@ void QLogger::printDebug( const QString& msg, const char* file /*= NULL*/, const
 
     QString str = print2(msg, file, function, line);
 
-    log4cpp::Category& sub1 =
-        log4cpp::Category::getInstance(std::string("sub1"));
-    sub1.debug(str.toStdString());
+    //log4cpp::Category& sub1 =
+    //    log4cpp::Category::getInstance(std::string("sub1"));
+    //sub1.debug(str.toStdString());
+    LOG4CPLUS_DEBUG(Logger::getRoot(), str.toStdString().c_str());
 }
 
 void QLogger::printInfo( const QString& msg, const char* file /*= NULL*/, const char* function /*= NULL*/, int line /*= -1 */ )
@@ -105,9 +118,10 @@ void QLogger::printInfo( const QString& msg, const char* file /*= NULL*/, const 
 
     QString str = print2(msg, file, function, line);
 
-    log4cpp::Category& sub1 =
-        log4cpp::Category::getInstance(std::string("sub1"));
-    sub1.info(str.toStdString());
+    //log4cpp::Category& sub1 =
+    //    log4cpp::Category::getInstance(std::string("sub1"));
+    //sub1.info(str.toStdString());
+    LOG4CPLUS_INFO(Logger::getRoot(), str.toStdString().c_str());
 }
 
 void QLogger::printError( const QString& msg, const char* file /*= NULL*/, const char* function /*= NULL*/, int line /*= -1 */ )
@@ -115,9 +129,10 @@ void QLogger::printError( const QString& msg, const char* file /*= NULL*/, const
     //print("Error", msg, file, function, line);
     QString str = print2(msg, file, function, line);
 
-    log4cpp::Category& sub1 =
-        log4cpp::Category::getInstance(std::string("sub1"));
-    sub1.error(str.toStdString());
+    //log4cpp::Category& sub1 =
+    //    log4cpp::Category::getInstance(std::string("sub1"));
+    //sub1.error(str.toStdString());
+    LOG4CPLUS_ERROR(Logger::getRoot(), str.toStdString().c_str());
 }
 
 //void QLogger::print(const QString &level, const QString& msg, const char* file /*= NULL*/, const char* function /*= NULL*/, int line /*= -1 */ )

@@ -394,6 +394,9 @@ public:
     */
     bool checkProcessFinished(const QString &dirId);
 
+    QString getTaskLockFilePath(const QString &dirId);
+
+
 protected:
     static QMutex m_mutexTime;
     static bool m_bReadTime;
@@ -416,6 +419,8 @@ protected:
     QUuid m_oId;
 
     //QSharedPointer<QProcess> m_oDataTransferPro;
+    QMutex m_oTaskLocker;
+
 };
 
 #endif // CollectorBase_h__

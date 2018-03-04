@@ -68,7 +68,7 @@ ADD_DEFINITIONS("-DBOOST_LIB_DIAGNOSTIC")
 
 find_package(CURL REQUIRED)
 
-find_package(Log4cpp REQUIRED)
+find_package(Log4cplus REQUIRED)
 
 #ADD_DEFINITIONS("-DCURL_STATICLIB")
 

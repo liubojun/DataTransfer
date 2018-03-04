@@ -21,7 +21,9 @@ void CltDispatch::Dispatch(const QSharedPointer<TimerCallBackParam> &data)
         return;
     }
     //QSLOG_DEBUG("DISPATHCH1");
+
     QtConcurrent::run(m_pParent, &CollectorBase::getNewFiles);
+
     //QTimer::singleShot(0, this, SLOT(dowork()));
 }
 

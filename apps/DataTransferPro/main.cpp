@@ -59,7 +59,6 @@ int main(int argc, char **argv)
     DataBase::getInstance()->QueryCollectTask(oTask);
 
     CollectorBase *pCollect = new FtpCollector(oCnd, oLocker, iLogSize);
-
     pCollect->getNewFiles(oTask);
 
     QCoreApplication::processEvents();

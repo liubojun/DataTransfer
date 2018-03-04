@@ -10,6 +10,8 @@
 #include <QElapsedTimer>
 #include <QCoreApplication>
 #include <QProcess>
+#include <QLockFile>
+#include <QTime>
 
 FtpCollector::FtpCollector(QWaitCondition &in_oCond, QMutex &in_oLocker, int &in_iLogsize)
     : CollectorBase(in_oCond, in_oLocker, in_iLogsize)
@@ -72,10 +74,16 @@ void FtpCollector::getNewFiles()
     //    QSLOG_DEBUG("Last ftp collect isn't finished.");
     //    return;
     //}
-    QSLOG_DEBUG("get new files from ftp server.");
+    if (!m_oTaskLocker.tryLock())
+    {
+        return;
+    }
+
+    QSharedPointer<QMutex> autoUnlock(&m_oTaskLocker, &QMutex::unlock);
     if (!readSet())
     {
         QSLOG_ERROR("query database error.");
+        m_bFinish = true;
         return;
     }
 
@@ -86,6 +94,7 @@ void FtpCollector::getNewFiles()
         return;
     }
 
+    ///////////////////////////////////////////////////////////////
     // 使用共享内存，查看当前的QProcess是否存在，如果存在的话，则无需再次启动针对该目录ID的收集任务
     if (!checkProcessFinished(m_collectSet.dirID))
     {
@@ -93,8 +102,7 @@ void FtpCollector::getNewFiles()
         return;
     }
 
-    QString strLogInfo(QStringLiteral("[%1]: 开始收集任务 %2[%3]").arg(QDateTime::currentDateTime().toString(Qt::ISODate)).arg(m_collectSet.dirName)
-                       .arg(m_collectSet.rltvPath));
+    QString strLogInfo(QStringLiteral("开始收集任务 %1[%2]").arg(m_collectSet.dirName).arg(m_collectSet.rltvPath));
     emit print(strLogInfo);
     QSLOG_DEBUG(strLogInfo);
     bool bConnect = true;
@@ -108,17 +116,16 @@ void FtpCollector::getNewFiles()
         QSLOG_DEBUG("test ftp error");
         return;
     }
-    QSLOG_DEBUG("test ftp success.");
+    //QSLOG_DEBUG("test ftp success.");
 
     // 如果连接是正常的话
     m_nLineState = 0;
     emit taskState(m_collectSet, 0, m_nLineState);
 
     emit startGif(m_collectSet.dirID, true);
-    //m_oDataTransferPro = QSharedPointer<QProcess>(new QProcess());
+
     QProcess oProcess;
-    //setProcess(&oProcess);
-    //connect(&oProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(readOutput()));
+
     oProcess.start("DataTransferPro", QStringList() << m_collectSet.dirID);
 
     // 初始化，设置子进程运行标识
@@ -126,13 +133,13 @@ void FtpCollector::getNewFiles()
     m_bChildProcessRunning = true;
     connect(&oProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(stoprcv(int, QProcess::ExitStatus)));
     QSLOG_DEBUG("start data transfer pro");
-    //oProcess.waitForFinished();
+
     while (m_bChildProcessRunning)
     {
         QCoreApplication::processEvents();
         QThread::sleep(1);
     }
-    //QProcess::execute("DataTransferPro", QStringList() << m_collectSet.dirID);
+
     emit startGif(m_collectSet.dirID, false);
     QSLOG_DEBUG("finish process.");
     return;
@@ -190,20 +197,20 @@ void FtpCollector::getNewFiles(const CollectTask &in_oTask)
         if (!bConnect)
         {
             m_nLineState = 1;
-            //emit taskState(m_collectSet, 0, m_nLineState);
+            emit taskState(m_collectSet, 0, m_nLineState);
             return;
         }
 
         if (bConnect)
         {
             m_nLineState = 0;
-            //emit taskState(m_collectSet, 0, m_nLineState);
-            //emit startGif(m_collectSet.dirID, true);
+            emit taskState(m_collectSet, 0, m_nLineState);
+            emit startGif(m_collectSet.dirID, true);
             m_bFinish = false;
             m_fileList.clear();	//清空新文件列表
 
             m_pCftp->getNewFiles(m_fileList, oRecordSet);
-            //emit startGif(m_collectSet.dirID, false);
+            emit startGif(m_collectSet.dirID, false);
         }
         else
         {
@@ -220,12 +227,14 @@ void FtpCollector::getNewFiles(const CollectTask &in_oTask)
 
 void FtpCollector::ftpDone()
 {
-    QSLOG_DEBUG(QString("Finished ftp collect, %1 files").arg(m_fileList.size()));
+    QSLOG_DEBUG(QString::fromLocal8Bit("本次收集共获取到新文件:%1").arg(m_fileList.size()));
     if (m_fileList.isEmpty() || !m_bRun)
     {
-        m_bFinish = true;
         return;
     }
+
+    QTime oTimer;
+    oTimer.start();
 
     CurlFtp m_ftp;
     for (int i=0; i<m_fileList.size(); ++i)
@@ -240,8 +249,8 @@ void FtpCollector::ftpDone()
             sendFile.transfer(task);
         }
     }
-
-    m_bFinish = true;
+	m_bFinish = true;
+    QSLOG_DEBUG(QString::fromLocal8Bit("本次分发共用时:%1秒").arg(oTimer.elapsed()/1000));
 }
 
 bool FtpCollector::testCollection()
