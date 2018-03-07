@@ -17,17 +17,17 @@
 
 #include "ctkLog.h"
 #include <string>
-#include <log4cplus/loggingmacros.h>
-#include <log4cplus/configurator.h>
-#include <log4cplus/helpers/loglog.h>
-#include <log4cplus/helpers/stringhelper.h>
-#include <log4cplus/helpers/fileinfo.h>
-#include <log4cplus/loggingmacros.h>
-
-
-using namespace std;
-using namespace log4cplus;
-using namespace log4cplus::helpers;
+//#include <log4cplus/loggingmacros.h>
+//#include <log4cplus/configurator.h>
+//#include <log4cplus/helpers/loglog.h>
+//#include <log4cplus/helpers/stringhelper.h>
+//#include <log4cplus/helpers/fileinfo.h>
+//#include <log4cplus/loggingmacros.h>
+//
+//
+//using namespace std;
+//using namespace log4cplus;
+//using namespace log4cplus::helpers;
 
 //#include <log4cpp/Category.hh>
 //#include <log4cpp/PropertyConfigurator.hh>
@@ -75,18 +75,18 @@ QLogger::QLogger( qint64 size /* = 10M */, qint64 num /* = 10 */ )
 
     //设置log的路径（sLogPath）与、单个log文件的大小（size）及log文件的个数（num）
     //QsLogging::DestinationPtr fileDestination(QsLogging::DestinationFactory::MakeFileDestination(
-    //            sLogPath, QsLogging::EnableLogRotation, QsLogging::MaxSizeBytes(size), QsLogging::MaxOldLogCount(num)));
+    //          sLogPath, QsLogging::EnableLogRotation, QsLogging::MaxSizeBytes(size), QsLogging::MaxOldLogCount(num)));
 
     //logger.addDestination(fileDestination);
 
-    std::string initFileName = QString("%1/config/%2.logproperties").arg(qApp->applicationDirPath()).arg(m_strAppName).toStdString();
+    //std::string initFileName = QString("%1/config/%2.logproperties").arg(qApp->applicationDirPath()).arg(m_strAppName).toStdString();
     //log4cpp::PropertyConfigurator::configure(initFileName);
 
     //log4cpp::Category& root = log4cpp::Category::getRoot();
 
     //log4cpp::Category& sub1 =
-    //log4cpp::Category::getInstance(std::string("sub1"));
-    PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(initFileName.c_str()));
+    //    log4cpp::Category::getInstance(std::string("sub1"));
+    //PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT(initFileName.c_str()));
 
 }
 
@@ -102,93 +102,93 @@ QLogger::~QLogger()
 
 void QLogger::printDebug( const QString& msg, const char* file /*= NULL*/, const char* function /*= NULL*/, int line /*= -1 */ )
 {
-    //print(msg, file, function, line);
+    print("Debug", msg, file, function, line);
 
-    QString str = print2(msg, file, function, line);
+    //QString str = print2(msg, file, function, line);
 
     //log4cpp::Category& sub1 =
-    //    log4cpp::Category::getInstance(std::string("sub1"));
+    //   log4cpp::Category::getInstance(std::string("sub1"));
     //sub1.debug(str.toStdString());
-    LOG4CPLUS_DEBUG(Logger::getRoot(), str.toStdString().c_str());
+    //LOG4CPLUS_DEBUG(Logger::getRoot(), str.toStdString().c_str());
 }
 
 void QLogger::printInfo( const QString& msg, const char* file /*= NULL*/, const char* function /*= NULL*/, int line /*= -1 */ )
 {
-    // print("Info", msg, file, function, line);
+    print("Info", msg, file, function, line);
 
-    QString str = print2(msg, file, function, line);
+    //QString str = print2(msg, file, function, line);
 
     //log4cpp::Category& sub1 =
-    //    log4cpp::Category::getInstance(std::string("sub1"));
+    //   log4cpp::Category::getInstance(std::string("sub1"));
     //sub1.info(str.toStdString());
-    LOG4CPLUS_INFO(Logger::getRoot(), str.toStdString().c_str());
+    //LOG4CPLUS_INFO(Logger::getRoot(), str.toStdString().c_str());
 }
 
 void QLogger::printError( const QString& msg, const char* file /*= NULL*/, const char* function /*= NULL*/, int line /*= -1 */ )
 {
-    //print("Error", msg, file, function, line);
-    QString str = print2(msg, file, function, line);
+    print("Error", msg, file, function, line);
+    //QString str = print2(msg, file, function, line);
 
     //log4cpp::Category& sub1 =
-    //    log4cpp::Category::getInstance(std::string("sub1"));
+    //   log4cpp::Category::getInstance(std::string("sub1"));
     //sub1.error(str.toStdString());
-    LOG4CPLUS_ERROR(Logger::getRoot(), str.toStdString().c_str());
+    //LOG4CPLUS_ERROR(Logger::getRoot(), str.toStdString().c_str());
 }
 
-//void QLogger::print(const QString &level, const QString& msg, const char* file /*= NULL*/, const char* function /*= NULL*/, int line /*= -1 */ )
-//{
-//    //QMutexLocker lockGuard(&m_oLocker)
-//    QMutexLocker locker(&m_oLocker);
-//    QString lockFile = m_strLogPath + ".lock";
-//    QLockFile fileLocker(lockFile);
-//    bool flag = fileLocker.lock();
-//    QString m;
-//
-//    if ( !file )
-//    {
-//        m =  QString("[%1] %2").arg(level).arg(msg);
-//    }
-//    else if ( !function )
-//    {
-//        m = QString( "%1: [%2] %3" ).arg( file ).arg(level).arg( msg );
-//    }
-//    else if ( line == -1 )
-//    {
-//        m = QString( "%1: (%2) [%3] %4" ).arg( file ).arg( function ).arg(level).arg( msg );
-//    }
-//    else
-//    {
-//#ifndef _MSC_VER
-//        m = QString( "%1: %2: (%3) [%4] %5" ).arg( file ).arg( line ).arg( function ).arg(level).arg( msg );
-//#else
-//        m = QString( "%1(%2) : (%3) [%4][%5] %6" ).arg( file ).arg( line ).arg( function ).arg(level).arg((int)QThread::currentThreadId()).arg( msg );
-//#endif
-//    }
-//    qDebug( "%s", m.toUtf8().constData() );
-//
-//    if (getLogFileSize(m_strLogPath) > (m_iLogSize))
-//    {
-//        backOldLogFile(m_strLogPath);
-//    }
-//
-//
-//
-//    FILE *fp = fopen(m_strLogPath.toLocal8Bit().toStdString().c_str(), "a+");
-//
-//    if (NULL == fp)
-//    {
-//        fileLocker.unlock();
-//        return;
-//    }
-//    m.prepend(QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss") + " " );
-//    std::string tmp_strFormat(m.toLocal8Bit().toStdString());
-//    std::stringstream stream;
-//    stream << tmp_strFormat << "\n";
-//    fprintf(fp, stream.str().c_str());
-//    fclose(fp);
-//
-//    fileLocker.unlock();
-//}
+void QLogger::print(const QString &level, const QString& msg, const char* file /*= NULL*/, const char* function /*= NULL*/, int line /*= -1 */ )
+{
+    //QMutexLocker lockGuard(&m_oLocker)
+    QMutexLocker locker(&m_oLocker);
+    QString lockFile = m_strLogPath + ".lock";
+    QLockFile fileLocker(lockFile);
+    bool flag = fileLocker.lock();
+    QString m;
+
+    if ( !file )
+    {
+        m =  QString("[%1] %2").arg(level).arg(msg);
+    }
+    else if ( !function )
+    {
+        m = QString( "%1: [%2] %3" ).arg( file ).arg(level).arg( msg );
+    }
+    else if ( line == -1 )
+    {
+        m = QString( "%1: (%2) [%3] %4" ).arg( file ).arg( function ).arg(level).arg( msg );
+    }
+    else
+    {
+#ifndef _MSC_VER
+        m = QString( "%1: %2: (%3) [%4] %5" ).arg( file ).arg( line ).arg( function ).arg(level).arg( msg );
+#else
+        m = QString( "%1(%2) : (%3) [%4][%5] %6" ).arg( file ).arg( line ).arg( function ).arg(level).arg((int)QThread::currentThreadId()).arg( msg );
+#endif
+    }
+    qDebug( "%s", m.toUtf8().constData() );
+
+    if (getLogFileSize(m_strLogPath) > (m_iLogSize))
+    {
+        backOldLogFile(m_strLogPath);
+    }
+
+
+
+    FILE *fp = fopen(m_strLogPath.toLocal8Bit().toStdString().c_str(), "a+");
+
+    if (NULL == fp)
+    {
+        fileLocker.unlock();
+        return;
+    }
+    m.prepend(QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss") + " " );
+    std::string tmp_strFormat(m.toLocal8Bit().toStdString());
+    std::stringstream stream;
+    stream << tmp_strFormat << "\n";
+    fprintf(fp, stream.str().c_str());
+    fclose(fp);
+
+    fileLocker.unlock();
+}
 
 QString QLogger::print2(const QString& msg, const char* file /*= NULL*/, const char* function /*= NULL*/, int line /*= -1 */)
 {

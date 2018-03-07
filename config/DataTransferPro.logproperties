@@ -1,18 +1,16 @@
-# log4cplus.properties
+# log4cpp.properties
 
-log4cplus.rootLogger=DEBUG, A3
-#log4cplus.category.sub1=DEBUG, A3
-#log4cplus.category.sub1.sub2=DEBUG, A3
+log4cpp.rootCategory=DEBUG, rootAppender
+log4cpp.category.sub1=DEBUG, A3
+log4cpp.category.sub1.sub2=DEBUG, A3
 
-#log4cplus.appender.rootAppender=ConsoleAppender
-#log4cplus.appender.rootAppender.layout=PatternLayout
-#log4cplus.appender.rootAppender.layout.ConversionPattern=%d [%p] %m%n 
+log4cpp.appender.rootAppender=ConsoleAppender
+log4cpp.appender.rootAppender.layout=PatternLayout
+log4cpp.appender.rootAppender.layout.ConversionPattern=%d [%p] %m%n 
 
-
-log4cplus.appender.A3=log4cplus::RollingFileAppender
-log4cplus.appender.A3.File=log/DataTransferPro.log
-log4cplus.appender.A3.MaxFileSize=10MB
-log4cplus.appender.A3.MaxBackupIndex=10
-log4cplus.appender.A3.UseLockFile=true
-log4cplus.appender.A3.layout=log4cplus::PatternLayout
-log4cplus.appender.A3.layout.ConversionPattern=%D{%y-%m-%d %H:%M:%S,%q} : %t [%p]  %m%n 
+log4cpp.appender.A3=RollingFileAppender
+log4cpp.appender.A3.fileName=log/DataTransferPro.log
+log4cpp.appender.A3.maxFileSize=2000000
+log4cpp.appender.A3.maxBackupIndex=10
+log4cpp.appender.A3.layout=PatternLayout
+log4cpp.appender.A3.layout.ConversionPattern=%d : %t [%p]  %m%n 
