@@ -7,7 +7,8 @@
 LogPrintImpl::LogPrintImpl(MainWindow *in_pWnd) : m_pWnd(in_pWnd)//, server(RCF::TcpEndpoint(50001))
 {
     int threadnum, logport;
-    DataBase::getInstance()->queryBaseInfo(threadnum, logport);
+    bool enableLog;
+    DataBase::getInstance()->queryBaseInfo(threadnum, logport, enableLog);
     server = new RCF::RcfServer(RCF::TcpEndpoint(logport));
     connect(this, SIGNAL(showLog(const string &, const string &, const string &, int)), m_pWnd,
             SLOT(print(const string &, const string &, const string &, int)));

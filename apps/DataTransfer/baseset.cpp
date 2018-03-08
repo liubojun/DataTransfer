@@ -18,8 +18,9 @@ void CBaseSetDlg::onApply()
 {
     int iThreadCount = ui.spinBox_threadnum->text().toInt();
     int iLogPort = ui.spinBox_logport->text().toInt();
+    bool enableLog = ui.checkBox_writeLog->isChecked();
 
-    DataBase::getInstance()->updateBaseInfo(iThreadCount, iLogPort);
+    DataBase::getInstance()->updateBaseInfo(iThreadCount, iLogPort, enableLog);
     QThreadPool::globalInstance()->setMaxThreadCount(iThreadCount);
 }
 
@@ -39,9 +40,10 @@ void CBaseSetDlg::init()
     // ²éÑ¯Êý¾Ý¿â
     int threadnum = 0;
     int portNum = 0;
-    DataBase::getInstance()->queryBaseInfo(threadnum, portNum);
+    bool enableLog = false;
+    DataBase::getInstance()->queryBaseInfo(threadnum, portNum, enableLog);
     ui.spinBox_threadnum->setValue(threadnum);
     ui.spinBox_logport->setValue(portNum);
-
+    ui.checkBox_writeLog->setChecked(enableLog);
 }
 

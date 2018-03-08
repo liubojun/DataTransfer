@@ -24,6 +24,14 @@ int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
 
+    // 查询基本信息
+    int threadNum, port;
+    bool enableLog;
+    DataBase::getInstance()->queryBaseInfo(threadNum, port, enableLog);
+
+    // 设置是否启用日志文件输出
+    QLogger::getInstance()->enableLog(enableLog);
+
     if (argc != 2)
     {
         QSLOG_ERROR("param num incorrect!");

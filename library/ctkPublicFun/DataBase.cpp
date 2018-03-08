@@ -122,6 +122,7 @@ DataBase::DataBase()
                "[PROGRAMID] INT,"
                "[THREADNUM] INT,"
                "[LOGPORT] INT,"
+               "[ENABLELOG] BOOL,"
                "CONSTRAINT [] PRIMARY KEY ([PROGRAMID]) ON CONFLICT FAIL)");
 
 }
@@ -1018,7 +1019,7 @@ bool DataBase::deleteClearTask(const QString &name)
     return false;
 }
 
-bool DataBase::queryBaseInfo(int &threadNum, int &logPort)
+bool DataBase::queryBaseInfo(int &threadNum, int &logPort, bool &writeLog)
 {
     QSqlDatabase t_oDb;
     try
@@ -1034,7 +1035,7 @@ bool DataBase::queryBaseInfo(int &threadNum, int &logPort)
         bool res;
         // 先删除收集任务表
         // sql = QString("SELECT THREADNUM, LOGPORT FROM T_GLOBALINFO WHERE PROGRAMID = %1").arg(MAGIC_NUM);
-        sql = QString("SELECT THREADNUM, LOGPORT FROM T_GLOBALINFO WHERE PROGRAMID = :PROGRAMID");
+        sql = QString("SELECT THREADNUM, LOGPORT, ENABLELOG FROM T_GLOBALINFO WHERE PROGRAMID = :PROGRAMID");
         query.prepare(sql);
         query.bindValue(":PROGRAMID", MAGIC_NUM);
         res = query.exec();
@@ -1044,7 +1045,7 @@ bool DataBase::queryBaseInfo(int &threadNum, int &logPort)
             {
                 threadNum = query.value(0).toInt();
                 logPort = query.value(1).toInt();
-
+                writeLog = query.value(2).toBool();
                 return true;
             }
             else
@@ -1067,7 +1068,7 @@ bool DataBase::queryBaseInfo(int &threadNum, int &logPort)
 }
 
 
-bool DataBase::updateBaseInfo(int threadNum, int logPort)
+bool DataBase::updateBaseInfo(int threadNum, int logPort, bool enableLog)
 {
     QSqlDatabase t_oDb;
     try
@@ -1084,7 +1085,7 @@ bool DataBase::updateBaseInfo(int threadNum, int logPort)
 
         // 先删除收集任务表
         // sql = QString("REPLACE INTO T_GLOBALINFO(PROGRAMID,THREADNUM, LOGPORT) VALUES(%1, %2)").arg(MAGIC_NUM).arg(threadNum);
-        sql = QString("REPLACE INTO T_GLOBALINFO(PROGRAMID,THREADNUM, LOGPORT) VALUES(:PROGRAMID,:THREADNUM, :LOGPORT)");
+        sql = QString("REPLACE INTO T_GLOBALINFO(PROGRAMID,THREADNUM, LOGPORT, ENABLELOG) VALUES(:PROGRAMID,:THREADNUM, :LOGPORT, :ENABLELOG)");
         if (!query.prepare(sql))
         {
             QSLOG_ERROR(QString("Error: %1").arg(query.lastError().text()));
@@ -1094,6 +1095,7 @@ bool DataBase::updateBaseInfo(int threadNum, int logPort)
         query.bindValue(":PROGRAMID", MAGIC_NUM);
         query.bindValue(":THREADNUM", threadNum);
         query.bindValue(":LOGPORT", logPort);
+        query.bindValue(":ENABLELOG", enableLog);
         res = query.exec();
         if (res)
         {

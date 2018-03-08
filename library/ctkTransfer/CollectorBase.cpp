@@ -44,7 +44,8 @@ CollectorBase::CollectorBase(QWaitCondition &in_oCond, QMutex &in_oLocker, int &
 
     m_oId = QUuid::createUuid();
     int threadnum, logport;
-    DataBase::getInstance()->queryBaseInfo(threadnum, logport);
+    bool enableLog;
+    DataBase::getInstance()->queryBaseInfo(threadnum, logport, enableLog);
     m_oRcfClient = new RcfClient<I_LogPrint>(RCF::TcpEndpoint(logport));
 }
 

@@ -31,6 +31,13 @@ public:
 
     static void addOutFunPtr(OutPutFunPtr ptr);
 
+    /**
+     * @brief:是否启用日志输出
+     * @param: bool in_bEnableLog 启用标识
+     * @return:void 描述返回值
+     */
+    static void enableLog(bool in_bEnableLog);
+
     ~QLogger();
 
     //************************************
@@ -114,6 +121,9 @@ private:
 
     int m_iLogNum;
 
+    // 是否启用日志输出
+    bool m_bEnableLog;
+
     static QLogger *s_instance;
     static QList<OutPutFunPtr> m_printer;
 
@@ -122,9 +132,9 @@ private:
 // 设置函数输出指针
 #define QSLOG_SET_PRINTFUNCTION(Ptr)  QLogger::setOutFunPtr(ptr)
 
-#define QSLOG_DEBUG(str) //QLogger::getInstance()->printDebug(QString(str), __FILE__, __FUNCTION__, __LINE__)
-#define QSLOG_INFO(str)  //QLogger::getInstance()->printInfo(QString(str), __FILE__, __FUNCTION__, __LINE__)
-#define QSLOG_ERROR(str) //QLogger::getInstance()->printError(QString(str), __FILE__, __FUNCTION__, __LINE__)
+#define QSLOG_DEBUG(str) QLogger::getInstance()->printDebug(QString(str), __FILE__, __FUNCTION__, __LINE__)
+#define QSLOG_INFO(str)  QLogger::getInstance()->printInfo(QString(str), __FILE__, __FUNCTION__, __LINE__)
+#define QSLOG_ERROR(str) QLogger::getInstance()->printError(QString(str), __FILE__, __FUNCTION__, __LINE__)
 
 #define QSLOG_RELEASE \
 	if (NULL != QLogger::getInstance()) \

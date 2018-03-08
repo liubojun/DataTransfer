@@ -47,6 +47,7 @@ QLogger::QLogger( qint64 size /* = 10M */, qint64 num /* = 10 */ )
 {
     m_iLogNum = num;
     m_iLogSize = size;
+    m_bEnableLog = false;	// 默认不启用日志输出
 
     // 将FilePath中的前缀与后缀截断掉，得到appName
 
@@ -102,6 +103,10 @@ QLogger::~QLogger()
 
 void QLogger::printDebug( const QString& msg, const char* file /*= NULL*/, const char* function /*= NULL*/, int line /*= -1 */ )
 {
+    if (!m_bEnableLog)
+    {
+        return;
+    }
     print("Debug", msg, file, function, line);
 
     //QString str = print2(msg, file, function, line);
@@ -114,6 +119,10 @@ void QLogger::printDebug( const QString& msg, const char* file /*= NULL*/, const
 
 void QLogger::printInfo( const QString& msg, const char* file /*= NULL*/, const char* function /*= NULL*/, int line /*= -1 */ )
 {
+    if (!m_bEnableLog)
+    {
+        return;
+    }
     print("Info", msg, file, function, line);
 
     //QString str = print2(msg, file, function, line);
@@ -126,6 +135,10 @@ void QLogger::printInfo( const QString& msg, const char* file /*= NULL*/, const 
 
 void QLogger::printError( const QString& msg, const char* file /*= NULL*/, const char* function /*= NULL*/, int line /*= -1 */ )
 {
+    if (!m_bEnableLog)
+    {
+        return;
+    }
     print("Error", msg, file, function, line);
     //QString str = print2(msg, file, function, line);
 
@@ -338,6 +351,11 @@ void QLogger::backOldLogFile(const QString &in_strFilePath)
     //{
     //	file.rename(fileInfo.absolutePath() + "/" +  m_strAppName +  + ".log." + QString::number(MaxNum + 1));
     //}
+}
+
+void QLogger::enableLog(bool in_bEnableLog)
+{
+    QLogger::getInstance()->m_bEnableLog = in_bEnableLog;
 }
 
 

@@ -78,17 +78,19 @@ public:
      * @brief:查询当前可用线程数以及日志监听端口
      * @param: int & threadNum 可用线程数
      * @param: int &logPort 日志监听端口
+     * @param: bool &writeLog 是否记录日志
      * @return:bool 查询成功，返回true，失败返回false
      */
-    bool queryBaseInfo(int &threadNum, int &logPort);
+    bool queryBaseInfo(int &threadNum, int &logPort, bool &writeLog);
 
     /**
      * @brief:更新基本信息
      * @param: int threadNum 线程数目
      * @param: int logPort 日志端口
+     * @param: bool enableLog 是否启用日志文件记录
      * @return:bool 更新成功，返回true，失败返回false
      */
-    bool updateBaseInfo(int threadNum, int logPort);
+    bool updateBaseInfo(int threadNum, int logPort, bool enableLog);
 
     /**
      * @brief:查询日志监听端口号

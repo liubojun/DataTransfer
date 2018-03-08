@@ -249,16 +249,22 @@ int main(int argc, char **argv)
 
 
     QApplication app(argc, argv);
+
+    // 查询基本信息
+    int threadnum = 0;
+    int logPort = 0;
+    bool enableLog = false;
+    DataBase::getInstance()->queryBaseInfo(threadnum, logPort, enableLog);
+
+    // 设置是否启用日志文件输出
+    QLogger::getInstance()->enableLog(enableLog);
+
     CChangeName::init_rename_rules((app.applicationDirPath() + "/config/rename.rule").toStdString().c_str());
     // CChangeName::change_name("H08_B03_R030_20171112_1700.AWX", "KuiHua");
 
     CPathBuilder::setChildProcessEnv();
 
     // 设置工作的线程池
-    // 查询数据库
-    int threadnum = 0;
-    int logPort = 0;
-    DataBase::getInstance()->queryBaseInfo(threadnum, logPort);
     QThreadPool::globalInstance()->setMaxThreadCount(threadnum);
 
     QSLOG_INFO(QString("START DATA TRANSFER PROGRAM, max thread count %1").arg(QThreadPool::globalInstance()->maxThreadCount()));
