@@ -17,10 +17,10 @@ signals:
 public slots:
     void openDirOpen();
 
-    // Õë¶ÔĞÂ½¨É¾³ıÈÎÎñÊ±µÄÈ·ÈÏ
+    // é’ˆå¯¹æ–°å»ºåˆ é™¤ä»»åŠ¡æ—¶çš„ç¡®è®¤
     void onApply();
 
-    // Õë¶ÔÊôĞÔÊ±µÄÈ·ÈÏ
+    // é’ˆå¯¹å±æ€§æ—¶çš„ç¡®è®¤
     void onApply2();
 
     void onItemChanged(const QString &item);
@@ -31,10 +31,10 @@ public slots:
 
     void onDelete();
 protected:
-    // ĞÂÔöµ¯³ö
+    // æ–°å¢å¼¹å‡º
     void InitUI();
 
-    // ÊôĞÔµ¯³ö
+    // å±æ€§å¼¹å‡º
     void InitUI(const QString &taskName);
 
     int computeSeconds();

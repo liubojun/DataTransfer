@@ -70,11 +70,11 @@ void DataClearDlg::openDirOpen()
     QString strDir;
     if (!ui.lineEdit_dir->text().isEmpty())
     {
-        strDir = QFileDialog::getExistingDirectory(this, QString::fromLocal8Bit("ÉèÖÃÇå³ıÄ¿Â¼"), ui.lineEdit_dir->text());
+        strDir = QFileDialog::getExistingDirectory(this, QString::fromLocal8Bit("è®¾ç½®æ¸…é™¤ç›®å½•"), ui.lineEdit_dir->text());
     }
     else
     {
-        strDir = QFileDialog::getExistingDirectory(this, QString::fromLocal8Bit("ÉèÖÃÇå³ıÄ¿Â¼"));
+        strDir = QFileDialog::getExistingDirectory(this, QString::fromLocal8Bit("è®¾ç½®æ¸…é™¤ç›®å½•"));
 
     }
 
@@ -86,16 +86,16 @@ void DataClearDlg::openDirOpen()
 
 void DataClearDlg::onApply()
 {
-    // ¼ì²éÊÇ·ñËùÓĞÄÚÈİ¶¼Ìî³äÍê±Ï
+    // æ£€æŸ¥æ˜¯å¦æ‰€æœ‰å†…å®¹éƒ½å¡«å……å®Œæ¯•
     if (ui.lineEdit_dir->text().isEmpty() || ui.lineEdit_file->text().isEmpty() || ui.lineEdit_name->text().isEmpty() || ui.lineEdit_rule->text().isEmpty())
     {
-        QMessageBox::warning(this, QString::fromLocal8Bit("²ÎÊı¼ì²é"), QString::fromLocal8Bit("²ÎÊıÎ´ÕıÈ·ÅäÖÃ"));
+        QMessageBox::warning(this, QString::fromLocal8Bit("å‚æ•°æ£€æŸ¥"), QString::fromLocal8Bit("å‚æ•°æœªæ­£ç¡®é…ç½®"));
         return;
     }
 
-    // ²é±í£¬ÅĞ¶Ï±íÖĞÊÇ·ñ´æÔÚÏàÍ¬µÄÃû³Æ»òÕßÄ¿Â¼
+    // æŸ¥è¡¨ï¼Œåˆ¤æ–­è¡¨ä¸­æ˜¯å¦å­˜åœ¨ç›¸åŒçš„åç§°æˆ–è€…ç›®å½•
 
-    // ¸ù¾İname²é±í£¬²¢½«±íÖĞµÄĞÅÏ¢·µ»Øµ½½çÃæÉÏ
+    // æ ¹æ®nameæŸ¥è¡¨ï¼Œå¹¶å°†è¡¨ä¸­çš„ä¿¡æ¯è¿”å›åˆ°ç•Œé¢ä¸Š
     QList<ClearTask> tasks;
     if (!DataBase::getInstance()->queryClearTask(tasks))
     {
@@ -105,7 +105,7 @@ void DataClearDlg::onApply()
     {
         if (task.taskName == ui.lineEdit_name->text() || QFileInfo(task.taskDir).absoluteFilePath() == QFileInfo(ui.lineEdit_dir->text()).absoluteFilePath())
         {
-            QMessageBox::warning(this, QString::fromLocal8Bit("²ÎÊı¼ì²é"), QString::fromLocal8Bit("´æÔÚÏàÍ¬µÄÈÎÎñ"));
+            QMessageBox::warning(this, QString::fromLocal8Bit("å‚æ•°æ£€æŸ¥"), QString::fromLocal8Bit("å­˜åœ¨ç›¸åŒçš„ä»»åŠ¡"));
             return;
         }
     }
@@ -162,7 +162,7 @@ void DataClearDlg::onItemChanged(const QString &item)
 
 void DataClearDlg::onComBoxIndexChanged(int index)
 {
-    // 0:·ÖÖÓ£¬ 1:Ğ¡Ê±, 2£ºÌì 3: ÔÂ
+    // 0:åˆ†é’Ÿï¼Œ 1:å°æ—¶, 2ï¼šå¤© 3: æœˆ
     int step = 1;
     QStringList values;
 
@@ -237,7 +237,7 @@ void DataClearDlg::onAdded()
     ui.lineEdit_file->setDisabled(false);
     ui.comboBox_unit->setDisabled(false);
     ui.comboBox_value->setDisabled(false);
-    ui.lineEdit_name->setText(QString::fromLocal8Bit("Ä¿Â¼ÇåÀí-") + QDateTime::currentDateTime().toString("yyyyMMddhhmmss"));
+    ui.lineEdit_name->setText(QString::fromLocal8Bit("ç›®å½•æ¸…ç†-") + QDateTime::currentDateTime().toString("yyyyMMddhhmmss"));
     ui.lineEdit_rule->setText("0 0 * * * *");
     ui.lineEdit_file->setText(".*");
     ui.lineEdit_dir->setText("");
@@ -250,7 +250,7 @@ int DataClearDlg::computeSeconds()
     int index = ui.comboBox_unit->currentIndex();
     QString vaule = ui.comboBox_value->currentText();
 
-    // 0:·ÖÖÓ£¬ 1:Ğ¡Ê±, 2£ºÌì 3: ÔÂ
+    // 0:åˆ†é’Ÿï¼Œ 1:å°æ—¶, 2ï¼šå¤© 3: æœˆ
     int step = 1;
 
     switch (index)
@@ -277,23 +277,23 @@ int DataClearDlg::computeSeconds()
 
 void DataClearDlg::onDelete()
 {
-    // Êı¾İ¿âÉ¾³ı
+    // æ•°æ®åº“åˆ é™¤
     //DataBase::getInstance()->deleteClearTask(ui.listWidget->currentItem()->text());
 
 }
 
 void DataClearDlg::onApply2()
 {
-    // ¼ì²éÊÇ·ñËùÓĞÄÚÈİ¶¼Ìî³äÍê±Ï
+    // æ£€æŸ¥æ˜¯å¦æ‰€æœ‰å†…å®¹éƒ½å¡«å……å®Œæ¯•
     if (ui.lineEdit_dir->text().isEmpty() || ui.lineEdit_file->text().isEmpty() || ui.lineEdit_name->text().isEmpty() || ui.lineEdit_rule->text().isEmpty())
     {
-        QMessageBox::warning(this, QString::fromLocal8Bit("²ÎÊı¼ì²é"), QString::fromLocal8Bit("²ÎÊıÎ´ÕıÈ·ÅäÖÃ"));
+        QMessageBox::warning(this, QString::fromLocal8Bit("å‚æ•°æ£€æŸ¥"), QString::fromLocal8Bit("å‚æ•°æœªæ­£ç¡®é…ç½®"));
         return;
     }
 
-    //// ²é±í£¬ÅĞ¶Ï±íÖĞÊÇ·ñ´æÔÚÏàÍ¬µÄÃû³Æ»òÕßÄ¿Â¼
+    //// æŸ¥è¡¨ï¼Œåˆ¤æ–­è¡¨ä¸­æ˜¯å¦å­˜åœ¨ç›¸åŒçš„åç§°æˆ–è€…ç›®å½•
 
-    //// ¸ù¾İname²é±í£¬²¢½«±íÖĞµÄĞÅÏ¢·µ»Øµ½½çÃæÉÏ
+    //// æ ¹æ®nameæŸ¥è¡¨ï¼Œå¹¶å°†è¡¨ä¸­çš„ä¿¡æ¯è¿”å›åˆ°ç•Œé¢ä¸Š
     //QList<ClearTask> tasks;
     //if (!DataBase::getInstance()->queryClearTask(tasks))
     //{
