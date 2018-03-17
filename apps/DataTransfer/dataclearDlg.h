@@ -20,7 +20,7 @@ public slots:
     // 针对新建删除任务时的确认
     void onApply();
 
-    // 针对属性时的确认
+    // 针对属性时的确�?
     void onApply2();
 
     void onItemChanged(const QString &item);
@@ -34,7 +34,7 @@ protected:
     // 新增弹出
     void InitUI();
 
-    // 属性弹出
+    // 属性弹�?
     void InitUI(const QString &taskName);
 
     int computeSeconds();

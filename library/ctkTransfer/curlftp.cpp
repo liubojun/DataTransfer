@@ -654,6 +654,11 @@ QString CurlFtp::parseMlsdInfo(const QString &rootPath, const QString &info, Fil
         }
         else if (oneInfo.nType == 2 && m_subDirFlag)
         {
+            //
+            if (oneInfo.strFileName == "." || oneInfo.strFileName == "..")
+            {
+                continue;
+            }
             // 如果需要遍历子目录
             QString strPath = m_strCurDir.dir + oneInfo.strFileName + "/";
             DIRLEVEL oDirLevel;

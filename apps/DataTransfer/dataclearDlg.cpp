@@ -89,11 +89,11 @@ void DataClearDlg::onApply()
     // 检查是否所有内容都填充完毕
     if (ui.lineEdit_dir->text().isEmpty() || ui.lineEdit_file->text().isEmpty() || ui.lineEdit_name->text().isEmpty() || ui.lineEdit_rule->text().isEmpty())
     {
-        QMessageBox::warning(this, QString::fromLocal8Bit("参数检查"), QString::fromLocal8Bit("参数未正确配置"));
+        QMessageBox::warning(this, QString::fromLocal8Bit("参数检�?), QString::fromLocal8Bit("参数未正确配�?));
         return;
     }
 
-    // 查表，判断表中是否存在相同的名称或者目录
+    // 查表，判断表中是否存在相同的名称或者目�?
 
     // 根据name查表，并将表中的信息返回到界面上
     QList<ClearTask> tasks;
@@ -105,7 +105,7 @@ void DataClearDlg::onApply()
     {
         if (task.taskName == ui.lineEdit_name->text() || QFileInfo(task.taskDir).absoluteFilePath() == QFileInfo(ui.lineEdit_dir->text()).absoluteFilePath())
         {
-            QMessageBox::warning(this, QString::fromLocal8Bit("参数检查"), QString::fromLocal8Bit("存在相同的任务"));
+            QMessageBox::warning(this, QString::fromLocal8Bit("参数检�?), QString::fromLocal8Bit("存在相同的任�?));
             return;
         }
     }
@@ -162,7 +162,7 @@ void DataClearDlg::onItemChanged(const QString &item)
 
 void DataClearDlg::onComBoxIndexChanged(int index)
 {
-    // 0:分钟， 1:小时, 2：天 3: 月
+    // 0:分钟�?1:小时, 2：天 3: �?
     int step = 1;
     QStringList values;
 
@@ -250,7 +250,7 @@ int DataClearDlg::computeSeconds()
     int index = ui.comboBox_unit->currentIndex();
     QString vaule = ui.comboBox_value->currentText();
 
-    // 0:分钟， 1:小时, 2：天 3: 月
+    // 0:分钟�?1:小时, 2：天 3: �?
     int step = 1;
 
     switch (index)
@@ -277,7 +277,7 @@ int DataClearDlg::computeSeconds()
 
 void DataClearDlg::onDelete()
 {
-    // 数据库删除
+    // 数据库删�?
     //DataBase::getInstance()->deleteClearTask(ui.listWidget->currentItem()->text());
 
 }
@@ -287,11 +287,11 @@ void DataClearDlg::onApply2()
     // 检查是否所有内容都填充完毕
     if (ui.lineEdit_dir->text().isEmpty() || ui.lineEdit_file->text().isEmpty() || ui.lineEdit_name->text().isEmpty() || ui.lineEdit_rule->text().isEmpty())
     {
-        QMessageBox::warning(this, QString::fromLocal8Bit("参数检查"), QString::fromLocal8Bit("参数未正确配置"));
+        QMessageBox::warning(this, QString::fromLocal8Bit("参数检�?), QString::fromLocal8Bit("参数未正确配�?));
         return;
     }
 
-    //// 查表，判断表中是否存在相同的名称或者目录
+    //// 查表，判断表中是否存在相同的名称或者目�?
 
     //// 根据name查表，并将表中的信息返回到界面上
     //QList<ClearTask> tasks;
