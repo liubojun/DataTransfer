@@ -221,11 +221,12 @@ QString QLogger::print2(const QString& msg, const char* file /*= NULL*/, const c
     }
     else
     {
-#ifndef _MSC_VER
-        m = QString("%1: %2: (%3) [%4] %5").arg(file).arg(line).arg(function).arg(level).arg(msg);
-#else
+        //#ifndef _MSC_VER
+        //m = QString("%1: %2: (%3) [%4] %5").arg(file).arg(line).arg(function).arg(level).arg(msg);
         m = QString("%1(%2) : (%3) %4").arg(file).arg(line).arg(function).arg(msg);
-#endif
+        //#else
+        //        m = QString("%1(%2) : (%3) %4").arg(file).arg(line).arg(function).arg(msg);
+        //#endif
     }
     qDebug("%s", m.toUtf8().constData());
     return m;
