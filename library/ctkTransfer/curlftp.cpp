@@ -761,7 +761,7 @@ int CurlFtp::downloadFile(const char *url, const char *user_pwd, FileData *fileD
     }
     if (1 == ftp_transfermode)
     {
-        if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_TRANSFERTEXT, 1L))
+        if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_TRANSFERTEXT, 1L))
         {
             QSLOG_ERROR("curl_easy_setopt error");
             return -1;
@@ -771,7 +771,7 @@ int CurlFtp::downloadFile(const char *url, const char *user_pwd, FileData *fileD
     }
     else
     {
-        if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_TRANSFERTEXT, 0))
+        if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_TRANSFERTEXT, 0))
         {
             QSLOG_ERROR("curl_easy_setopt error");
             return -1;
@@ -785,7 +785,7 @@ int CurlFtp::downloadFile(const char *url, const char *user_pwd, FileData *fileD
     //curl_easy_setopt(m_pCurl, CURLOPT_POSTQUOTE, headerlist);
     if (1 == ftp_connectmode)
     {
-        if (CURLE_OK != curl_easy_setopt(m_pCurl, CURLOPT_FTPPORT, "-"))
+        if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_FTPPORT, "-"))
         {
             QSLOG_ERROR("curl_easy_setopt error");
             return -1;
@@ -803,6 +803,13 @@ int CurlFtp::downloadFile(const char *url, const char *user_pwd, FileData *fileD
         QSLOG_ERROR("curl_easy_setopt error");
         return -1;
     }
+
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L))
+    {
+        QSLOG_ERROR("curl_easy_setopt error.");
+        return false;
+    }
+
     if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L))
     {
         QSLOG_ERROR("curl_easy_setopt error");

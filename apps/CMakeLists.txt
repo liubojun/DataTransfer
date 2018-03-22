@@ -5,7 +5,7 @@ set (APPS
 
 IF (BUILD_APP_DataTransfer)
 	set (APPS
-		${APPS} DataTransfer DataTransferPro 
+		${APPS} DataTransfer DataTransferPro DataTransferConsole
 	)
 ENDIF ()
 

@@ -1,4 +1,4 @@
-#include "dataclearDlg.h"
+﻿#include "dataclearDlg.h"
 #include "DataBase.h"
 #include <QDateTime>
 #include <QFileDialog>
@@ -89,11 +89,11 @@ void DataClearDlg::onApply()
     // 检查是否所有内容都填充完毕
     if (ui.lineEdit_dir->text().isEmpty() || ui.lineEdit_file->text().isEmpty() || ui.lineEdit_name->text().isEmpty() || ui.lineEdit_rule->text().isEmpty())
     {
-        QMessageBox::warning(this, QString::fromLocal8Bit("参数检�?), QString::fromLocal8Bit("参数未正确配�?));
+        QMessageBox::warning(this, QString::fromLocal8Bit("参数检查错误"), QString::fromLocal8Bit("参数未正确配置?"));
         return;
     }
 
-    // 查表，判断表中是否存在相同的名称或者目�?
+    // 查表，判断表中是否存在相同的名称或者目录?
 
     // 根据name查表，并将表中的信息返回到界面上
     QList<ClearTask> tasks;
@@ -105,7 +105,7 @@ void DataClearDlg::onApply()
     {
         if (task.taskName == ui.lineEdit_name->text() || QFileInfo(task.taskDir).absoluteFilePath() == QFileInfo(ui.lineEdit_dir->text()).absoluteFilePath())
         {
-            QMessageBox::warning(this, QString::fromLocal8Bit("参数检�?), QString::fromLocal8Bit("存在相同的任�?));
+            QMessageBox::warning(this, QString::fromLocal8Bit("参数检查错误"), QString::fromLocal8Bit("存在相同的任务?"));
             return;
         }
     }
@@ -287,7 +287,7 @@ void DataClearDlg::onApply2()
     // 检查是否所有内容都填充完毕
     if (ui.lineEdit_dir->text().isEmpty() || ui.lineEdit_file->text().isEmpty() || ui.lineEdit_name->text().isEmpty() || ui.lineEdit_rule->text().isEmpty())
     {
-        QMessageBox::warning(this, QString::fromLocal8Bit("参数检�?), QString::fromLocal8Bit("参数未正确配�?));
+        QMessageBox::warning(this, QString::fromLocal8Bit("参数检查错误"), QString::fromLocal8Bit("存在相同的任务?"));
         return;
     }
 
