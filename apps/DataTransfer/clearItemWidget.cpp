@@ -1,4 +1,4 @@
-#include "clearItemWidget.h"
+﻿#include "clearItemWidget.h"
 #include <QDateTime>
 
 ClearItemWidget::ClearItemWidget(const QString &name, QWidget *parent /*= NULL*/) : QWidget(parent)
