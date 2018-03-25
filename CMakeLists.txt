@@ -188,7 +188,7 @@ endmacro()
 #>
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps)		#应用
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/i18n) #国际化
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/i18n) #国际化
 
 
 #拷贝相应的配置文件

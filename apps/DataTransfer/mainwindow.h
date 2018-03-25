@@ -25,8 +25,8 @@
 class DataClearDlg;
 class QThread;
 // 左侧item的标识，用来区分清理与收集任务
-const QString CLEARITEM = "clear";
-const QString COLLECTITEM = "collect";
+const QString CLEARITEM = "  cl";
+const QString COLLECTITEM = "  cc";
 
 class MainWindow : public QMainWindow
 {
