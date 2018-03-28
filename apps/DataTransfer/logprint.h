@@ -2,17 +2,17 @@
 #define logprint_h__
 
 #include <string>
-#include <RCF/RCF.hpp>
+//#include <RCF/RCF.hpp>
 #include <QThread>
-
-#include "logprotocol.h"
+#include <QUdpSocket>
+//#include "logprotocol.h"
 
 using namespace std;
 
 
 class MainWindow;
 
-class LogPrintImpl : public QObject
+class LogPrintImpl : public QThread
 {
     Q_OBJECT
 public:
@@ -27,18 +27,24 @@ public:
 
     void stop();
 
-    void print(const string &dirName, const string &dirId, const string &info, int infoType);
+    // void print(const string &dirName, const string &dirId, const string &info, int infoType);
+    //void print(const QString &dirName, const QString &dirId, const QString &info, int infoType);
 
 public slots:
 
-    void start();
+    //void start();
+
+    void readPendingDatagrams();
 signals:
-    void showLog(const string &dirName, const string &dirId, const string &info, int infoType);
+    void showLog(const QString &dirName, const QString &dirId, const QString &info, int infoType);
 private:
     MainWindow *m_pWnd;
-    RCF::RcfInitDeinit rcfInit;
-    RCF::RcfServer *server;
-    QThread m_oThread;
+    //RCF::RcfInitDeinit rcfInit;
+    //RCF::RcfServer *server;
+    //QThread m_oThread;
+
+    QUdpSocket m_oUdpSocket;
+
 };
 
 #endif // logprint_h__

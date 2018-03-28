@@ -17,7 +17,7 @@
 #include "pathbuilder.h"
 #include "mainwindow.h"
 #include "change_name.h"
-#include "logprotocol.h"
+//#include "logprotocol.h"
 #include "logprint.h"
 
 #include <iostream>

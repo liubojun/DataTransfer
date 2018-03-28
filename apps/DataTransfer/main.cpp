@@ -17,7 +17,7 @@
 #include "pathbuilder.h"
 #include "mainwindow.h"
 #include "change_name.h"
-#include "logprotocol.h"
+//#include "logprotocol.h"
 #include "logprint.h"
 
 #include <iostream>
@@ -379,7 +379,7 @@ int main(int argc, char **argv)
 
     MainWindow *wnd = new MainWindow(plugin);
     LogPrintImpl oLogPrint(wnd);
-    oLogPrint.run();
+    //oLogPrint.run();
     QCoreApplication::processEvents();
 
     wnd->initialize();

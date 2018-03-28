@@ -27,13 +27,14 @@ using namespace std;
 #include <QProcess>
 #include <QWaitCondition>
 #include <QUuid>
+#include <QUdpSocket>
 #include "commontypedef.h"
 #include "ctkLog.h"
 #include "../ctkProtocol/fileMsg.h"
 #include "lateFileTime.h"
 #include "transferSet.h"
 #include "lastCollectTime.h"
-#include "logprotocol.h"
+//#include "logprotocol.h"
 #include "macro.h"
 
 class IRadarBaseDataParse;
@@ -412,8 +413,13 @@ protected:
     QMutex &m_oLocker;
     int &m_iLogsize;
 
-    RCF::RcfInitDeinit m_oRcfInit;
-    RcfClient<I_LogPrint> *m_oRcfClient;
+    //RCF::RcfInitDeinit m_oRcfInit;
+    //RcfClient<I_LogPrint> *m_oRcfClient;
+
+    // 日志端口
+    int m_iUdpLogPort;
+
+    QUdpSocket m_oLogSocket;
 
     // 当前收集器的唯一标识
     QUuid m_oId;

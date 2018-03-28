@@ -75,7 +75,7 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
         ctkPublicFun
 		ctkTransfer
         ${VLD_LIB}
-		RCF
+		#RCF
 		
         )
 

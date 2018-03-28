@@ -26,7 +26,7 @@ IF (WITH_QT5)
         #find_package(Qt5Quick REQUIRED)
         #find_package(Qt5QuickWidgets REQUIRED)
 	#find_package(Qt5OpenGl REQUIRED)
-        #find_package(Qt5Network)
+        find_package(Qt5Network)
         #find_package(Qt5Concurrent REQUIRED)
 	include(${CMAKE_MODULE_PATH}/ECMQt4To5Porting.cmake)
 	ADD_DEFINITIONS("-DWITH_QT5")
@@ -188,7 +188,7 @@ endmacro()
 #>
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/apps)		#应用
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/i18n) #国际化
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/i18n) #国际化
 
 
 #拷贝相应的配置文件

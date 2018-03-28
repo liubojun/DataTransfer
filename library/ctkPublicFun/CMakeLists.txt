@@ -26,7 +26,7 @@ SET(HDRS
 	${RadarProjectInclude}/ctkPublicFun/pupdata.h  
 	${RadarProjectInclude}/ctkPublicFun/DataBase.h
 	${RadarProjectInclude}/ctkPublicFun/change_name.h
-	${RadarProjectInclude}/ctkPublicFun/logprotocol.h
+	#${RadarProjectInclude}/ctkPublicFun/logprotocol.h
 	${RadarProjectInclude}/ctkPublicFun/subdirfilter.h
 )
 

@@ -103,7 +103,7 @@ ctkMacroBuildPlugin(
   TARGET_LIBRARIES ${PLUGIN_target_libraries} ${VLD_LIB}
   ctkLogger
   ctkPublicFun	
-  RCF
+  #RCF
   ${QT_QTCORE_LIBRARY}
   ${QT_QTGUI_LIBRARY}
   #Mpr.lib

@@ -130,6 +130,13 @@ int SharedDirCollector::reStart()
 
 void SharedDirCollector::getNewFiles()
 {
+    if (!m_oTaskLocker.tryLock())
+    {
+        return;
+    }
+
+    QSharedPointer<QMutex> autoUnlock(&m_oTaskLocker, &QMutex::unlock);
+
     if (!readSet())
     {
         return;

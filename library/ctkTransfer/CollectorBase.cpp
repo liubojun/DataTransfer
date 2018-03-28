@@ -13,6 +13,8 @@
 #include <algorithm>
 #include <QtConcurrent/QtConcurrent>
 #include <QSharedMemory>
+#include <QByteArray>
+#include <QDataStream>
 
 #ifdef WITH_MEM_CHECK
 #include "vld.h"
@@ -43,10 +45,10 @@ CollectorBase::CollectorBase(QWaitCondition &in_oCond, QMutex &in_oLocker, int &
     connect(this, SIGNAL(begin()), this, SLOT(onBegined()));
 
     m_oId = QUuid::createUuid();
-    int threadnum, logport;
+    int threadnum;
     bool enableLog;
-    DataBase::getInstance()->queryBaseInfo(threadnum, logport, enableLog);
-    m_oRcfClient = new RcfClient<I_LogPrint>(RCF::TcpEndpoint(logport));
+    DataBase::getInstance()->queryBaseInfo(threadnum, m_iUdpLogPort, enableLog);
+    //m_oRcfClient = new RcfClient<I_LogPrint>(RCF::TcpEndpoint(logport));
 }
 
 CollectorBase::~CollectorBase()
@@ -56,8 +58,8 @@ CollectorBase::~CollectorBase()
     //m_oThread.wait();
     //m_oThread.terminate();
     emit showIdentify(m_oId.toString());
-    delete m_oRcfClient;
-    m_oRcfClient = NULL;
+    //delete m_oRcfClient;
+    //m_oRcfClient = NULL;
 
 }
 
@@ -129,13 +131,19 @@ void CollectorBase::emitLog(const QString &info, int infoType)
     //m_iLogsize++;
     //emit showLog(m_collectSet, info, infoType);
 
-
+    QSLOG_DEBUG("LOG");
     try
     {
         //printf("111111111111111111\n");
-        m_oRcfClient->print(m_collectSet.dirName.toLocal8Bit().toStdString(),
-                            m_collectSet.dirID.toLocal8Bit().toStdString(),
-                            info.toLocal8Bit().toStdString(), infoType);
+        //m_oRcfClient->print(m_collectSet.dirName.toLocal8Bit().toStdString(),
+        //                    m_collectSet.dirID.toLocal8Bit().toStdString(),
+        //                    info.toLocal8Bit().toStdString(), infoType);
+        QByteArray datagram;
+        QDataStream stream(&datagram, QIODevice::WriteOnly);
+        stream << m_collectSet.dirName << m_collectSet.dirID << info << infoType;
+
+        qint64 iLen = m_oLogSocket.writeDatagram(datagram, QHostAddress::LocalHost, m_iUdpLogPort);
+
     }
     catch (std::exception &ex)
     {

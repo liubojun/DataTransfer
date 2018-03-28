@@ -10,6 +10,7 @@
 
 class DistributeFile : public QObject
 {
+    Q_OBJECT
 public:
     DistributeFile(CollectorBase *pBase, CurlFtp &oCurlFtp);
     virtual ~DistributeFile();
@@ -20,6 +21,8 @@ public:
     TransTask m_fileInfo;
 
     //SignalSender m_signalObj;
+signals:
+    void emitLog(const QString &info, int infoType);
 
 protected:
     /**
