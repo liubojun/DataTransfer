@@ -23,7 +23,60 @@
 class CollectorBase;
 class CDirRecord;
 //////////////////////////////////////////////////////////////////////////
+struct CListInfo
+{
+	QString	strFileName;
+	QString	strMdfyTime;
+	int		nType;			// 1-文件，2-目录
+	qint64	nFileSize;
 
+	CListInfo()
+	{
+		nType = 0;
+		nFileSize = 0;
+	}
+};
+
+// 存储文件
+struct FileData
+{
+	const char *filename;
+	FILE *stream;
+	//QSharedPointer<FILE> autoclose;
+	FileData()
+	{
+		filename = NULL;
+		stream = NULL;
+	}
+	~FileData()
+	{
+
+	}
+};
+
+/// 在内存中缓存文件内容（加密压缩需要）
+struct MemoryData
+{
+	char *memdata;		///< 起始地址
+	size_t size;		///< 有效大小
+	size_t capacity;	///< 申请的空间大小
+
+	MemoryData()
+	{
+		memdata = NULL;
+		size = 0;
+		capacity = 0;
+	}
+
+	~MemoryData()
+	{
+		if (NULL != memdata)
+		{
+			free(memdata);
+		}
+
+	}
+};
 // int get_file_size(FILE *file)
 // {
 //     int size = 0;
@@ -51,7 +104,92 @@ class CDirRecord;
 //     curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
 //     //	curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
 // }
+static size_t WriteInMemoryFun(void *contents, size_t size, size_t nmemb, void *userp)
+{
+	size_t realsize = size * nmemb;		//本次回调获取的数据
+	struct MemoryData *mem = (struct MemoryData *)userp;
 
+	mem->memdata = (char *)realloc(mem->memdata, mem->size + realsize + 1);
+	if (mem->memdata == NULL)
+	{
+		/* out of memory! */
+		QSLOG_ERROR("not enough memory (realloc returned NULL)\n");
+		return 0;
+	}
+
+	memcpy(&(mem->memdata[mem->size]), contents, realsize);
+	mem->size += realsize;
+	mem->memdata[mem->size] = 0;
+
+	return realsize;
+}
+
+static size_t UploadFromMemFun(void *ptr, size_t size, size_t nmemb, void *stream)
+{
+	struct MemoryData *mem = (struct MemoryData *)stream;
+	size_t tocopy = size * nmemb;
+
+	if (tocopy < 1 || mem->size == 0)
+	{
+		return 0;
+	}
+
+	if (mem->size < tocopy)
+	{
+		tocopy = mem->size;
+	}
+
+	memcpy(ptr, mem->memdata, tocopy);
+	mem->memdata += tocopy;
+	mem->size -= tocopy;
+
+	return tocopy;
+}
+
+// 下载到文件
+static size_t WriteInFileFun(void *buffer, size_t size, size_t nmemb, void *stream)
+{
+	struct FileData *out = (struct FileData *)stream;
+	if (out && !out->stream)	// 若没有打开文件
+	{
+		out->stream = fopen(out->filename, "wb");
+		if (NULL == out->stream)		// 打开文件失败
+		{
+			QSLOG_ERROR(QStringLiteral("打开文件：%1失败").arg(out->filename));
+			return -1;
+		}
+		// 设置自动释放
+		//out->autoclose = QSharedPointer<FILE>(out->stream, fclose);
+	}
+
+	return fwrite(buffer, size, nmemb, out->stream);
+}
+
+// 从文件上传
+static size_t ReadFromFile(void *buffer, size_t size, size_t nmemb, void *stream)
+{
+	curl_off_t nread;
+	/* in real-world cases, this would probably get this data differently
+	as this fread() stuff is exactly what the library already would do
+	by default internally */
+	size_t retcode = fread(buffer, size, nmemb, (FILE *)stream);
+
+	nread = (curl_off_t)retcode;
+
+	//QSLOG_DEBUG(QString("*** We read %1 bytes from file").arg(nread));
+	return retcode;
+
+	//size_t retcode = fread(buffer, size, nmemb, (FILE *)stream);
+	//return retcode;
+}
+
+static size_t throw_away(void *ptr, size_t size, size_t nmemb, void *data)
+{
+	(void)ptr;
+	(void)data;
+
+	return (size_t)(size * nmemb);
+}
 
 
 static size_t getDataFun(void *ptr, size_t size, size_t nmemb, void *stream)
@@ -65,60 +203,7 @@ static size_t getDataFun(void *ptr, size_t size, size_t nmemb, void *stream)
     return 0;
 }
 
-struct CListInfo
-{
-    QString	strFileName;
-    QString	strMdfyTime;
-    int		nType;			// 1-文件，2-目录
-    qint64	nFileSize;
 
-    CListInfo()
-    {
-        nType = 0;
-        nFileSize = 0;
-    }
-};
-
-// 存储文件
-struct FileData
-{
-    const char *filename;
-    FILE *stream;
-    //QSharedPointer<FILE> autoclose;
-    FileData()
-    {
-        filename = NULL;
-        stream = NULL;
-    }
-    ~FileData()
-    {
-
-    }
-};
-
-/// 在内存中缓存文件内容（加密压缩需要）
-struct MemoryData
-{
-    char *memdata;		///< 起始地址
-    size_t size;		///< 有效大小
-    size_t capacity;	///< 申请的空间大小
-
-    MemoryData()
-    {
-        memdata = NULL;
-        size = 0;
-        capacity = 0;
-    }
-
-    ~MemoryData()
-    {
-        if (NULL != memdata)
-        {
-            free(memdata);
-        }
-
-    }
-};
 
 typedef struct
 {
