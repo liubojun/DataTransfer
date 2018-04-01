@@ -36,7 +36,7 @@ public:
     //virtual void MdyClearSet(const DataClearSet &set);
 
 public slots:
-    virtual void doNow(const QString &dir);
+virtual void doNow(const QString &taskName);
 
 private:
     QString m_info;                     //调度规则
@@ -48,7 +48,7 @@ private:
     QList<BaseDatas> m_oBaseDatas;
     QList<QSharedPointer<CDispatch> > m_oProcessors;
 
-    // 一个目录对应一个Dispathcer和一个Timer
+    // 一个任务名称对应一个Dispathcer和一个Timer
     QMap<QString, QSharedPointer<CDispatch> > m_mapDispatchers;
     QMap<QString, QSharedPointer<QObject> > m_mapTimers;
 

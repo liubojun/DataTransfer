@@ -71,13 +71,13 @@ bool DataClear::start(const BaseDatas &data)
         connect(cDispatch.data(), SIGNAL(clearEnd(const QString &)), this, SIGNAL( taskEnd(const QString &)));
         QSharedPointer<QThread> pThread = QSharedPointer<QThread>(new QThread());
         pThread->start();
-        m_pWorkThread.insert(data.m_fullPath, pThread);
+        m_pWorkThread.insert(data.m_taskName, pThread);
         cDispatch->moveToThread(pThread.data());
 
         flag = iDt->SetDispatchTimer(data.m_DDrule.toStdString(), cDispatch.data(), QSharedPointer<TimerCallBackParam>(new BaseDatas(data)), m_pTimerObject);
 
-        m_mapDispatchers[data.m_fullPath] = cDispatch;
-        m_mapTimers[data.m_fullPath] = m_pTimerObject;
+        m_mapDispatchers[data.m_taskName] = cDispatch;
+		m_mapTimers[data.m_taskName] = m_pTimerObject;
 
         return flag;
     }
@@ -94,12 +94,12 @@ void DataClear::stop(const BaseDatas &data)
     IDispatchTimer *iDt = qobject_cast<IDispatchTimer *>(op);
     if (iDt)
     {
-        QSharedPointer<QObject> pTimer = m_mapTimers.take(data.m_fullPath);
+		QSharedPointer<QObject> pTimer = m_mapTimers.take(data.m_taskName);
         if (pTimer != NULL)
         {
             iDt->stopDispatchTimer(pTimer);
-            m_mapDispatchers.remove(data.m_fullPath);
-            QMap<QString, QSharedPointer<QThread> >::iterator iter = m_pWorkThread.find(data.m_fullPath);
+            m_mapDispatchers.remove(data.m_taskName);
+			QMap<QString, QSharedPointer<QThread> >::iterator iter = m_pWorkThread.find(data.m_taskName);
             if (iter !=  m_pWorkThread.end())
             {
                 iter.value()->quit();
@@ -213,7 +213,7 @@ const QList<BaseDatas> & DataClear::get()
 //    AddClearSet(set);
 //}
 
-void DataClear::doNow(const QString &dir)
+void DataClear::doNow(const QString &taskName)
 {
     ICtkPluginManager *pManager = getCtkPluginManager();
     QObject *op = pManager->getService("IDispatchTimer");
@@ -221,7 +221,7 @@ void DataClear::doNow(const QString &dir)
 
     bool flag = true;
 
-    QSharedPointer<CDispatch> m_pDispatch = m_mapDispatchers[dir];
+	QSharedPointer<CDispatch> m_pDispatch = m_mapDispatchers[taskName];
     if (!m_pDispatch.isNull())
     {
         m_pDispatch->doNow();

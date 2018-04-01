@@ -8,6 +8,7 @@ set(PLUGIN_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/CDispatch.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/DelFiles.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/DataCleartemp.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/ftpclear.cpp
 )
 
 set(PLUGIN_HDRS
@@ -17,6 +18,7 @@ set(PLUGIN_HDRS
   ${CMAKE_CURRENT_SOURCE_DIR}/DelFiles.h
   ${CMAKE_CURRENT_SOURCE_DIR}/DataClearActivator.h
   ${CMAKE_CURRENT_SOURCE_DIR}/DataCleartemp.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ftpclear.h
   ${RadarProjectInclude}/interface/IBaseInterface.h
   ${RadarProjectInclude}/org.radar.dataclear/BaseDatas.h
   ${RadarProjectInclude}/org.radar.dataclear/IDataClear.h
@@ -28,6 +30,7 @@ set(PLUGIN_MOC_SRCS
   ${RadarProjectInclude}/interface/IBaseInterface.h
   ${RadarProjectInclude}/org.radar.dataclear/IDataClear.h
   ${RadarProjectInclude}/org.common.quartz/DispatchInterface.h
+  ${RadarProjectInclude}/ctkTransfer/CollectorBase.h
   ${CMAKE_CURRENT_SOURCE_DIR}/DataClear.h
   ${CMAKE_CURRENT_SOURCE_DIR}/CDispatch.h
   ${CMAKE_CURRENT_SOURCE_DIR}/DataClearActivator.h
@@ -52,6 +55,11 @@ INCLUDE_DIRECTORIES(
 					${RadarProjectInclude}/org.common.quartz
 					${RadarProjectInclude}/ctkPluginManager
 					${RadarProjectInclude}/org.radar.drawproduct
+					${RadarProjectInclude}/ctkTransfer
+					${RadarProjectInclude}/ctkPublicFun
+					${RadarProjectInclude}/QsLog
+					${RadarProjectInclude}/ctkProtocol
+					${CURL_INCLUDE_DIR}
 					${VLD_INCLUDE}	
 				)
 
@@ -73,8 +81,10 @@ ctkMacroBuildPlugin(
   TARGET_LIBRARIES ${PLUGIN_target_libraries} ctkLogger
   ${QT_QTGUI_LIBRARY} 
   ${QT_UITOOLS_LIBRARY}
+  ${QT_QTNETWORK_LIBRARY}
   ${VLD_LIB} 
   ctkPublicFun 
+  ctkTransfer
   ctkLogger
 )
 

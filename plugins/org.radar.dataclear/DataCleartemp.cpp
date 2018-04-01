@@ -1,5 +1,6 @@
 ﻿#include "DataCleartemp.h"
 #include "DelFiles.h"
+#include "ftpclear.h"
 #include <QString>
 #include <QSharedPointer>
 
@@ -18,7 +19,7 @@ DateClearTemp::DateClearTemp(QList<BaseDatas> datas):m_datas(datas)
     //dataClear();
 }
 
-DateClearTemp::DateClearTemp(BaseDatas &data)
+DateClearTemp::DateClearTemp(BaseDatas &data) : m_data(data)
 {
     m_fullpath = data.m_fullPath;
     m_style = data.m_style;
@@ -55,6 +56,17 @@ bool DateClearTemp::dataClear(const QString &style,const double &freeSpace,const
 
 bool DateClearTemp::dataClear()
 {
-    QSharedPointer<DelFiles> delFile = QSharedPointer<DelFiles>(new DelFiles(m_fullpath,m_style,m_freeSpace,m_timeLine,m_regexs));
-    return delFile->delFiles();
+
+	if (m_data.taskType == 1)
+	{
+		CFtpClear ftpClear(m_data);
+		ftpClear.run();
+		return true;
+	}
+	else
+	{
+		QSharedPointer<DelFiles> delFile = QSharedPointer<DelFiles>(new DelFiles(m_fullpath, m_style, m_freeSpace, m_timeLine, m_regexs));
+		return delFile->delFiles();
+	}
+
 }

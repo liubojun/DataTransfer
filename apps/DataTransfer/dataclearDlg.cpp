@@ -26,6 +26,19 @@ void DataClearDlg::InitUI()
     connect(ui.pushButton_cancel, SIGNAL(pressed()), this, SLOT(reject()));
     connect(ui.comboBox_unit, SIGNAL(currentIndexChanged(int )), this, SLOT(onComBoxIndexChanged(int)));
 
+	connect(ui.rBt_dir, SIGNAL(clicked(bool)), ui.cBx_ftpmode, SLOT(setDisabled(bool)));
+	connect(ui.rBt_ftp, SIGNAL(clicked(bool)), ui.cBx_ftpmode, SLOT(setEnabled(bool)));
+	connect(ui.rBt_dir, SIGNAL(clicked(bool)), ui.lineEdit_ip, SLOT(setDisabled(bool)));
+	connect(ui.rBt_ftp, SIGNAL(clicked(bool)), ui.lineEdit_ip, SLOT(setEnabled(bool)));
+	connect(ui.rBt_dir, SIGNAL(clicked(bool)), ui.spinBox_port, SLOT(setDisabled(bool)));
+	connect(ui.rBt_ftp, SIGNAL(clicked(bool)), ui.spinBox_port, SLOT(setEnabled(bool)));
+	connect(ui.rBt_dir, SIGNAL(clicked(bool)), ui.lineEdit_user, SLOT(setDisabled(bool)));
+	connect(ui.rBt_ftp, SIGNAL(clicked(bool)), ui.lineEdit_user, SLOT(setEnabled(bool)));
+	connect(ui.rBt_dir, SIGNAL(clicked(bool)), ui.lineEdit_password, SLOT(setDisabled(bool)));
+	connect(ui.rBt_ftp, SIGNAL(clicked(bool)), ui.lineEdit_password, SLOT(setEnabled(bool)));
+		
+	// 默认用目录清理M模式
+	ui.rBt_dir->setChecked(true);
     //ui.lineEdit_name->setDisabled(true);
     //ui.lineEdit_dir->setDisabled(true);
     //ui.lineEdit_rule->setDisabled(true);
@@ -52,6 +65,36 @@ void DataClearDlg::InitUI(const QString &taskName)
     connect(ui.pushButton_confirm, SIGNAL(pressed()), this, SLOT(onApply2()));
     connect(ui.pushButton_cancel, SIGNAL(pressed()), this, SLOT(reject()));
     connect(ui.comboBox_unit, SIGNAL(currentIndexChanged(int )), this, SLOT(onComBoxIndexChanged(int)));
+	connect(ui.rBt_dir, SIGNAL(clicked(bool)), ui.cBx_ftpmode, SLOT(setDisabled(bool)));
+	connect(ui.rBt_ftp, SIGNAL(clicked(bool)), ui.cBx_ftpmode, SLOT(setEnabled(bool)));
+	connect(ui.rBt_dir, SIGNAL(clicked(bool)), ui.lineEdit_ip, SLOT(setDisabled(bool)));
+	connect(ui.rBt_ftp, SIGNAL(clicked(bool)), ui.lineEdit_ip, SLOT(setEnabled(bool)));
+	connect(ui.rBt_dir, SIGNAL(clicked(bool)), ui.spinBox_port, SLOT(setDisabled(bool)));
+	connect(ui.rBt_ftp, SIGNAL(clicked(bool)), ui.spinBox_port, SLOT(setEnabled(bool)));
+	connect(ui.rBt_dir, SIGNAL(clicked(bool)), ui.lineEdit_user, SLOT(setDisabled(bool)));
+	connect(ui.rBt_ftp, SIGNAL(clicked(bool)), ui.lineEdit_user, SLOT(setEnabled(bool)));
+	connect(ui.rBt_dir, SIGNAL(clicked(bool)), ui.lineEdit_password, SLOT(setDisabled(bool)));
+	connect(ui.rBt_ftp, SIGNAL(clicked(bool)), ui.lineEdit_password, SLOT(setEnabled(bool)));
+
+	if (1 == task.taskType)
+	{
+		ui.rBt_ftp->setChecked(true);
+		ui.cBx_ftpmode->setEnabled(true);
+		ui.lineEdit_ip->setEnabled(true);
+		ui.spinBox_port->setEnabled(true);
+		ui.lineEdit_user->setEnabled(true);
+		ui.lineEdit_password->setEnabled(true);
+	}
+	else
+	{
+		ui.rBt_dir->setChecked(true);
+	}
+	ui.lineEdit_ip->setText(task.ip);
+	ui.spinBox_port->setValue(task.port);
+	ui.lineEdit_user->setText(task.user);
+	ui.lineEdit_password->setText(task.password);
+	ui.cBx_ftpmode->setCurrentIndex(task.transfermode == 0 ? 1 : 0);
+	
 
     ui.lineEdit_name->setText(task.taskName);
     ui.lineEdit_rule->setText(task.quartzRule);
@@ -112,14 +155,28 @@ void DataClearDlg::onApply()
 
     ClearTask task;
     task.taskName = ui.lineEdit_name->text();
-    task.taskDir = QFileInfo(ui.lineEdit_dir->text()).absoluteFilePath();
+	task.taskType = ui.rBt_dir->isChecked() ? 0 : 1;
+	task.ip = ui.lineEdit_ip->text();
+	task.port = ui.spinBox_port->value();
+	task.user = ui.lineEdit_user->text();
+	task.password = ui.lineEdit_password->text();
+	task.transfermode = ui.cBx_ftpmode->currentIndex() == 0 ? 1 : 0;
+	if (task.taskType == 0)
+	{
+		task.taskDir = QFileInfo(ui.lineEdit_dir->text()).absoluteFilePath();
+	}
+	else
+	{
+		task.taskDir = ui.lineEdit_dir->text();
+	}
+    
     task.quartzRule = ui.lineEdit_rule->text();
     task.matchRule = ui.lineEdit_file->text();
     task.clearUnit = ui.comboBox_unit->currentIndex();
     task.clearValue = ui.comboBox_value->currentText().toInt();
     task.activeFlag = ui.checkBox_active->isChecked();
     DataBase::getInstance()->insertClearTask(task);
-
+	m_task = task;
     accept();
     emit newTaskCreated(task);
 }
@@ -162,7 +219,7 @@ void DataClearDlg::onItemChanged(const QString &item)
 
 void DataClearDlg::onComBoxIndexChanged(int index)
 {
-    // 0:分钟�?1:小时, 2：天 3: �?
+    // 0:分钟�?1:小时, 2：天 3: �?
     int step = 1;
     QStringList values;
 
@@ -250,7 +307,7 @@ int DataClearDlg::computeSeconds()
     int index = ui.comboBox_unit->currentIndex();
     QString vaule = ui.comboBox_value->currentText();
 
-    // 0:分钟�?1:小时, 2：天 3: �?
+    // 0:分钟�?1:小时, 2：天 3: �?
     int step = 1;
 
     switch (index)
@@ -277,7 +334,7 @@ int DataClearDlg::computeSeconds()
 
 void DataClearDlg::onDelete()
 {
-    // 数据库删�?
+    // 数据库删�?
     //DataBase::getInstance()->deleteClearTask(ui.listWidget->currentItem()->text());
 
 }
@@ -291,7 +348,7 @@ void DataClearDlg::onApply2()
         return;
     }
 
-    //// 查表，判断表中是否存在相同的名称或者目�?
+    //// 查表，判断表中是否存在相同的名称或者目�?
 
     //// 根据name查表，并将表中的信息返回到界面上
     //QList<ClearTask> tasks;
@@ -308,15 +365,37 @@ void DataClearDlg::onApply2()
     //}
 
     //ClearTask task;
-    m_task.taskName = ui.lineEdit_name->text();
-    m_task.taskDir = QFileInfo(ui.lineEdit_dir->text()).absoluteFilePath();
-    m_task.quartzRule = ui.lineEdit_rule->text();
-    m_task.matchRule = ui.lineEdit_file->text();
-    m_task.clearUnit = ui.comboBox_unit->currentIndex();
-    m_task.clearValue = ui.comboBox_value->currentText().toInt();
-    m_task.activeFlag = ui.checkBox_active->isChecked();
+    //m_task.taskName = ui.lineEdit_name->text();
+    //m_task.taskDir = QFileInfo(ui.lineEdit_dir->text()).absoluteFilePath();
+    //m_task.quartzRule = ui.lineEdit_rule->text();
+    //m_task.matchRule = ui.lineEdit_file->text();
+    //m_task.clearUnit = ui.comboBox_unit->currentIndex();
+    //m_task.clearValue = ui.comboBox_value->currentText().toInt();
+    //m_task.activeFlag = ui.checkBox_active->isChecked();
     //DataBase::getInstance()->insertClearTask(task);
+	ClearTask task;
+	task.taskName = ui.lineEdit_name->text();
+	task.taskType = ui.rBt_dir->isChecked() ? 0 : 1;
+	task.ip = ui.lineEdit_ip->text();
+	task.port = ui.spinBox_port->value();
+	task.user = ui.lineEdit_user->text();
+	task.password = ui.lineEdit_password->text();
+	task.transfermode = ui.cBx_ftpmode->currentIndex() == 0 ? 1 : 0;
+	if (task.taskType == 0)
+	{
+		task.taskDir = QFileInfo(ui.lineEdit_dir->text()).absoluteFilePath();
+	}
+	else
+	{
+		task.taskDir = ui.lineEdit_dir->text();
+	}
 
+	task.quartzRule = ui.lineEdit_rule->text();
+	task.matchRule = ui.lineEdit_file->text();
+	task.clearUnit = ui.comboBox_unit->currentIndex();
+	task.clearValue = ui.comboBox_value->currentText().toInt();
+	task.activeFlag = ui.checkBox_active->isChecked();
+	m_task = task;
     accept();
     //emit newTaskCreated(task);
 }

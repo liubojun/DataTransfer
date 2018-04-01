@@ -63,6 +63,12 @@ DataBase::DataBase()
     // 判断清理表是否存在，如果不存在则自动创建
     checkTable("T_DIR_CLEAR", "CREATE TABLE T_DIR_CLEAR ("
                "[NAME] VHARCHAR(64) NOT NULL, "
+			   "[TYPE] INT(1) NOT NULL DEFAULT (0), "
+			   "[IP] VARCHAR2(50), "
+			   "[PORT] INT(5),"
+			   "[USER] VARCHAR2(20), "
+			   "[PASSWORD] VARCHAR2(20), "
+			   "[TRANSFERMODE] INT(1) DEFAULT (0), "
                "[DIR] VHARCHAR(256) NOT NULL, "
                "[QUARTZ] VHARCHAR(64) NOT NULL,"
                "[FILE] VHARCHAR(64) NOT NULL, "
@@ -799,20 +805,27 @@ bool DataBase::queryClearTask(QList<ClearTask> &tasks)
     QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
     QSqlQuery query(t_oDb);
 
-    QString sql = QString("select * from T_DIR_CLEAR");
+    QString sql = QString("SELECT NAME,TYPE,IP,PORT,USER,PASSWORD,TRANSFERMODE,DIR,QUARTZ,FILE,UNIT,VALUE,ACTIVE FROM T_DIR_CLEAR");
     bool res = query.exec(sql);
     if (res)
     {
         while (query.next())
         {
             ClearTask task;
-            task.taskName = query.value(0).toString();
-            task.taskDir = query.value(1).toString();
-            task.quartzRule = query.value(2).toString();
-            task.matchRule = query.value(3).toString();
-            task.clearUnit = query.value(4).toInt();
-            task.clearValue = query.value(5).toInt();
-            task.activeFlag = query.value(6).toInt();
+			int index = 0;
+			task.taskName = query.value(index++).toString();
+			task.taskType = query.value(index++).toInt();
+			task.ip = query.value(index++).toString();
+			task.port = query.value(index++).toInt();
+			task.user = query.value(index++).toString();
+			task.password = query.value(index++).toString();
+			task.transfermode = query.value(index++).toInt();
+			task.taskDir = query.value(index++).toString();
+			task.quartzRule = query.value(index++).toString();
+			task.matchRule = query.value(index++).toString();
+			task.clearUnit = query.value(index++).toInt();
+			task.clearValue = query.value(index++).toInt();
+			task.activeFlag = query.value(index++).toInt();
             tasks.append(task);
         }
         return true;
@@ -835,19 +848,26 @@ bool DataBase::queryClearTask(ClearTask &task)
     QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
     QSqlQuery query(t_oDb);
 
-    QString sql = QString("select * from T_DIR_CLEAR where name = '%1'").arg(task.taskName);
+    QString sql = QString("SELECT NAME,TYPE,IP,PORT,USER,PASSWORD,TRANSFERMODE,DIR,QUARTZ,FILE,UNIT,VALUE,ACTIVE FROM T_DIR_CLEAR WHERE NAME = '%1'").arg(task.taskName);
     bool res = query.exec(sql);
     if (res)
     {
         if (query.next())
         {
-            task.taskName = query.value(0).toString();
-            task.taskDir = query.value(1).toString();
-            task.quartzRule = query.value(2).toString();
-            task.matchRule = query.value(3).toString();
-            task.clearUnit = query.value(4).toInt();
-            task.clearValue = query.value(5).toInt();
-            task.activeFlag = query.value(6).toInt();
+			int index = 0;
+			task.taskName = query.value(index++).toString();
+			task.taskType = query.value(index++).toInt();
+			task.ip = query.value(index++).toString();
+			task.port = query.value(index++).toInt();
+			task.user = query.value(index++).toString();
+			task.password = query.value(index++).toString();
+			task.transfermode = query.value(index++).toInt();
+			task.taskDir = query.value(index++).toString();
+			task.quartzRule = query.value(index++).toString();
+			task.matchRule = query.value(index++).toString();
+			task.clearUnit = query.value(index++).toInt();
+			task.clearValue = query.value(index++).toInt();
+			task.activeFlag = query.value(index++).toInt();
 
             return true;
         }
@@ -960,10 +980,16 @@ bool DataBase::insertClearTask(const ClearTask &task)
         }
         QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
         QSqlQuery query(t_oDb);
-        QString sql = QString("REPLACE INTO T_DIR_CLEAR(NAME, DIR, QUARTZ, FILE, UNIT, VALUE, ACTIVE)"
-                              "VALUES(:NAME, :DIR,:QUARTZ,:FILE,:UNIT, :VALUE, :ACTIVE)");
+        QString sql = QString("REPLACE INTO T_DIR_CLEAR(NAME,TYPE,IP,PORT,USER,PASSWORD,TRANSFERMODE,DIR,QUARTZ,FILE,UNIT,VALUE,ACTIVE)"
+                              "VALUES(:NAME,:TYPE,:IP,:PORT,:USER,:PASSWORD,:TRANSFERMODE,:DIR,:QUARTZ,:FILE,:UNIT,:VALUE,:ACTIVE)");
         query.prepare(sql);
         query.bindValue(":NAME", task.taskName);
+		query.bindValue(":TYPE", task.taskType);
+		query.bindValue(":IP", task.ip);
+		query.bindValue(":PORT", task.port);
+		query.bindValue(":USER", task.user);
+		query.bindValue(":PASSWORD", task.password);
+		query.bindValue(":TRANSFERMODE", task.transfermode);
         query.bindValue(":DIR", task.taskDir);
         query.bindValue(":QUARTZ", task.quartzRule);
         query.bindValue(":FILE", task.matchRule);

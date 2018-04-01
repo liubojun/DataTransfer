@@ -69,13 +69,12 @@ INCLUDE_DIRECTORIES(
 					${RadarProjectInclude}/org.radar.dataadapter
 					${RadarProjectInclude}/org.radar.pathadapter
 					${RadarProjectInclude}/ctkPublicFun
-					${RadarProjectInclude}/QsLog
 					${RadarProjectInclude}/3dpart
+					${RadarProjectInclude}/QsLog
 					${RadarProjectInclude}/3dpart/Common
 					${RadarProjectInclude}/ctkProtocol
 					${RadarProjectInclude}/ctkTransfer
 					${RadarProjectInclude}/3dpart
-					${RadarProjectInclude}/3dpart/RCF-2.2.0.0/include
 					${CURL_INCLUDE_DIR}
 					${VLD_INCLUDE}
 				)

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>415</width>
-    <height>309</height>
+    <width>514</width>
+    <height>456</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -41,6 +41,137 @@
            <string>*</string>
           </property>
          </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QRadioButton" name="rBt_dir">
+          <property name="text">
+           <string>目录</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="rBt_ftp">
+          <property name="text">
+           <string>FTP</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cBx_ftpmode">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <item>
+           <property name="text">
+            <string>被动</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>主动</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
+         <widget class="QLabel" name="label_ip">
+          <property name="text">
+           <string>主机：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_ip">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>端口：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spinBox_port">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+          <property name="value">
+           <number>21</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
+        <item>
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>用户：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_user">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>密码：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_password">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>
@@ -217,6 +348,26 @@
        </layout>
       </item>
      </layout>
+     <zorder>label_9</zorder>
+     <zorder>comboBox_value</zorder>
+     <zorder>label_8</zorder>
+     <zorder>comboBox_unit</zorder>
+     <zorder>label_7</zorder>
+     <zorder>lineEdit_file</zorder>
+     <zorder>label_4</zorder>
+     <zorder>rBt_dir</zorder>
+     <zorder>rBt_ftp</zorder>
+     <zorder>cBx_ftpmode</zorder>
+     <zorder>lineEdit_ip</zorder>
+     <zorder>label_ip</zorder>
+     <zorder>label_12</zorder>
+     <zorder>lineEdit_password</zorder>
+     <zorder>label_13</zorder>
+     <zorder>lineEdit_user</zorder>
+     <zorder>label_14</zorder>
+     <zorder>horizontalSpacer_4</zorder>
+     <zorder>horizontalSpacer_5</zorder>
+     <zorder>spinBox_port</zorder>
     </widget>
    </item>
    <item>

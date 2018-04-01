@@ -28,15 +28,17 @@ int main(int argc, char **argv)
     QCoreApplication app(argc, argv);
 
 	FTP::CFtp oFtp;
-	oFtp.connectToHost("192.168.0.106");
+	oFtp.connectToHost("127.0.0.1");
 	oFtp.login("nriet", "123456");
-	oFtp.cd("/home/Administrator/");
+	oFtp.cd("/test");
+	//oFtp.cd("/home/Administrator/");
 	//oFtp.cd("/usr/i686-w64-mingw32/lib");
 	//oFtp.cd("ldscripts");
 	oFtp.list();
 	//oFtp.cd("../../");
 	//oFtp.list("/home/Administrator");
-	oFtp.get("mintty.exe.stackdump", "E:");
+	//oFtp.get("mintty.exe.stackdump", "E:");
+	oFtp.remove("/test/xh.txt");
 	qDebug() << oFtp.errorString();
     // 查询基本信息
     int threadNum, port;

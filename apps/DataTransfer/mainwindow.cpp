@@ -275,11 +275,18 @@ bool MainWindow::addClear(const ClearTask &task, bool bDb)
     if (task.activeFlag)
     {
         BaseDatas data;
+		data.m_taskName = task.taskName;
         data.m_DDrule = task.quartzRule;
         data.m_fullPath = task.taskDir;
         data.m_regex.append(task.matchRule);
         data.m_time = task.computeSecond();
         data.m_style = "0";	// 按照时间规则进行清理
+		data.taskType = task.taskType;
+		data.ip = task.ip;
+		data.port = task.port;
+		data.user = task.user;
+		data.password = task.password;
+		data.transfermode = task.transfermode;
         m_pDataClear->start(data);
     }
     else
@@ -591,7 +598,8 @@ void MainWindow::doNow()
         task.taskName = m_ItemTask[pItem];
         if (DataBase::getInstance()->queryClearTask(task))
         {
-            emit doClearWork(task.taskDir);
+            // emit doClearWork(task.taskDir);
+			emit doClearWork(task.taskName);
         }
     }
 }
@@ -717,6 +725,7 @@ void MainWindow::deltTask()
         // m_pCollect->deltSyncTransfer(dirID);
 
         BaseDatas data;
+		data.m_taskName = task.taskName;
         data.m_fullPath = task.taskDir;
         m_pDataClear->stop(data);
         // 从界面删除
@@ -809,6 +818,7 @@ void MainWindow::startOrstop()
             logInfo = QStringLiteral("已停止。");
             bFlag = false;
             BaseDatas data;
+			data.m_taskName = task.taskName;
             data.m_fullPath = task.taskDir;
             m_pDataClear->stop(data);
         }
@@ -819,11 +829,18 @@ void MainWindow::startOrstop()
             logInfo = QStringLiteral("已启动。");
             bFlag = true;
             BaseDatas data;
+			data.m_taskName = task.taskName;
             data.m_DDrule = task.quartzRule;
             data.m_fullPath = task.taskDir;
             data.m_regex.append(task.matchRule);
             data.m_time = task.computeSecond();
             data.m_style = "0";	// 按照时间规则进行清理
+			data.taskType = task.taskType;
+			data.ip = task.ip;
+			data.port = task.port;
+			data.user = task.user;
+			data.password = task.password;
+			data.transfermode = task.transfermode;
             m_pDataClear->start(data);
         }
         //((MyItemWidget *)(ui.listWidget->itemWidget(pItem)))->setEnabled(bFlag);    // 可以直接灰化
@@ -908,7 +925,13 @@ void MainWindow::onProperty()
                     task.matchRule != m_pClearDlg->m_task.matchRule ||
                     task.quartzRule != m_pClearDlg->m_task.quartzRule ||
                     task.taskDir != m_pClearDlg->m_task.taskDir ||
-                    task.taskName != m_pClearDlg->m_task.taskName )
+                    task.taskName != m_pClearDlg->m_task.taskName ||
+					task.taskType != m_pClearDlg->m_task.taskType ||
+					task.ip != m_pClearDlg->m_task.ip ||
+					task.port != m_pClearDlg->m_task.port ||
+					task.user != m_pClearDlg->m_task.user ||
+					task.password != m_pClearDlg->m_task.password ||
+					task.transfermode != m_pClearDlg->m_task.transfermode)
             {
                 bRestart = true;
 
@@ -922,11 +945,18 @@ void MainWindow::onProperty()
             //// 修改收集设置
             //m_pCollect->mdfySyncTransfer(task);
             BaseDatas data;
+			data.m_taskName = task.taskName;
             data.m_DDrule = task.quartzRule;
             data.m_fullPath = task.taskDir;
             data.m_regex.append(task.matchRule);
             data.m_time = task.computeSecond();
             data.m_style = "0";	// 按照时间规则进行清理
+			data.taskType = task.taskType;
+			data.ip = task.ip;
+			data.port = task.port;
+			data.user = task.user;
+			data.password = task.password;
+			data.transfermode = task.transfermode;
             m_pDataClear->stop(data);
             m_pDataClear->start(data);
         }
@@ -1109,11 +1139,18 @@ void MainWindow::onNewClearTaskCreated(const ClearTask &task)
     //// 启动收集
     //m_pCollect->addSyncTransfer(task);
     BaseDatas data;
+	data.m_taskName = task.taskName;
     data.m_DDrule = task.quartzRule;
     data.m_fullPath = task.taskDir;
     data.m_regex.append(task.matchRule);
     data.m_time = task.computeSecond();
     data.m_style = "0";	// 按照时间规则进行清理
+	data.taskType = task.taskType;
+	data.ip = task.ip;
+	data.port = task.port;
+	data.user = task.user;
+	data.password = task.password;
+	data.transfermode = task.transfermode;
     m_pDataClear->start(data);
 
 }

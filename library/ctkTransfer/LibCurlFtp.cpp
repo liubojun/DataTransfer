@@ -7,7 +7,6 @@ CFtp::CFtp()
 	m_pCurlHandler = NULL;
 	m_pCurlHandler = curl_easy_init();
 	enableDebugLevel(true);
-	prepare();
 
 }
 
@@ -20,6 +19,7 @@ int CFtp::cd(const QString &dir)
 {
 	QString url = makeUrl(dir);
 	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+	prepare();
 	m_iRetCode = curl_easy_perform(m_pCurlHandler);
 	return m_iRetCode;
 }
@@ -145,6 +145,7 @@ int CFtp::login(const QString &user /*= QString()*/, const QString &password /*=
 {
 	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_USERNAME, user.toLocal8Bit().toStdString().c_str());
 	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_PASSWORD, password.toLocal8Bit().toStdString().c_str());
+	prepare();
 	m_iRetCode = curl_easy_perform(m_pCurlHandler);
 	return m_iRetCode;
 }
@@ -172,7 +173,28 @@ int CFtp::rename(const QString &oldname, const QString &newname)
 
 int CFtp::remove(const QString &file)
 {
-	return 0;
+	QString filename, url;
+	if (file.startsWith("/"))
+	{
+		filename = file.split("/").last();
+		QString dir = file.mid(0, file.lastIndexOf("/"));
+		url = makeUrl(dir);
+	}
+	else
+	{
+		filename = file;
+		url = makeUrl("");
+	}
+	QString szCmd = QString("DELE %1").arg(filename);
+	//m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url);
+	struct curl_slist *headerlist = NULL;
+	headerlist = curl_slist_append(headerlist, szCmd.toLocal8Bit().toStdString().c_str());
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_POSTQUOTE, headerlist);
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+	prepare();
+	m_iRetCode = curl_easy_perform(m_pCurlHandler);
+	curl_slist_free_all(headerlist);
+	return m_iRetCode;
 }
 
 
@@ -298,6 +320,7 @@ void CFtp::parseMlsdInfo(const QString &currentDir, const QString &info, QList<C
 			fInfo.name = oneInfo.strFileName;
 			fInfo.size = oneInfo.nFileSize;
 			fInfo.path = currentDir + oneInfo.strFileName;
+			fInfo.time = QDateTime::fromString(oneInfo.strMdfyTime, "yyyyMMddhhmmss");
 			fInfo.type = FILE;
 			fileList.push_back(fInfo);
 			

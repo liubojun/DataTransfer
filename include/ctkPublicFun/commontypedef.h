@@ -481,6 +481,12 @@ enum TaskState
 struct ClearTask
 {
     QString taskName;	// 清理任务名
+	int taskType;		// 任务类型 0：目录清理，1: ftp清理
+	QString ip;			// ftp ip
+	quint16 port;		// ftp port
+	QString user;		// ftp user
+	QString password;	// ftp password
+	int transfermode;	// ftp transfermode 0：主动， 1： 被动
     QString taskDir;	// 任务目录
     QString quartzRule;	// 清理任务规则
     QString matchRule;	// 删除文件匹配规则
