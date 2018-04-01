@@ -1,4 +1,5 @@
 #include "LibCurlFtp.h"
+#include <QDataStream>
 
 using namespace FTP;
 CFtp::CFtp()
@@ -77,6 +78,14 @@ int CFtp::get(const QString &file, const QString &dir, TransferType type /*= Bin
 	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEFUNCTION, WriteInFileFun);
 	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEDATA, &fileData);
 	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+	if (Ascii == type)
+	{
+		m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_TRANSFERTEXT, 1L);
+	}
+	else
+	{
+		m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_TRANSFERTEXT, 0);
+	}
 	m_iRetCode = curl_easy_perform(m_pCurlHandler);
 	// 关闭文件
 	if (fileData.stream)
@@ -85,6 +94,33 @@ int CFtp::get(const QString &file, const QString &dir, TransferType type /*= Bin
 	}
 	return m_iRetCode;
 }
+
+
+int FTP::CFtp::get(const QString &file, QIODevice *dev, TransferType type /*= Binary*/)
+{
+	// 获知当前所在目录
+	QString url = makeUrl("");
+	url.append(file);
+
+	MemoryData oMemData;
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEDATA, &oMemData);
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+	if (Ascii == type)
+	{
+		m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_TRANSFERTEXT, 1L);
+	}
+	else
+	{
+		m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_TRANSFERTEXT, 0);
+	}
+	m_iRetCode = curl_easy_perform(m_pCurlHandler);
+
+	QDataStream stream(dev);
+	stream.writeBytes(oMemData.memdata, oMemData.size);
+	return m_iRetCode;
+}
+
 
 QList<CFileInfo> CFtp::list(const QString &dir /*= QString()*/)
 {
@@ -147,7 +183,11 @@ int CFtp::rmdir(const QString &dir)
 
 int CFtp::setTransferMode(TransferMode mode)
 {
-	return 0;
+	if (mode == Active)
+	{
+		m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_FTPPORT, "-");
+	}
+	return m_iRetCode;
 }
 
 QString CFtp::makeUrl(const QString &host, quint16 port)
@@ -159,6 +199,15 @@ QString CFtp::makeUrl(const QString &host, quint16 port)
 QString FTP::CFtp::makeUrl(const QString &dir)
 {
 	QStringList dirbodies = dir.split("/");
+	if (dir.startsWith("/"))
+	{
+		// 先进入到root初始目录
+		while (m_urlBody.size() > 1)
+		{
+			m_urlBody.pop_back();
+		}
+
+	}
 	foreach(QString str ,dirbodies)
 	{
 		if (str.trimmed().isEmpty())

@@ -70,6 +70,9 @@ namespace FTP
 		// 从ftp下载文件
 		int get(const QString &file, const QString &dir, TransferType type = Binary);
 
+		// 从ftp下载文件(支持文件不落地，直接走内存)
+		int get(const QString &file, QIODevice *dev, TransferType type = Binary);
+
 		// 获取文件目录列表
 		QList<CFileInfo> list(const QString &dir = QString());
 
@@ -110,8 +113,13 @@ namespace FTP
 		// easy_perform准备工作
 		void prepare();
 
+		// 解析ftp LIST命令返回的字符串
 		void parseMlsdInfo(const QString &rootPath, const QString &info, QList<CFileInfo> &fileList);
+
+		// 解析4段分隔符的ftp
 		void process4Ftp(CListInfo &oneInfo, const QStringList &lstParts);
+
+		// 解析9段分隔符的ftp
 		void process9Ftp(CListInfo &oneInfo, const QStringList &lstParts);
 
 	private:

@@ -19,6 +19,8 @@
 #include "subdirfilter.h"
 #include "LibCurlFtp.h"
 #include <QDebug>
+#include <QByteArray>
+
 // 单进程模式完成一次数据的收集、分发
 // DataTransferPro 收集目录ID
 int main(int argc, char **argv)
@@ -28,7 +30,10 @@ int main(int argc, char **argv)
 	FTP::CFtp oFtp;
 	oFtp.connectToHost("192.168.0.106");
 	oFtp.login("nriet", "123456");
-	oFtp.cd("home/Administrator/");
+	oFtp.cd("/home/Administrator/");
+	//oFtp.cd("/usr/i686-w64-mingw32/lib");
+	//oFtp.cd("ldscripts");
+	oFtp.list();
 	//oFtp.cd("../../");
 	//oFtp.list("/home/Administrator");
 	oFtp.get("mintty.exe.stackdump", "E:");
