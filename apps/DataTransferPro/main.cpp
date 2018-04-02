@@ -27,19 +27,19 @@ int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
 
-	FTP::CFtp oFtp;
-	oFtp.connectToHost("127.0.0.1");
-	oFtp.login("nriet", "123456");
-	oFtp.cd("/test");
-	//oFtp.cd("/home/Administrator/");
-	//oFtp.cd("/usr/i686-w64-mingw32/lib");
-	//oFtp.cd("ldscripts");
-	oFtp.list();
-	//oFtp.cd("../../");
-	//oFtp.list("/home/Administrator");
-	//oFtp.get("mintty.exe.stackdump", "E:");
-	oFtp.remove("/test/xh.txt");
-	qDebug() << oFtp.errorString();
+    //FTP::CFtp oFtp;
+    //oFtp.connectToHost("127.0.0.1");
+    //oFtp.login("nriet", "123456");
+    //oFtp.cd("/test");
+    ////oFtp.cd("/home/Administrator/");
+    ////oFtp.cd("/usr/i686-w64-mingw32/lib");
+    ////oFtp.cd("ldscripts");
+    //oFtp.list();
+    ////oFtp.cd("../../");
+    ////oFtp.list("/home/Administrator");
+    ////oFtp.get("mintty.exe.stackdump", "E:");
+    //oFtp.remove("/20171225/Z_QH_QPE60_20170605061800.bin.bz2");
+    //qDebug() << oFtp.errorString();
     // 查询基本信息
     int threadNum, port;
     bool enableLog;
