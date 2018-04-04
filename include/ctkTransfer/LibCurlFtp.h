@@ -116,6 +116,7 @@ namespace FTP
 		// easy_perform准备工作
 		void prepare();
 
+
 		// 解析ftp LIST命令返回的字符串
 		void parseMlsdInfo(const QString &rootPath, const QString &info, QList<CFileInfo> &fileList);
 

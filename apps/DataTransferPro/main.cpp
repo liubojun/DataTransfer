@@ -27,9 +27,10 @@ int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
 
- //   FTP::CFtp oFtp;
- //   oFtp.connectToHost("127.0.0.1");
- //   oFtp.login("nriet", "123456");
+	FTP::CFtp oFtp;
+	oFtp.connectToHost("127.0.0.1");
+	oFtp.login("nriet", "123456");
+	oFtp.rmdir("test");
 	//oFtp.put("E:/workspace/DataTransfer/build/datatransfer/debug/bin/Debug/ctkPluginManager.pdb", "/test/remote.bin", ".tmp");
 	//oFtp.getFileSize("/test/remote.bin");
     //oFtp.cd("/test");

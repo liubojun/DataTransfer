@@ -307,7 +307,28 @@ int CFtp::remove(const QString &file)
 
 int CFtp::rmdir(const QString &dir)
 {
-    return 0;
+	QString dirname, url;
+	//if (dir.startsWith("/"))
+	//{
+	//	dirname = dir.split("/").last();
+	//	QString dir = dir.mid(0, dir.lastIndexOf("/"));
+	//	url = makeUrl(dir);
+	//}
+	//else
+	{
+		dirname = dir;
+		url = makeUrl("");
+	}
+	QString szCmd = QString("RMD %1").arg(dirname);
+	//m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url);
+	struct curl_slist *headerlist = NULL;
+	headerlist = curl_slist_append(headerlist, szCmd.toLocal8Bit().toStdString().c_str());
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_POSTQUOTE, headerlist);
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+	prepare();
+	m_iRetCode = curl_easy_perform(m_pSecCurlHandler);
+	curl_slist_free_all(headerlist);
+	return m_iRetCode;
 }
 
 int CFtp::setTransferMode(TransferMode mode)
@@ -380,6 +401,9 @@ void CFtp::prepare()
 {
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEDATA, (void *)&listInfo);
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
+
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_WRITEDATA, (void *)&listInfo);
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
 }
 
 void CFtp::parseMlsdInfo(const QString &currentDir, const QString &info, QList<CFileInfo> &fileList)
