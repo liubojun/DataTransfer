@@ -73,6 +73,9 @@ namespace FTP
 		// 从ftp下载文件(支持文件不落地，直接走内存)
 		int get(const QString &file, QIODevice *dev, TransferType type = Binary);
 
+		// 获取ftp文件大小
+		double getFileSize(const QString &file);
+
 		// 获取文件目录列表
 		QList<CFileInfo> list(const QString &dir = QString());
 
@@ -83,7 +86,7 @@ namespace FTP
 		int mkdir(const QString &dir);
 
 		// 上传到目标文件
-		int	put(QIODevice * dev, const QString & file, TransferType type = Binary);
+		int	put(const QString & localFile, const QString & remoteFile, const QString &suffix = QString(".tmp"), TransferType type = Binary);
 
 		// 上传到目标文件
 		int	put(const QByteArray & data, const QString & file, TransferType type = Binary);
@@ -125,6 +128,9 @@ namespace FTP
 	private:
 		// 内部维护curl句柄
 		CURL *m_pCurlHandler;
+
+		// 辅助curl句柄，主要用在获取文件属性等
+		CURL *m_pSecCurlHandler;
 
 		MemoryData listInfo;
 

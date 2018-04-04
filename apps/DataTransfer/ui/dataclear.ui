@@ -115,19 +115,6 @@
           </property>
          </widget>
         </item>
-        <item>
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
        </layout>
       </item>
       <item>
@@ -159,19 +146,6 @@
            <bool>false</bool>
           </property>
          </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_5">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </item>
@@ -348,26 +322,6 @@
        </layout>
       </item>
      </layout>
-     <zorder>label_9</zorder>
-     <zorder>comboBox_value</zorder>
-     <zorder>label_8</zorder>
-     <zorder>comboBox_unit</zorder>
-     <zorder>label_7</zorder>
-     <zorder>lineEdit_file</zorder>
-     <zorder>label_4</zorder>
-     <zorder>rBt_dir</zorder>
-     <zorder>rBt_ftp</zorder>
-     <zorder>cBx_ftpmode</zorder>
-     <zorder>lineEdit_ip</zorder>
-     <zorder>label_ip</zorder>
-     <zorder>label_12</zorder>
-     <zorder>lineEdit_password</zorder>
-     <zorder>label_13</zorder>
-     <zorder>lineEdit_user</zorder>
-     <zorder>label_14</zorder>
-     <zorder>horizontalSpacer_4</zorder>
-     <zorder>horizontalSpacer_5</zorder>
-     <zorder>spinBox_port</zorder>
     </widget>
    </item>
    <item>

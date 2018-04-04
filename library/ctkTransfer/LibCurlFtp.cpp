@@ -1,11 +1,13 @@
 #include "LibCurlFtp.h"
 #include <QDataStream>
+#include <stdio.h>
 
 using namespace FTP;
 CFtp::CFtp()
 {
     m_pCurlHandler = NULL;
     m_pCurlHandler = curl_easy_init();
+	m_pSecCurlHandler = curl_easy_init();
     enableDebugLevel(true);
 
 }
@@ -31,6 +33,12 @@ int CFtp::close()
         curl_easy_cleanup(m_pCurlHandler);
         m_pCurlHandler = NULL;
     }
+	if (NULL != m_pSecCurlHandler)
+	{
+		curl_easy_cleanup(m_pSecCurlHandler);
+		m_pSecCurlHandler = NULL;
+	}
+	
     return 0;
 }
 
@@ -122,6 +130,38 @@ int FTP::CFtp::get(const QString &file, QIODevice *dev, TransferType type /*= Bi
 }
 
 
+double CFtp::getFileSize(const QString &file)
+{
+	QString filename, url;
+	if (file.startsWith("/"))
+	{
+		filename = file.split("/").last();
+		QString dir = file.mid(0, file.lastIndexOf("/"));
+		url = makeUrl(dir);
+	}
+	else
+	{
+		filename = file;
+		url = makeUrl("");
+	}
+	url = url + filename;
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_CUSTOMREQUEST, "GET");
+	curl_easy_setopt(m_pSecCurlHandler, CURLOPT_NOBODY, 1);
+	curl_easy_setopt(m_pSecCurlHandler, CURLOPT_HEADER, 0);
+	curl_easy_setopt(m_pSecCurlHandler, CURLOPT_NOSIGNAL, 1L);
+	curl_easy_setopt(m_pSecCurlHandler, CURLOPT_VERBOSE, 1L);
+	//prepare();
+	struct MemoryData listInfo;
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_WRITEDATA, (void *)&listInfo);
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
+	m_iRetCode = curl_easy_perform(m_pSecCurlHandler);
+	double fileSize = 0.0;
+	m_iRetCode = curl_easy_getinfo(m_pSecCurlHandler, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &fileSize);
+	return fileSize;
+}
+
+
 QList<CFileInfo> CFtp::list(const QString &dir /*= QString()*/)
 {
     if (!dir.isEmpty())
@@ -143,8 +183,14 @@ QList<CFileInfo> CFtp::list(const QString &dir /*= QString()*/)
 
 int CFtp::login(const QString &user /*= QString()*/, const QString &password /*= QString()*/)
 {
+
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_USERNAME, user.toLocal8Bit().toStdString().c_str());
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_PASSWORD, password.toLocal8Bit().toStdString().c_str());
+
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_USERNAME, user.toLocal8Bit().toStdString().c_str());
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_PASSWORD, password.toLocal8Bit().toStdString().c_str());
+	
+
     prepare();
     m_iRetCode = curl_easy_perform(m_pCurlHandler);
     return m_iRetCode;
@@ -155,9 +201,70 @@ int CFtp::mkdir(const QString &dir)
     return 0;
 }
 
-int CFtp::put(QIODevice * dev, const QString & file, TransferType type /*= Binary*/)
+int CFtp::put(const QString & localFile, const QString & remoteFile, const QString &suffix /*= QString(".tmp")*/, TransferType type /*= Binary*/)
 {
-    return 0;
+	QString filename, url;
+	if (remoteFile.startsWith("/"))
+	{
+		filename = remoteFile.split("/").last();
+		QString dir = remoteFile.mid(0, remoteFile.lastIndexOf("/"));
+		url = makeUrl(dir);
+	}
+	else
+	{
+		filename = remoteFile;
+		url = makeUrl("");
+	}
+
+	
+
+	QString cmdTmpName = "RNFR " + filename + suffix;
+	QString cmdOrgName = "RNTO " + filename;
+	QString strUrl = url + filename + suffix;
+	//strUrl += filename + sendsuffix;
+	struct curl_slist *headerlist = NULL;
+	headerlist = curl_slist_append(headerlist, cmdTmpName.toLocal8Bit().toStdString().c_str());
+	headerlist = curl_slist_append(headerlist, cmdOrgName.toLocal8Bit().toStdString().c_str());
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_UPLOAD, 1);
+	//////////////////////////////////////////////////////////////////////////
+	// 断点续传
+	std::FILE *pfile = fopen(localFile.toLocal8Bit().toStdString().c_str(), "rb");
+	if (pfile == NULL)
+	{
+		QSLOG_ERROR(QString("open file %1 failure").arg(localFile));
+		return -1;
+	}
+	QSharedPointer<std::FILE> autoclose(pfile, fclose);
+	double size = getFileSize(remoteFile);
+	fseek(pfile,0 , SEEK_END);
+	long fileLen = ftell(pfile);
+	if (size != double(-1.0) )
+	{	
+		if ((long)size != fileLen)
+		{
+			if (0 != remove(remoteFile))
+			{
+				QSLOG_ERROR(errorString());
+			}
+		}
+		else
+		{
+			// 文件已经存在
+			return m_iRetCode;
+		}
+	}
+	fseek(pfile, 0, SEEK_SET);
+
+
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_APPEND, 0);
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, strUrl.toLocal8Bit().toStdString().c_str());
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_FTP_CREATE_MISSING_DIRS, 1);
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_READDATA, pfile);
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_READFUNCTION, ReadFromFile);
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_POSTQUOTE, headerlist);
+	m_iRetCode = curl_easy_perform(m_pCurlHandler);
+	curl_slist_free_all(headerlist);
+	return m_iRetCode;
 }
 
 int CFtp::put(const QByteArray & data, const QString & file, TransferType type /*= Binary*/)
@@ -185,14 +292,14 @@ int CFtp::remove(const QString &file)
         filename = file;
         url = makeUrl("");
     }
-    QString szCmd = QString("DELE %1").arg(filename).arg("Z_QH_QPE60_20170605062400.bin.bz2");
+    QString szCmd = QString("DELE %1").arg(filename);
     //m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url);
     struct curl_slist *headerlist = NULL;
     headerlist = curl_slist_append(headerlist, szCmd.toLocal8Bit().toStdString().c_str());
-    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_POSTQUOTE, headerlist);
-    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_POSTQUOTE, headerlist);
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
     prepare();
-    m_iRetCode = curl_easy_perform(m_pCurlHandler);
+	m_iRetCode = curl_easy_perform(m_pSecCurlHandler);
     curl_slist_free_all(headerlist);
     return m_iRetCode;
 }
