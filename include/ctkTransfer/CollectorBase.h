@@ -27,7 +27,7 @@ using namespace std;
 #include <QProcess>
 #include <QWaitCondition>
 #include <QUuid>
-#include <QUdpSocket>
+#include <QTcpSocket>
 #include "commontypedef.h"
 #include "ctkLog.h"
 #include "../ctkProtocol/fileMsg.h"
@@ -419,7 +419,7 @@ protected:
     // 日志端口
     int m_iUdpLogPort;
 
-    QUdpSocket m_oLogSocket;
+	QTcpSocket m_oLogSocket;
 
     // 当前收集器的唯一标识
     QUuid m_oId;

@@ -20,15 +20,18 @@ LogPrintImpl::LogPrintImpl(MainWindow *in_pWnd) : m_pWnd(in_pWnd)//, server(RCF:
             SLOT(print(const QString &, const QString &, const QString &, int)));
     //m_oThread.start();
     //this->moveToThread(&m_oThread);
-    if (!m_oUdpSocket.bind(QHostAddress::LocalHost, logport))
+    // if (!m_oUdpSocket.bind(QHostAddress::LocalHost, logport))
+	if (!m_oServer.listen(QHostAddress::LocalHost, logport))
     {
-        QSLOG_ERROR(QString("udp bind port failure, reason: %1").arg(m_oUdpSocket.errorString()));
+        //QSLOG_ERROR(QString("udp bind port failure, reason: %1").arg(m_oUdpSocket.errorString()));
     }
     else
     {
-        QSLOG_DEBUG(QString("udp bind port %1 success").arg(logport));
-        connect(&m_oUdpSocket, SIGNAL(readyRead()),
-                this, SLOT(readPendingDatagrams()));
+        QSLOG_DEBUG(QString("tcp bind port %1 success").arg(logport));
+		connect(&m_oServer, SIGNAL(showLog(const QString &, const QString &, const QString &, int)), this, SIGNAL(showLog(const QString &, const QString &, const QString &, int)));
+		//connect(&m_oServer, SIGNAL(newConnection()), this, SLOT(newconnections()));
+        //connect(&m_oUdpSocket, SIGNAL(readyRead()),
+        //        this, SLOT(readPendingDatagrams()));
     }
 }
 
@@ -53,25 +56,27 @@ LogPrintImpl::~LogPrintImpl()
 void LogPrintImpl::readPendingDatagrams()
 {
     //qDebug() << QThread::currentThreadId();
-    while (m_oUdpSocket.hasPendingDatagrams())
-    {
-        QByteArray datagram;
-        datagram.resize(m_oUdpSocket.pendingDatagramSize());
-        QHostAddress sender;
-        quint16 senderPort;
+    //while (m_oUdpSocket.hasPendingDatagrams())
+    //{
+    //    QByteArray datagram;
+    //    datagram.resize(m_oUdpSocket.pendingDatagramSize());
+    //    QHostAddress sender;
+    //    quint16 senderPort;
 
-        m_oUdpSocket.readDatagram(datagram.data(), datagram.size(),
-                                  &sender, &senderPort);
+    //    m_oUdpSocket.readDatagram(datagram.data(), datagram.size(),
+    //                              &sender, &senderPort);
 
-        QDataStream stream(&datagram, QIODevice::ReadOnly);
-        QString strDirName;
-        QString strDirId;
-        QString strLogInfo;
-        int iInfoType;
-        stream >> strDirName >> strDirId >> strLogInfo >> iInfoType;
-        emit showLog(strDirName, strDirId, strLogInfo, iInfoType);
-        // processTheDatagram(datagram);
-    }
+    //    QDataStream stream(&datagram, QIODevice::ReadOnly);
+    //    QString strDirName;
+    //    QString strDirId;
+    //    QString strLogInfo;
+    //    int iInfoType;
+    //    stream >> strDirName >> strDirId >> strLogInfo >> iInfoType;
+    //    emit showLog(strDirName, strDirId, strLogInfo, iInfoType);
+    //    // processTheDatagram(datagram);
+    //}
+
+
 }
 
 void LogPrintImpl::run()
@@ -85,6 +90,14 @@ void LogPrintImpl::run()
 void LogPrintImpl::stop()
 {
     //server->stop();
+}
+
+void LogPrintImpl::newconnections()
+{
+	QTcpSocket *tcpSocket = m_oServer.nextPendingConnection();
+	connect(tcpSocket, SIGNAL(readyRead()),
+		this, SLOT(readPendingDatagrams()));
+	connect(tcpSocket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
 }
 
 //void LogPrintImpl::start()

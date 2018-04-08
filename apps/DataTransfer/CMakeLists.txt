@@ -19,6 +19,8 @@ SET(SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/systemset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/baseset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/subdirtemplateedit.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/tcpsocket.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/tcpserver.cpp
 )
 
 # .h文件
@@ -39,6 +41,8 @@ SET(HDRS
   ${CMAKE_CURRENT_SOURCE_DIR}/systemset.h
   ${CMAKE_CURRENT_SOURCE_DIR}/baseset.h
   ${CMAKE_CURRENT_SOURCE_DIR}/subdirtemplateedit.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/tcpsocket.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/tcpserver.h
 )
 
 SET(MOC_HDRS
@@ -59,6 +63,8 @@ SET(MOC_HDRS
 	${CMAKE_CURRENT_SOURCE_DIR}/systemset.h
 	${CMAKE_CURRENT_SOURCE_DIR}/baseset.h
 	${CMAKE_CURRENT_SOURCE_DIR}/subdirtemplateedit.h
+	${CMAKE_CURRENT_SOURCE_DIR}/tcpsocket.h
+	${CMAKE_CURRENT_SOURCE_DIR}/tcpserver.h
 )
 
 SET(UI

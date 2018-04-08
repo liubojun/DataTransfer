@@ -19,6 +19,8 @@ SET(SRCS
   ${RadarProject}/apps/DataTransfer/systemset.cpp
   ${RadarProject}/apps/DataTransfer/baseset.cpp
   ${RadarProject}/apps/DataTransfer/subdirtemplateedit.cpp
+  ${RadarProject}/apps/DataTransfer/tcpsocket.cpp
+  ${RadarProject}/apps/DataTransfer/tcpserver.cpp
 )
 
 # .h文件
@@ -39,6 +41,8 @@ SET(HDRS
   ${RadarProject}/apps/DataTransfer/systemset.h
   ${RadarProject}/apps/DataTransfer/baseset.h
   ${RadarProject}/apps/DataTransfer/subdirtemplateedit.h
+  ${RadarProject}/apps/DataTransfer/tcpsocket.h
+  ${RadarProject}/apps/DataTransfer/tcpserver.h
 )
 
 SET(MOC_HDRS
@@ -59,6 +63,8 @@ SET(MOC_HDRS
 	${RadarProject}/apps/DataTransfer/systemset.h
 	${RadarProject}/apps/DataTransfer/baseset.h
 	${RadarProject}/apps/DataTransfer/subdirtemplateedit.h
+	${RadarProject}/apps/DataTransfer/tcpsocket.h
+	${RadarProject}/apps/DataTransfer/tcpserver.h
 )
 
 SET(UI

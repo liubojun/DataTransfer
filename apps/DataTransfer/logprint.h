@@ -5,12 +5,14 @@
 //#include <RCF/RCF.hpp>
 #include <QThread>
 #include <QUdpSocket>
+#include "tcpserver.h"
 //#include "logprotocol.h"
 
 using namespace std;
 
 
 class MainWindow;
+
 
 class LogPrintImpl : public QThread
 {
@@ -35,6 +37,8 @@ public slots:
     //void start();
 
     void readPendingDatagrams();
+
+	void newconnections();
 signals:
     void showLog(const QString &dirName, const QString &dirId, const QString &info, int infoType);
 private:
@@ -43,8 +47,9 @@ private:
     //RCF::RcfServer *server;
     //QThread m_oThread;
 
-    QUdpSocket m_oUdpSocket;
-
+    // QUdpSocket m_oUdpSocket;
+	// QTcpSocket m_oUdpSocket;
+	TcpServer m_oServer;
 };
 
 #endif // logprint_h__
