@@ -23,7 +23,7 @@ LogPrintImpl::LogPrintImpl(MainWindow *in_pWnd) : m_pWnd(in_pWnd)//, server(RCF:
     // if (!m_oUdpSocket.bind(QHostAddress::LocalHost, logport))
 	if (!m_oServer.listen(QHostAddress::LocalHost, logport))
     {
-        //QSLOG_ERROR(QString("udp bind port failure, reason: %1").arg(m_oUdpSocket.errorString()));
+		QSLOG_ERROR(QString("udp bind port failure, reason: %1").arg(m_oServer.errorString()));
     }
     else
     {
