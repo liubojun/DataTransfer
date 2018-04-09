@@ -27,12 +27,12 @@ int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
 
-	FTP::CFtp oFtp;
-	oFtp.connectToHost("127.0.0.1");
-	oFtp.login("nriet", "123456");
-	oFtp.rmdir("test");
-	//oFtp.put("E:/workspace/DataTransfer/build/datatransfer/debug/bin/Debug/ctkPluginManager.pdb", "/test/remote.bin", ".tmp");
-	//oFtp.getFileSize("/test/remote.bin");
+    //FTP::CFtp oFtp;
+    //oFtp.connectToHost("127.0.0.1");
+    //oFtp.login("nriet", "123456");
+    //oFtp.rmdir("test");
+    //oFtp.put("E:/workspace/DataTransfer/build/datatransfer/debug/bin/Debug/ctkPluginManager.pdb", "/test/remote.bin", ".tmp");
+    //oFtp.getFileSize("/test/remote.bin");
     //oFtp.cd("/test");
     ////oFtp.cd("/home/Administrator/");
     ////oFtp.cd("/usr/i686-w64-mingw32/lib");
@@ -59,11 +59,11 @@ int main(int argc, char **argv)
 
     QString strLockPath = app.applicationDirPath() + "/lock/";
 
-	QDir oDir(strLockPath);
-	if (!oDir.exists())
-	{
-		oDir.mkpath(strLockPath);
-	}
+    QDir oDir(strLockPath);
+    if (!oDir.exists())
+    {
+        oDir.mkpath(strLockPath);
+    }
     QLockFile oMem(strLockPath + argv[1]);
     if (!oMem.lock())
     {

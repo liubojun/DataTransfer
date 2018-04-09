@@ -6,17 +6,17 @@
 
 class TcpSocket : public QTcpSocket
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	TcpSocket(QTcpSocket *parent = NULL);
+    TcpSocket(QObject *parent = NULL);
 signals:
-	void showLog(const QString &dirName, const QString &dirId, const QString &info, int infoType);
+    void showLog(const QString &dirName, const QString &dirId, const QString &info, int infoType);
 public slots:
 
-	void readPendingDatagrams();
+    void readPendingDatagrams();
 
 private:
-	quint16 m_iMsgLen;
+    quint16 m_iMsgLen;
 };
 
 

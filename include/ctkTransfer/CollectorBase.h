@@ -36,7 +36,7 @@ using namespace std;
 #include "lastCollectTime.h"
 //#include "logprotocol.h"
 #include "macro.h"
-
+#include <QUdpSocket>
 class IRadarBaseDataParse;
 
 /**
@@ -419,7 +419,7 @@ protected:
     // 日志端口
     int m_iUdpLogPort;
 
-	QTcpSocket m_oLogSocket;
+    QUdpSocket m_oLogSocket;
 
     // 当前收集器的唯一标识
     QUuid m_oId;
