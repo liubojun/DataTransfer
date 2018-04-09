@@ -419,7 +419,7 @@ protected:
     // 日志端口
     int m_iUdpLogPort;
 
-    QUdpSocket m_oLogSocket;
+    // QUdpSocket m_oLogSocket;
 
     // 当前收集器的唯一标识
     QUuid m_oId;

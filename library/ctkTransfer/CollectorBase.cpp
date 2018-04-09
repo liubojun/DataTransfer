@@ -49,7 +49,6 @@ CollectorBase::CollectorBase(QWaitCondition &in_oCond, QMutex &in_oLocker, int &
     int threadnum;
     bool enableLog;
     DataBase::getInstance()->queryBaseInfo(threadnum, m_iUdpLogPort, enableLog);
-    //m_oLogSocket.connectToHost(QHostAddress::LocalHost, m_iUdpLogPort);
     //if (!m_oLogSocket.waitForConnected())
     //{
     //	QSLOG_ERROR(QString("cannot connect to host, error:") + m_oLogSocket.errorString());
@@ -64,7 +63,7 @@ CollectorBase::~CollectorBase()
     //m_oThread.wait();
     //m_oThread.terminate();
     emit showIdentify(m_oId.toString());
-    m_oLogSocket.close();
+    //m_oLogSocket.close();
     //delete m_oRcfClient;
     //m_oRcfClient = NULL;
 
@@ -145,6 +144,7 @@ void CollectorBase::emitLog(const QString &info, int infoType)
         //m_oRcfClient->print(m_collectSet.dirName.toLocal8Bit().toStdString(),
         //                    m_collectSet.dirID.toLocal8Bit().toStdString(),
         //                    info.toLocal8Bit().toStdString(), infoType);
+        QUdpSocket m_oLogSocket;
         QByteArray datagram;
         QDataStream stream(&datagram, QIODevice::WriteOnly);
         quint16 iMsgLen = 0;
@@ -153,6 +153,7 @@ void CollectorBase::emitLog(const QString &info, int infoType)
         iMsgLen = datagram.length() - sizeof(quint16);
         stream << iMsgLen;
         // m_oLogSocket.write(datagram);
+        // m_oLogSocket.close();
         qint64 iLen = m_oLogSocket.writeDatagram(datagram, QHostAddress::LocalHost, m_iUdpLogPort);
 
     }
