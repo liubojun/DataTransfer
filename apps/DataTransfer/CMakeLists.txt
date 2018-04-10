@@ -19,8 +19,6 @@ SET(SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/systemset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/baseset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/subdirtemplateedit.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/tcpsocket.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/tcpserver.cpp
 )
 
 # .h文件
@@ -41,8 +39,6 @@ SET(HDRS
   ${CMAKE_CURRENT_SOURCE_DIR}/systemset.h
   ${CMAKE_CURRENT_SOURCE_DIR}/baseset.h
   ${CMAKE_CURRENT_SOURCE_DIR}/subdirtemplateedit.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/tcpsocket.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/tcpserver.h
 )
 
 SET(MOC_HDRS
@@ -63,8 +59,6 @@ SET(MOC_HDRS
 	${CMAKE_CURRENT_SOURCE_DIR}/systemset.h
 	${CMAKE_CURRENT_SOURCE_DIR}/baseset.h
 	${CMAKE_CURRENT_SOURCE_DIR}/subdirtemplateedit.h
-	${CMAKE_CURRENT_SOURCE_DIR}/tcpsocket.h
-	${CMAKE_CURRENT_SOURCE_DIR}/tcpserver.h
 )
 
 SET(UI
@@ -140,14 +134,14 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
         ${QT_QTUITOOLS_LIBRARY}
         ${QT_QTQML_LIBRARY}
         ${QT_QTQUICK_LIBRARY}
-		${QT_QTNETWORK_LIBRARY}
+		#${QT_QTNETWORK_LIBRARY}
         ctkLogger
         ctkPublicFun
         ctkPluginManager
         ${VLD_LIB}
         CTKPluginFramework
         ${CURL_LIBRARY}
-		#RCF
+		RCF
         )
 
 INSTALL(TARGETS ${PROJECT_NAME}

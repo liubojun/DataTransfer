@@ -2,11 +2,11 @@
 #define logprint_h__
 
 #include <string>
-//#include <RCF/RCF.hpp>
+#include <RCF/RCF.hpp>
 #include <QThread>
-#include <QUdpSocket>
+//#include <QUdpSocket>
 //#include "tcpserver.h"
-//#include "logprotocol.h"
+#include "logprotocol.h"
 
 using namespace std;
 
@@ -29,25 +29,25 @@ public:
 
     void stop();
 
-    // void print(const string &dirName, const string &dirId, const string &info, int infoType);
+    void print(const string &dirName, const string &dirId, const string &info, int infoType);
     //void print(const QString &dirName, const QString &dirId, const QString &info, int infoType);
 
 public slots:
 
-    //void start();
+    void start();
 
     void readPendingDatagrams();
 
     void newconnections();
 signals:
-    void showLog(const QString &dirName, const QString &dirId, const QString &info, int infoType);
+    void showLog(const string &dirName, const string &dirId, const string &info, int infoType);
 private:
     MainWindow *m_pWnd;
-    //RCF::RcfInitDeinit rcfInit;
-    //RCF::RcfServer *server;
-    //QThread m_oThread;
+    RCF::RcfInitDeinit rcfInit;
+    RCF::RcfServer *server;
+    QThread m_oThread;
 
-    QUdpSocket m_oUdpSocket;
+    // QUdpSocket m_oUdpSocket;
     // QTcpSocket m_oUdpSocket;
     // TcpServer m_oServer;
 };

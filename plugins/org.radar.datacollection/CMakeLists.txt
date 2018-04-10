@@ -75,6 +75,7 @@ INCLUDE_DIRECTORIES(
 					${RadarProjectInclude}/ctkProtocol
 					${RadarProjectInclude}/ctkTransfer
 					${RadarProjectInclude}/3dpart
+					${RadarProjectInclude}/3dpart/RCF-2.2.0.0/include
 					${CURL_INCLUDE_DIR}
 					${VLD_INCLUDE}
 				)
@@ -102,7 +103,7 @@ ctkMacroBuildPlugin(
   TARGET_LIBRARIES ${PLUGIN_target_libraries} ${VLD_LIB}
   ctkLogger
   ctkPublicFun	
-  #RCF
+  RCF
   ${QT_QTCORE_LIBRARY}
   ${QT_QTGUI_LIBRARY}
   #Mpr.lib

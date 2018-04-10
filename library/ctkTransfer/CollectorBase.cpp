@@ -15,7 +15,7 @@
 #include <QSharedMemory>
 #include <QByteArray>
 #include <QDataStream>
-#include <QHostAddress>
+//#include <QHostAddress>
 
 #ifdef WITH_MEM_CHECK
 #include "vld.h"
@@ -53,7 +53,7 @@ CollectorBase::CollectorBase(QWaitCondition &in_oCond, QMutex &in_oLocker, int &
     //{
     //	QSLOG_ERROR(QString("cannot connect to host, error:") + m_oLogSocket.errorString());
     //}
-    //m_oRcfClient = new RcfClient<I_LogPrint>(RCF::TcpEndpoint(logport));
+    m_oRcfClient = new RcfClient<I_LogPrint>(RCF::TcpEndpoint(m_iUdpLogPort));
 }
 
 CollectorBase::~CollectorBase()
@@ -141,20 +141,18 @@ void CollectorBase::emitLog(const QString &info, int infoType)
     try
     {
         //printf("111111111111111111\n");
-        //m_oRcfClient->print(m_collectSet.dirName.toLocal8Bit().toStdString(),
-        //                    m_collectSet.dirID.toLocal8Bit().toStdString(),
-        //                    info.toLocal8Bit().toStdString(), infoType);
-        QUdpSocket m_oLogSocket;
-        QByteArray datagram;
-        QDataStream stream(&datagram, QIODevice::WriteOnly);
-        quint16 iMsgLen = 0;
-        stream << iMsgLen  << m_collectSet.dirName << m_collectSet.dirID << info << infoType;
-        stream.device()->seek(0);
-        iMsgLen = datagram.length() - sizeof(quint16);
-        stream << iMsgLen;
-        // m_oLogSocket.write(datagram);
-        // m_oLogSocket.close();
-        qint64 iLen = m_oLogSocket.writeDatagram(datagram, QHostAddress::LocalHost, m_iUdpLogPort);
+        m_oRcfClient->print(m_collectSet.dirName.toLocal8Bit().toStdString(),
+                            m_collectSet.dirID.toLocal8Bit().toStdString(),
+                            info.toLocal8Bit().toStdString(), infoType);
+        //QUdpSocket m_oLogSocket;
+        //QByteArray datagram;
+        //QDataStream stream(&datagram, QIODevice::WriteOnly);
+        //quint16 iMsgLen = 0;
+        //stream << iMsgLen  << m_collectSet.dirName << m_collectSet.dirID << info << infoType;
+        //stream.device()->seek(0);
+        //iMsgLen = datagram.length() - sizeof(quint16);
+        //stream << iMsgLen;
+        //qint64 iLen = m_oLogSocket.writeDatagram(datagram, QHostAddress::LocalHost, m_iUdpLogPort);
 
     }
     catch (std::exception &ex)

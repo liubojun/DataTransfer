@@ -70,11 +70,11 @@ IF (WIN32)
 		${QT_QTCORE_LIBRARY}
 		${QT_UITOOLS_LIBRARY}
 		${VLD_LIB}	#VLD内存泄露检查
-		${QT_QTNETWORK_LIBRARY}
+		#${QT_QTNETWORK_LIBRARY}
 		CTKPluginFramework	
 		ctkLogger
 		ctkPublicFun
-		#RCF
+		RCF
 		Mpr
 		${CURL_LIBRARY}
 	)
@@ -84,12 +84,12 @@ ELSE (WIN32)
 		${QT_QTCORE_LIBRARY}
 		${QT_UITOOLS_LIBRARY}
         ${QT_QTSQL_LIBRARY}
-		${QT_QTNETWORK_LIBRARY}
+		#${QT_QTNETWORK_LIBRARY}
 		${VLD_LIB}
 		${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libctkLogger.so	#需要明确路径
         CTKPluginFramework
 		ctkPublicFun
-		#RCF
+		RCF
 		${CURL_LIBRARY}
 	)
 ENDIF (WIN32)

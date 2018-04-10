@@ -19,8 +19,6 @@ SET(SRCS
   ${RadarProject}/apps/DataTransfer/systemset.cpp
   ${RadarProject}/apps/DataTransfer/baseset.cpp
   ${RadarProject}/apps/DataTransfer/subdirtemplateedit.cpp
-  ${RadarProject}/apps/DataTransfer/tcpsocket.cpp
-  ${RadarProject}/apps/DataTransfer/tcpserver.cpp
 )
 
 # .h文件
@@ -41,8 +39,6 @@ SET(HDRS
   ${RadarProject}/apps/DataTransfer/systemset.h
   ${RadarProject}/apps/DataTransfer/baseset.h
   ${RadarProject}/apps/DataTransfer/subdirtemplateedit.h
-  ${RadarProject}/apps/DataTransfer/tcpsocket.h
-  ${RadarProject}/apps/DataTransfer/tcpserver.h
 )
 
 SET(MOC_HDRS
@@ -63,8 +59,6 @@ SET(MOC_HDRS
 	${RadarProject}/apps/DataTransfer/systemset.h
 	${RadarProject}/apps/DataTransfer/baseset.h
 	${RadarProject}/apps/DataTransfer/subdirtemplateedit.h
-	${RadarProject}/apps/DataTransfer/tcpsocket.h
-	${RadarProject}/apps/DataTransfer/tcpserver.h
 )
 
 SET(UI
@@ -139,14 +133,14 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
         ${QT_QTUITOOLS_LIBRARY}
         ${QT_QTQML_LIBRARY}
         ${QT_QTQUICK_LIBRARY}
-		${QT_QTNETWORK_LIBRARY}
+		#${QT_QTNETWORK_LIBRARY}
         ctkLogger
         ctkPublicFun
         ctkPluginManager
         ${VLD_LIB}
         CTKPluginFramework
         ${CURL_LIBRARY}
-		#RCF
+		RCF
         )
 
 INSTALL(TARGETS ${PROJECT_NAME}

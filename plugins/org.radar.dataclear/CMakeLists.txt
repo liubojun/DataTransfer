@@ -59,6 +59,8 @@ INCLUDE_DIRECTORIES(
 					${RadarProjectInclude}/ctkPublicFun
 					${RadarProjectInclude}/QsLog
 					${RadarProjectInclude}/ctkProtocol
+					${RadarProjectInclude}/3dpart
+					${RadarProjectInclude}/3dpart/RCF-2.2.0.0/include
 					${CURL_INCLUDE_DIR}
 					${VLD_INCLUDE}	
 				)

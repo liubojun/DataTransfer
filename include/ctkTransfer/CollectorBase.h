@@ -27,16 +27,17 @@ using namespace std;
 #include <QProcess>
 #include <QWaitCondition>
 #include <QUuid>
-#include <QTcpSocket>
+//#include <QTcpSocket>
 #include "commontypedef.h"
 #include "ctkLog.h"
 #include "../ctkProtocol/fileMsg.h"
 #include "lateFileTime.h"
 #include "transferSet.h"
 #include "lastCollectTime.h"
-//#include "logprotocol.h"
+#include "logprotocol.h"
 #include "macro.h"
-#include <QUdpSocket>
+#include "RCF/RCF.hpp"
+//#include <QUdpSocket>
 class IRadarBaseDataParse;
 
 /**
@@ -413,8 +414,8 @@ protected:
     QMutex &m_oLocker;
     int &m_iLogsize;
 
-    //RCF::RcfInitDeinit m_oRcfInit;
-    //RcfClient<I_LogPrint> *m_oRcfClient;
+    RCF::RcfInitDeinit m_oRcfInit;
+    RcfClient<I_LogPrint> *m_oRcfClient;
 
     // 日志端口
     int m_iUdpLogPort;
