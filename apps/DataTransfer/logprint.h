@@ -50,7 +50,7 @@ private:
     //QThread m_oThread;
 
     QUdpSocket m_oUdpSocket;
-    quint16 m_iLogPort;
+    int m_iLogPort;
     // QTcpSocket m_oUdpSocket;
     // TcpServer m_oServer;
 };
