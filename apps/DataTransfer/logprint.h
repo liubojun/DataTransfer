@@ -4,7 +4,7 @@
 #include <string>
 #include <RCF/RCF.hpp>
 #include <QThread>
-//#include <QUdpSocket>
+#include <QUdpSocket>
 //#include "tcpserver.h"
 #include "logprotocol.h"
 
@@ -29,8 +29,8 @@ public:
 
     void stop();
 
-    void print(const string &dirName, const string &dirId, const string &info, int infoType);
-    //void print(const QString &dirName, const QString &dirId, const QString &info, int infoType);
+    //void print(const string &dirName, const string &dirId, const string &info, int infoType);
+    void print(const QString &dirName, const QString &dirId, const QString &info, int infoType);
 
 public slots:
 
@@ -39,17 +39,21 @@ public slots:
     void readPendingDatagrams();
 
     void newconnections();
+
+    void timerUpDate();
 signals:
-    void showLog(const string &dirName, const string &dirId, const string &info, int infoType);
+    void showLog(const QString &dirName, const QString &dirId, const QString &info, int infoType);
 private:
     MainWindow *m_pWnd;
-    RCF::RcfInitDeinit rcfInit;
-    RCF::RcfServer *server;
-    QThread m_oThread;
+    //RCF::RcfInitDeinit rcfInit;
+    //RCF::RcfServer *server;
+    //QThread m_oThread;
 
-    // QUdpSocket m_oUdpSocket;
+    QUdpSocket m_oUdpSocket;
+    quint16 m_iLogPort;
     // QTcpSocket m_oUdpSocket;
     // TcpServer m_oServer;
 };
+
 
 #endif // logprint_h__

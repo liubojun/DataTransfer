@@ -390,8 +390,8 @@ void MainWindow::addLog(const CollectTask &task, const QString &info, int infoTy
     ////m_ilogsize--;
 }
 
-void MainWindow::print(const string &dirName, const string &dirId, const string &info, int infoType)
-//void MainWindow::print(const QString &dirName, const QString &dirId, const QString &info, int infoType)
+//void MainWindow::print(const string &dirName, const string &dirId, const string &info, int infoType)
+void MainWindow::print(const QString &dirName, const QString &dirId, const QString &info, int infoType)
 {
     //QSLOG_DEBUG("PRINT2");
     if (m_logNum >= 500)
@@ -419,11 +419,11 @@ void MainWindow::print(const string &dirName, const string &dirId, const string 
     }
 
     ui.tableWidget->setItem(0, 0, pItem);
-    pItem = new QTableWidgetItem(QString::fromLocal8Bit(dirName.c_str()));
-    //pItem = new QTableWidgetItem(dirName);
+    //pItem = new QTableWidgetItem(QString::fromLocal8Bit(dirName.c_str()));
+    pItem = new QTableWidgetItem(dirName);
     ui.tableWidget->setItem(0, 1, pItem);
-    pItem = new QTableWidgetItem(QString::fromLocal8Bit(info.c_str()));
-    //pItem = new QTableWidgetItem(info);
+    //pItem = new QTableWidgetItem(QString::fromLocal8Bit(info.c_str()));
+    pItem = new QTableWidgetItem(info);
     ui.tableWidget->setItem(0, 2, pItem);
 
     if (infoType == 0)
@@ -433,8 +433,8 @@ void MainWindow::print(const string &dirName, const string &dirId, const string 
     else if (infoType == 1)
     {
         // 发送成功
-        MyItemWidget *pIwidget = getItemWidget(QString::fromLocal8Bit(dirId.c_str()));
-        // MyItemWidget *pIwidget = getItemWidget(dirId);
+        // MyItemWidget *pIwidget = getItemWidget(QString::fromLocal8Bit(dirId.c_str()));
+        MyItemWidget *pIwidget = getItemWidget(dirId);
         if (pIwidget != NULL)
         {
             pIwidget->AddSuccess(qDT);

@@ -66,8 +66,8 @@ public slots:
     * @param  const std::string &infoType日志等级
     * @return ：无
     */
-    void print(const string &dirName, const string &dirId, const string &info, int infoType);
-    //void print(const QString &dirName, const QString &dirId, const QString &info, int infoType);
+    //void print(const string &dirName, const string &dirId, const string &info, int infoType);
+    void print(const QString &dirName, const QString &dirId, const QString &info, int infoType);
 protected:
     virtual void closeEvent(QCloseEvent *);
     virtual void changeEvent(QEvent *);
