@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>570</width>
-    <height>345</height>
+    <width>586</width>
+    <height>397</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -76,7 +76,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEdit"/>
+           <widget class="QLineEdit" name="lineEdit_username"/>
           </item>
           <item>
            <widget class="QLabel" name="label_19">
@@ -104,7 +104,7 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
           <item>
            <widget class="QLabel" name="label_2">
             <property name="text">
@@ -124,6 +124,34 @@
             <property name="text">
              <string>FTP</string>
             </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cbx_ftpTransferType">
+            <item>
+             <property name="text">
+              <string>binary</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>ascii</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cbx_ftpTransferMode">
+            <item>
+             <property name="text">
+              <string>被动模式</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>主动模式</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item>
@@ -192,7 +220,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEdit_2">
+           <widget class="QLineEdit" name="lineEdit_path">
             <property name="minimumSize">
              <size>
               <width>240</width>
@@ -292,7 +320,7 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="lineEdit_3"/>
+            <widget class="QLineEdit" name="lineEdit_ip"/>
            </item>
            <item row="0" column="2">
             <spacer name="horizontalSpacer_3">
@@ -315,7 +343,7 @@
             </widget>
            </item>
            <item row="0" column="4">
-            <widget class="QLineEdit" name="lineEdit_4">
+            <widget class="QLineEdit" name="lineEdit_port">
              <property name="text">
               <string>21</string>
              </property>
@@ -329,7 +357,7 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="lineEdit_5"/>
+            <widget class="QLineEdit" name="lineEdit_user"/>
            </item>
            <item row="1" column="2">
             <spacer name="horizontalSpacer_4">
@@ -352,7 +380,7 @@
             </widget>
            </item>
            <item row="1" column="4">
-            <widget class="QLineEdit" name="lineEdit_6"/>
+            <widget class="QLineEdit" name="lineEdit_pwd"/>
            </item>
           </layout>
          </widget>
@@ -371,13 +399,43 @@
        <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
-         <height>40</height>
+         <height>18</height>
         </size>
        </property>
       </spacer>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <widget class="QLabel" name="testResult_label">
+       <property name="text">
+        <string>Label</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Expanding</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>18</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QPushButton" name="pbt_test">
+         <property name="text">
+          <string>测试</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <spacer name="horizontalSpacer_5">
          <property name="orientation">

@@ -14,15 +14,31 @@ public:
     UserManageDlg(QDialog *parent = NULL);
     ~UserManageDlg();
 
+signals:
+    void testok(QString url);
+
+    void testfail(QString url);
+
 private slots:
     void onAdd();
     void onDelt();
     bool onApply();
-	void onOk();
-	void onCancel();
+    void onOk();
+    void onCancel();
     void onSelWay(bool bFile);
     void onBrowse();
     void onSelectUser(int);
+
+    // 测试当前远程分发用户是否可用
+    void onTest();
+
+    void onRemoteColTest();
+
+    void onTestOk(const QString &);
+
+    void onTestFail(const QString &);
+
+    void onTestResultTimeout();
 private:
     void InitUI();
 

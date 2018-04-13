@@ -7,7 +7,7 @@ CFtp::CFtp()
 {
     m_pCurlHandler = NULL;
     m_pCurlHandler = curl_easy_init();
-	m_pSecCurlHandler = curl_easy_init();
+    m_pSecCurlHandler = curl_easy_init();
     enableDebugLevel(true);
 
 }
@@ -33,12 +33,12 @@ int CFtp::close()
         curl_easy_cleanup(m_pCurlHandler);
         m_pCurlHandler = NULL;
     }
-	if (NULL != m_pSecCurlHandler)
-	{
-		curl_easy_cleanup(m_pSecCurlHandler);
-		m_pSecCurlHandler = NULL;
-	}
-	
+    if (NULL != m_pSecCurlHandler)
+    {
+        curl_easy_cleanup(m_pSecCurlHandler);
+        m_pSecCurlHandler = NULL;
+    }
+
     return 0;
 }
 
@@ -132,33 +132,33 @@ int FTP::CFtp::get(const QString &file, QIODevice *dev, TransferType type /*= Bi
 
 double CFtp::getFileSize(const QString &file)
 {
-	QString filename, url;
-	if (file.startsWith("/"))
-	{
-		filename = file.split("/").last();
-		QString dir = file.mid(0, file.lastIndexOf("/"));
-		url = makeUrl(dir);
-	}
-	else
-	{
-		filename = file;
-		url = makeUrl("");
-	}
-	url = url + filename;
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_CUSTOMREQUEST, "GET");
-	curl_easy_setopt(m_pSecCurlHandler, CURLOPT_NOBODY, 1);
-	curl_easy_setopt(m_pSecCurlHandler, CURLOPT_HEADER, 0);
-	curl_easy_setopt(m_pSecCurlHandler, CURLOPT_NOSIGNAL, 1L);
-	curl_easy_setopt(m_pSecCurlHandler, CURLOPT_VERBOSE, 1L);
-	//prepare();
-	struct MemoryData listInfo;
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_WRITEDATA, (void *)&listInfo);
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
-	m_iRetCode = curl_easy_perform(m_pSecCurlHandler);
-	double fileSize = 0.0;
-	m_iRetCode = curl_easy_getinfo(m_pSecCurlHandler, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &fileSize);
-	return fileSize;
+    QString filename, url;
+    if (file.startsWith("/"))
+    {
+        filename = file.split("/").last();
+        QString dir = file.mid(0, file.lastIndexOf("/"));
+        url = makeUrl(dir);
+    }
+    else
+    {
+        filename = file;
+        url = makeUrl("");
+    }
+    url = url + filename;
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_CUSTOMREQUEST, "GET");
+    curl_easy_setopt(m_pSecCurlHandler, CURLOPT_NOBODY, 1);
+    curl_easy_setopt(m_pSecCurlHandler, CURLOPT_HEADER, 0);
+    curl_easy_setopt(m_pSecCurlHandler, CURLOPT_NOSIGNAL, 1L);
+    curl_easy_setopt(m_pSecCurlHandler, CURLOPT_VERBOSE, 1L);
+    //prepare();
+    struct MemoryData listInfo;
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_WRITEDATA, (void *)&listInfo);
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
+    m_iRetCode = curl_easy_perform(m_pSecCurlHandler);
+    double fileSize = 0.0;
+    m_iRetCode = curl_easy_getinfo(m_pSecCurlHandler, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &fileSize);
+    return fileSize;
 }
 
 
@@ -181,15 +181,15 @@ QList<CFileInfo> CFtp::list(const QString &dir /*= QString()*/)
     return files;
 }
 
-int CFtp::login(const QString &user /*= QString()*/, const QString &password /*= QString()*/)
+int CFtp::login(const QString &user /*= QString()*/, const QString &password /*= QString()*/, int timeout /* = 30 s*/)
 {
 
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_USERNAME, user.toLocal8Bit().toStdString().c_str());
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_PASSWORD, password.toLocal8Bit().toStdString().c_str());
 
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_USERNAME, user.toLocal8Bit().toStdString().c_str());
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_PASSWORD, password.toLocal8Bit().toStdString().c_str());
-	
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_USERNAME, user.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_PASSWORD, password.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_TIMEOUT, timeout);
 
     prepare();
     m_iRetCode = curl_easy_perform(m_pCurlHandler);
@@ -203,68 +203,68 @@ int CFtp::mkdir(const QString &dir)
 
 int CFtp::put(const QString & localFile, const QString & remoteFile, const QString &suffix /*= QString(".tmp")*/, TransferType type /*= Binary*/)
 {
-	QString filename, url;
-	if (remoteFile.startsWith("/"))
-	{
-		filename = remoteFile.split("/").last();
-		QString dir = remoteFile.mid(0, remoteFile.lastIndexOf("/"));
-		url = makeUrl(dir);
-	}
-	else
-	{
-		filename = remoteFile;
-		url = makeUrl("");
-	}
-
-	
-
-	QString cmdTmpName = "RNFR " + filename + suffix;
-	QString cmdOrgName = "RNTO " + filename;
-	QString strUrl = url + filename + suffix;
-	//strUrl += filename + sendsuffix;
-	struct curl_slist *headerlist = NULL;
-	headerlist = curl_slist_append(headerlist, cmdTmpName.toLocal8Bit().toStdString().c_str());
-	headerlist = curl_slist_append(headerlist, cmdOrgName.toLocal8Bit().toStdString().c_str());
-	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_UPLOAD, 1);
-	//////////////////////////////////////////////////////////////////////////
-	// 断点续传
-	std::FILE *pfile = fopen(localFile.toLocal8Bit().toStdString().c_str(), "rb");
-	if (pfile == NULL)
-	{
-		QSLOG_ERROR(QString("open file %1 failure").arg(localFile));
-		return -1;
-	}
-	QSharedPointer<std::FILE> autoclose(pfile, fclose);
-	double size = getFileSize(remoteFile);
-	fseek(pfile,0 , SEEK_END);
-	long fileLen = ftell(pfile);
-	if (size != double(-1.0) )
-	{	
-		if ((long)size != fileLen)
-		{
-			if (0 != remove(remoteFile))
-			{
-				QSLOG_ERROR(errorString());
-			}
-		}
-		else
-		{
-			// 文件已经存在
-			return m_iRetCode;
-		}
-	}
-	fseek(pfile, 0, SEEK_SET);
+    QString filename, url;
+    if (remoteFile.startsWith("/"))
+    {
+        filename = remoteFile.split("/").last();
+        QString dir = remoteFile.mid(0, remoteFile.lastIndexOf("/"));
+        url = makeUrl(dir);
+    }
+    else
+    {
+        filename = remoteFile;
+        url = makeUrl("");
+    }
 
 
-	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_APPEND, 0);
-	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, strUrl.toLocal8Bit().toStdString().c_str());
-	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_FTP_CREATE_MISSING_DIRS, 1);
-	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_READDATA, pfile);
-	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_READFUNCTION, ReadFromFile);
-	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_POSTQUOTE, headerlist);
-	m_iRetCode = curl_easy_perform(m_pCurlHandler);
-	curl_slist_free_all(headerlist);
-	return m_iRetCode;
+
+    QString cmdTmpName = "RNFR " + filename + suffix;
+    QString cmdOrgName = "RNTO " + filename;
+    QString strUrl = url + filename + suffix;
+    //strUrl += filename + sendsuffix;
+    struct curl_slist *headerlist = NULL;
+    headerlist = curl_slist_append(headerlist, cmdTmpName.toLocal8Bit().toStdString().c_str());
+    headerlist = curl_slist_append(headerlist, cmdOrgName.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_UPLOAD, 1);
+    //////////////////////////////////////////////////////////////////////////
+    // 断点续传
+    std::FILE *pfile = fopen(localFile.toLocal8Bit().toStdString().c_str(), "rb");
+    if (pfile == NULL)
+    {
+        QSLOG_ERROR(QString("open file %1 failure").arg(localFile));
+        return -1;
+    }
+    QSharedPointer<std::FILE> autoclose(pfile, fclose);
+    double size = getFileSize(remoteFile);
+    fseek(pfile,0 , SEEK_END);
+    long fileLen = ftell(pfile);
+    if (size != double(-1.0) )
+    {
+        if ((long)size != fileLen)
+        {
+            if (0 != remove(remoteFile))
+            {
+                QSLOG_ERROR(errorString());
+            }
+        }
+        else
+        {
+            // 文件已经存在
+            return m_iRetCode;
+        }
+    }
+    fseek(pfile, 0, SEEK_SET);
+
+
+    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_APPEND, 0);
+    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, strUrl.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_FTP_CREATE_MISSING_DIRS, 1);
+    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_READDATA, pfile);
+    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_READFUNCTION, ReadFromFile);
+    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_POSTQUOTE, headerlist);
+    m_iRetCode = curl_easy_perform(m_pCurlHandler);
+    curl_slist_free_all(headerlist);
+    return m_iRetCode;
 }
 
 int CFtp::put(const QByteArray & data, const QString & file, TransferType type /*= Binary*/)
@@ -297,9 +297,9 @@ int CFtp::remove(const QString &file)
     struct curl_slist *headerlist = NULL;
     headerlist = curl_slist_append(headerlist, szCmd.toLocal8Bit().toStdString().c_str());
     m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_POSTQUOTE, headerlist);
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
     prepare();
-	m_iRetCode = curl_easy_perform(m_pSecCurlHandler);
+    m_iRetCode = curl_easy_perform(m_pSecCurlHandler);
     curl_slist_free_all(headerlist);
     return m_iRetCode;
 }
@@ -307,28 +307,28 @@ int CFtp::remove(const QString &file)
 
 int CFtp::rmdir(const QString &dir)
 {
-	QString dirname, url;
-	//if (dir.startsWith("/"))
-	//{
-	//	dirname = dir.split("/").last();
-	//	QString dir = dir.mid(0, dir.lastIndexOf("/"));
-	//	url = makeUrl(dir);
-	//}
-	//else
-	{
-		dirname = dir;
-		url = makeUrl("");
-	}
-	QString szCmd = QString("RMD %1").arg(dirname);
-	//m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url);
-	struct curl_slist *headerlist = NULL;
-	headerlist = curl_slist_append(headerlist, szCmd.toLocal8Bit().toStdString().c_str());
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_POSTQUOTE, headerlist);
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
-	prepare();
-	m_iRetCode = curl_easy_perform(m_pSecCurlHandler);
-	curl_slist_free_all(headerlist);
-	return m_iRetCode;
+    QString dirname, url;
+    //if (dir.startsWith("/"))
+    //{
+    //	dirname = dir.split("/").last();
+    //	QString dir = dir.mid(0, dir.lastIndexOf("/"));
+    //	url = makeUrl(dir);
+    //}
+    //else
+    {
+        dirname = dir;
+        url = makeUrl("");
+    }
+    QString szCmd = QString("RMD %1").arg(dirname);
+    //m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url);
+    struct curl_slist *headerlist = NULL;
+    headerlist = curl_slist_append(headerlist, szCmd.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_POSTQUOTE, headerlist);
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+    prepare();
+    m_iRetCode = curl_easy_perform(m_pSecCurlHandler);
+    curl_slist_free_all(headerlist);
+    return m_iRetCode;
 }
 
 int CFtp::setTransferMode(TransferMode mode)
@@ -402,8 +402,8 @@ void CFtp::prepare()
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEDATA, (void *)&listInfo);
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
 
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_WRITEDATA, (void *)&listInfo);
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_WRITEDATA, (void *)&listInfo);
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
 }
 
 void CFtp::parseMlsdInfo(const QString &currentDir, const QString &info, QList<CFileInfo> &fileList)
@@ -452,7 +452,7 @@ void CFtp::parseMlsdInfo(const QString &currentDir, const QString &info, QList<C
             fInfo.size = oneInfo.nFileSize;
             fInfo.path = currentDir + oneInfo.strFileName;
             fInfo.time = QDateTime::fromString(oneInfo.strMdfyTime, "yyyyMMddhhmmss");
-            fInfo.type = FILE;
+            fInfo.type = FTP_FILE;
             fileList.push_back(fInfo);
 
         }
@@ -466,7 +466,7 @@ void CFtp::parseMlsdInfo(const QString &currentDir, const QString &info, QList<C
             fInfo.name = oneInfo.strFileName;
             fInfo.size = oneInfo.nFileSize;
             fInfo.path = currentDir + oneInfo.strFileName;
-            fInfo.type = DIR;
+            fInfo.type = FTP_DIR;
             fileList.push_back(fInfo);
         }
     }

@@ -392,10 +392,12 @@ struct UserInfo
 {
     QString		userID;
     QString		userName;
-    int			sendType;	///< 分发方式：0-FILE，1-FTP
-    QString     sendSuffix;	// 传输过程中的临时文件后缀名
+    int			sendType;			///< 分发方式：0-FILE，1-FTP
+    int			ftpTransferType;	// 只有当sendType为1时生效，ftp传输类型 0-binary，1-ascii
+    int			ftpTransferMode;	// 只有当sendType为1时生效，ftp传输模式 0-被动，1-主动
+    QString     sendSuffix;			// 传输过程中的临时文件后缀名
     QString		rootPath;
-    int			timebaserule;	///< 时间变量基于的时间规则：0无，1-基于收集目录时间，2-基于文件名时间，3-基于系统时间
+    int			timebaserule;		///< 时间变量基于的时间规则：0无，1-基于收集目录时间，2-基于文件名时间，3-基于系统时间
     QString		lgUser;
     QString		lgPass;
     QString		ip;
@@ -481,12 +483,12 @@ enum TaskState
 struct ClearTask
 {
     QString taskName;	// 清理任务名
-	int taskType;		// 任务类型 0：目录清理，1: ftp清理
-	QString ip;			// ftp ip
-	quint16 port;		// ftp port
-	QString user;		// ftp user
-	QString password;	// ftp password
-	int transfermode;	// ftp transfermode 0：主动， 1： 被动
+    int taskType;		// 任务类型 0：目录清理，1: ftp清理
+    QString ip;			// ftp ip
+    quint16 port;		// ftp port
+    QString user;		// ftp user
+    QString password;	// ftp password
+    int transfermode;	// ftp transfermode 0：主动， 1： 被动
     QString taskDir;	// 任务目录
     QString quartzRule;	// 清理任务规则
     QString matchRule;	// 删除文件匹配规则

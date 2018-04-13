@@ -63,12 +63,12 @@ DataBase::DataBase()
     // 判断清理表是否存在，如果不存在则自动创建
     checkTable("T_DIR_CLEAR", "CREATE TABLE T_DIR_CLEAR ("
                "[NAME] VHARCHAR(64) NOT NULL, "
-			   "[TYPE] INT(1) NOT NULL DEFAULT (0), "
-			   "[IP] VARCHAR2(50), "
-			   "[PORT] INT(5),"
-			   "[USER] VARCHAR2(20), "
-			   "[PASSWORD] VARCHAR2(20), "
-			   "[TRANSFERMODE] INT(1) DEFAULT (0), "
+               "[TYPE] INT(1) NOT NULL DEFAULT (0), "
+               "[IP] VARCHAR2(50), "
+               "[PORT] INT(5),"
+               "[USER] VARCHAR2(20), "
+               "[PASSWORD] VARCHAR2(20), "
+               "[TRANSFERMODE] INT(1) DEFAULT (0), "
                "[DIR] VHARCHAR(256) NOT NULL, "
                "[QUARTZ] VHARCHAR(64) NOT NULL,"
                "[FILE] VHARCHAR(64) NOT NULL, "
@@ -110,6 +110,8 @@ DataBase::DataBase()
                "[USERID] VARCHAR(20) NOT NULL, "
                "[USERNAME] VARCHAR(20) NOT NULL, "
                "[SENDTYPE] INT, "
+               "[FTPTRANSFERTYPE] INT(1) NOT NULL DEFAULT 0,"
+               "[FTPTRANSFERMODE] INT(1) NOT NULL DEFAULT 0, "
                "[SENDSUFFIX] VARCHAR(20) NOT NULL, "
                "[RLTVPATH] VARCHAR(100), "
                "[TIMEBASEDRULE] INT(1) DEFAULT (0), "
@@ -324,7 +326,7 @@ bool DataBase::QueryUserInfo(TaskUser &user)
         for (int i=0; i<user.lstUser.size(); ++i)
         {
             UserInfo &uInfo = user.lstUser[i].user;
-            sql = QString("SELECT USERID, USERNAME, SENDTYPE, SENDSUFFIX, RLTVPATH, TIMEBASEDRULE, LOGINUSER, LOGINPASS, IP, PORT, KEEPDIR, COMPRESS, ENCRYPT, CONPUT, MAXTRYCOUNS FROM T_SEND_USER WHERE USERID = '%1'").arg(uInfo.userID);
+            sql = QString("SELECT USERID, USERNAME, SENDTYPE, FTPTRANSFERTYPE, FTPTRANSFERMODE, SENDSUFFIX, RLTVPATH, TIMEBASEDRULE, LOGINUSER, LOGINPASS, IP, PORT, KEEPDIR, COMPRESS, ENCRYPT, CONPUT, MAXTRYCOUNS FROM T_SEND_USER WHERE USERID = '%1'").arg(uInfo.userID);
             res = query.exec(sql);
             if (!res)
             {
@@ -337,6 +339,9 @@ bool DataBase::QueryUserInfo(TaskUser &user)
                 int index = 1;
                 uInfo.userName = query.value(index++).toString();
                 uInfo.sendType = query.value(index++).toInt();
+
+                uInfo.ftpTransferType = query.value(index++).toInt();
+                uInfo.ftpTransferMode = query.value(index++).toInt();
                 uInfo.sendSuffix = query.value(index++).toString();
                 uInfo.rootPath = query.value(index++).toString();
                 uInfo.timebaserule = query.value(index++).toInt();
@@ -376,7 +381,7 @@ bool DataBase::QueryUserInfo(QList<UserInfo> &lstUser)
         QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
         QSqlQuery query(t_oDb);
         // 先查收集用户表
-        QString sql = QString("SELECT USERID, USERNAME, SENDTYPE, SENDSUFFIX, RLTVPATH, TIMEBASEDRULE, LOGINUSER, LOGINPASS, IP, PORT, KEEPDIR, COMPRESS, ENCRYPT, CONPUT, MAXTRYCOUNS FROM T_SEND_USER");
+        QString sql = QString("SELECT USERID, USERNAME, SENDTYPE, FTPTRANSFERTYPE, FTPTRANSFERMODE, SENDSUFFIX, RLTVPATH, TIMEBASEDRULE, LOGINUSER, LOGINPASS, IP, PORT, KEEPDIR, COMPRESS, ENCRYPT, CONPUT, MAXTRYCOUNS FROM T_SEND_USER");
         bool res = query.exec(sql);
         if (res)
         {
@@ -387,6 +392,8 @@ bool DataBase::QueryUserInfo(QList<UserInfo> &lstUser)
                 user.userID = query.value(index++).toString();
                 user.userName = query.value(index++).toString();
                 user.sendType = query.value(index++).toInt();
+                user.ftpTransferType = query.value(index++).toInt();
+                user.ftpTransferMode = query.value(index++).toInt();
                 user.sendSuffix = query.value(index++).toString();
                 user.rootPath = query.value(index++).toString();
                 user.timebaserule = query.value(index++).toInt();
@@ -424,12 +431,14 @@ bool DataBase::InsertUserInfo(const UserInfo &user)
         QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
         QSqlQuery query(t_oDb);
         // 先查收集用户表
-        QString sql = QString("REPLACE INTO T_SEND_USER(USERID, USERNAME, SENDTYPE, SENDSUFFIX, RLTVPATH, TIMEBASEDRULE, LOGINUSER, LOGINPASS, IP, PORT, KEEPDIR, COMPRESS, ENCRYPT, CONPUT, MAXTRYCOUNS)"
-                              "VALUES(:USERID, :USERNAME, :SENDTYPE, :SENDSUFFIX, :RLTVPATH, :TIMEBASEDRULE, :LOGINUSER, :LOGINPASS, :IP, :PORT, :KEEPDIR, :COMPRESS, :ENCRYPT, :CONPUT, :MAXTRYCOUNS)");
+        QString sql = QString("REPLACE INTO T_SEND_USER(USERID, USERNAME, SENDTYPE, FTPTRANSFERTYPE, FTPTRANSFERMODE, SENDSUFFIX, RLTVPATH, TIMEBASEDRULE, LOGINUSER, LOGINPASS, IP, PORT, KEEPDIR, COMPRESS, ENCRYPT, CONPUT, MAXTRYCOUNS)"
+                              "VALUES(:USERID, :USERNAME, :SENDTYPE, :FTPTRANSFERTYPE, :FTPTRANSFERMODE, :SENDSUFFIX, :RLTVPATH, :TIMEBASEDRULE, :LOGINUSER, :LOGINPASS, :IP, :PORT, :KEEPDIR, :COMPRESS, :ENCRYPT, :CONPUT, :MAXTRYCOUNS)");
         query.prepare(sql);
         query.bindValue(":USERID", user.userID);
         query.bindValue(":USERNAME", user.userName);
         query.bindValue(":SENDTYPE", user.sendType);
+        query.bindValue(":FTPTRANSFERTYPE", user.ftpTransferType);
+        query.bindValue(":FTPTRANSFERMODE", user.ftpTransferMode);
         query.bindValue(":SENDSUFFIX", user.sendSuffix);
         query.bindValue(":RLTVPATH", user.rootPath);
         query.bindValue(":TIMEBASEDRULE", user.timebaserule);
@@ -812,20 +821,20 @@ bool DataBase::queryClearTask(QList<ClearTask> &tasks)
         while (query.next())
         {
             ClearTask task;
-			int index = 0;
-			task.taskName = query.value(index++).toString();
-			task.taskType = query.value(index++).toInt();
-			task.ip = query.value(index++).toString();
-			task.port = query.value(index++).toInt();
-			task.user = query.value(index++).toString();
-			task.password = query.value(index++).toString();
-			task.transfermode = query.value(index++).toInt();
-			task.taskDir = query.value(index++).toString();
-			task.quartzRule = query.value(index++).toString();
-			task.matchRule = query.value(index++).toString();
-			task.clearUnit = query.value(index++).toInt();
-			task.clearValue = query.value(index++).toInt();
-			task.activeFlag = query.value(index++).toInt();
+            int index = 0;
+            task.taskName = query.value(index++).toString();
+            task.taskType = query.value(index++).toInt();
+            task.ip = query.value(index++).toString();
+            task.port = query.value(index++).toInt();
+            task.user = query.value(index++).toString();
+            task.password = query.value(index++).toString();
+            task.transfermode = query.value(index++).toInt();
+            task.taskDir = query.value(index++).toString();
+            task.quartzRule = query.value(index++).toString();
+            task.matchRule = query.value(index++).toString();
+            task.clearUnit = query.value(index++).toInt();
+            task.clearValue = query.value(index++).toInt();
+            task.activeFlag = query.value(index++).toInt();
             tasks.append(task);
         }
         return true;
@@ -854,20 +863,20 @@ bool DataBase::queryClearTask(ClearTask &task)
     {
         if (query.next())
         {
-			int index = 0;
-			task.taskName = query.value(index++).toString();
-			task.taskType = query.value(index++).toInt();
-			task.ip = query.value(index++).toString();
-			task.port = query.value(index++).toInt();
-			task.user = query.value(index++).toString();
-			task.password = query.value(index++).toString();
-			task.transfermode = query.value(index++).toInt();
-			task.taskDir = query.value(index++).toString();
-			task.quartzRule = query.value(index++).toString();
-			task.matchRule = query.value(index++).toString();
-			task.clearUnit = query.value(index++).toInt();
-			task.clearValue = query.value(index++).toInt();
-			task.activeFlag = query.value(index++).toInt();
+            int index = 0;
+            task.taskName = query.value(index++).toString();
+            task.taskType = query.value(index++).toInt();
+            task.ip = query.value(index++).toString();
+            task.port = query.value(index++).toInt();
+            task.user = query.value(index++).toString();
+            task.password = query.value(index++).toString();
+            task.transfermode = query.value(index++).toInt();
+            task.taskDir = query.value(index++).toString();
+            task.quartzRule = query.value(index++).toString();
+            task.matchRule = query.value(index++).toString();
+            task.clearUnit = query.value(index++).toInt();
+            task.clearValue = query.value(index++).toInt();
+            task.activeFlag = query.value(index++).toInt();
 
             return true;
         }
@@ -984,12 +993,12 @@ bool DataBase::insertClearTask(const ClearTask &task)
                               "VALUES(:NAME,:TYPE,:IP,:PORT,:USER,:PASSWORD,:TRANSFERMODE,:DIR,:QUARTZ,:FILE,:UNIT,:VALUE,:ACTIVE)");
         query.prepare(sql);
         query.bindValue(":NAME", task.taskName);
-		query.bindValue(":TYPE", task.taskType);
-		query.bindValue(":IP", task.ip);
-		query.bindValue(":PORT", task.port);
-		query.bindValue(":USER", task.user);
-		query.bindValue(":PASSWORD", task.password);
-		query.bindValue(":TRANSFERMODE", task.transfermode);
+        query.bindValue(":TYPE", task.taskType);
+        query.bindValue(":IP", task.ip);
+        query.bindValue(":PORT", task.port);
+        query.bindValue(":USER", task.user);
+        query.bindValue(":PASSWORD", task.password);
+        query.bindValue(":TRANSFERMODE", task.transfermode);
         query.bindValue(":DIR", task.taskDir);
         query.bindValue(":QUARTZ", task.quartzRule);
         query.bindValue(":FILE", task.matchRule);

@@ -407,7 +407,7 @@ bool DistributeFile::sendToFtp(const char *fullPath, TransTask &task)
                                           usrPwd.toLocal8Bit().toStdString().c_str(),
                                           task.strDestFileName.toLocal8Bit().toStdString().c_str(),
                                           // fullPath, task.userInfo.at(userIndex).sendSuffix.toStdString().c_str());
-                                          fullPath, task.userInfo.sendSuffix.toStdString().c_str());
+                                          fullPath, task.userInfo.sendSuffix.toStdString().c_str(), task.userInfo.ftpTransferMode);
     }
     if (bRet != 0)
     {

@@ -1040,7 +1040,7 @@ bool CurlFtp::getFileSize(const char *url, const char *user_pwd, const string &f
 }
 
 
-int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string &filename, const char *localPath, const char *sendsuffix)
+int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string &filename, const char *localPath, const char *sendsuffix, int transferMode)
 {
     QSLOG_DEBUG("begin upload file to ftp");
     // 连接ftp服务器
@@ -1153,6 +1153,11 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
     {
         QSLOG_ERROR("curl_easy_setopt error");
         return -1;
+    }
+
+    if (1 == transferMode)
+    {
+        curl_easy_setopt(curl, CURLOPT_FTPPORT, "-");
     }
     //--进度条功能--
     // 	struct myprogress prog;
@@ -1319,7 +1324,7 @@ int CurlFtp::conputFileToFtp(const char *url, const char *user_pwd, const string
     }
     else
     {
-        return uploadFileToFtp(url, user_pwd, filename, localPath, sendsuffix);
+        return uploadFileToFtp(url, user_pwd, filename, localPath, sendsuffix, 0);
     }
 
     return 0;

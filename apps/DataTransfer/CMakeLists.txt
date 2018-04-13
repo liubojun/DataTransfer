@@ -59,6 +59,8 @@ SET(MOC_HDRS
 	${CMAKE_CURRENT_SOURCE_DIR}/systemset.h
 	${CMAKE_CURRENT_SOURCE_DIR}/baseset.h
 	${CMAKE_CURRENT_SOURCE_DIR}/subdirtemplateedit.h
+	${RadarProjectInclude}/ctkTransfer/CollectorBase.h
+
 )
 
 SET(UI
@@ -106,6 +108,7 @@ INCLUDE_DIRECTORIES(
 					${RadarProjectInclude}/interface
 					${RadarProjectInclude}/QsLog
 					${RadarProjectInclude}/ctkPublicFun
+					${RadarProjectInclude}/ctkTransfer
 					${RadarProjectInclude}/ctkProtocol
 					${CURL_INCLUDE_DIR}
 					${RadarProjectInclude}/3dpart
@@ -142,6 +145,7 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
         CTKPluginFramework
         ${CURL_LIBRARY}
 		#RCF
+		ctkTransfer
         )
 
 INSTALL(TARGETS ${PROJECT_NAME}

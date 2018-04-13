@@ -104,6 +104,7 @@ INCLUDE_DIRECTORIES(
 					${RadarProjectInclude}/interface
 					${RadarProjectInclude}/QsLog
 					${RadarProjectInclude}/ctkPublicFun
+					${RadarProjectInclude}/ctkTransfer
 					${RadarProjectInclude}/ctkProtocol
 					${RadarProject}/apps/DataTransfer
 					${CURL_INCLUDE_DIR}
@@ -141,6 +142,7 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
         CTKPluginFramework
         ${CURL_LIBRARY}
 		#RCF
+		ctkTransfer
         )
 
 INSTALL(TARGETS ${PROJECT_NAME}
