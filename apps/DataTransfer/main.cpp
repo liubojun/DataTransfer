@@ -345,7 +345,14 @@ int main(int argc, char **argv)
     }
     startScreen.showMessage(QStringLiteral("正在加载插件..."), Qt::AlignCenter, Qt::white);
 
+    QObject *pLoaderInstance = loader.instance();
+    if (NULL == pLoaderInstance)
+    {
+        QSLOG_ERROR("plugin instance is null");
+        return -1;
+    }
     ICtkPluginManager *plugin = dynamic_cast<ICtkPluginManager *>(loader.instance());
+    QSLOG_DEBUG("dynamic_cast");
     if (NULL != plugin)
     {
         plugin->init();

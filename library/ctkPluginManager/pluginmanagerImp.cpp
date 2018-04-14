@@ -75,6 +75,7 @@ ICtkPluginManager* CPluginManagerImp::instance()
 
 void CPluginManagerImp::init()
 {
+    QSLOG_DEBUG("CTK Plugin init.");
     // 判断plugins.db中的内容是否正确
     QString strDbUrl = qApp->applicationDirPath() + "/configuration/plugins.db";
     if (QFileInfo(strDbUrl).exists())
