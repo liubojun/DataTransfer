@@ -843,7 +843,7 @@ std::string CChangeName::change_name_by_id(const char *orig_file_name, const cha
         QSLOG_ERROR("input orig_file_name or rule is not correct");
         return orig_file_name;
     }
-    if (QString::fromLocal8Bit(prule) == QString::fromLocal8Bit("нч"))
+    if (QString::fromLocal8Bit(prule) == "NULL")
     {
         return orig_file_name;
     }
