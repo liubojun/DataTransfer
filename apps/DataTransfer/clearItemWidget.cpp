@@ -62,9 +62,13 @@ void ClearItemWidget::setName(const QString &name)
     ui.label->setText(name);
 }
 
-void ClearItemWidget::addSuccess(const QDateTime &dt)
+void ClearItemWidget::addSuccess(const QDateTime &dt, bool addCount/* = true*/)
 {
-    m_nFinish++;
+    if (addCount)
+    {
+        m_nFinish++;
+    }
+
 
     QString strTime = dt.toString("yyyyMMddhhmmss");
     QString state = QStringLiteral("完成%5个，最近：%1/%2 %3:%4").arg(strTime.mid(4, 2)).arg(strTime.mid(6, 2))

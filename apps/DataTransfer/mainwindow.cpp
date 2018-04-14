@@ -485,7 +485,7 @@ void MainWindow::printClearLog(const QString &dirName, const QString &dirId, con
     else if (infoType == 1)
     {
         // 发送成功
-        ClearItemWidget *pIwidget = (ClearItemWidget *)getItemWidget(dirId);
+        ClearItemWidget *pIwidget = (ClearItemWidget *)getItemWidget(dirName);
         if (pIwidget != NULL)
         {
             pIwidget->addSuccess(qDT);
@@ -1221,7 +1221,7 @@ void MainWindow::onClearTaskBegin(const QString &dir)
         {
             ClearItemWidget * item = (ClearItemWidget *)ui.listWidget->itemWidget(it.key());
             item->ShowGif(true);
-            item->addSuccess(QDateTime::currentDateTime());
+            item->addSuccess(QDateTime::currentDateTime(), false);
             break;
         }
     }

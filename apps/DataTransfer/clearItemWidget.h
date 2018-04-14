@@ -19,7 +19,7 @@ public:
 
     void setName(const QString &name);
 
-    void addSuccess(const QDateTime &dt);
+    void addSuccess(const QDateTime &dt, bool addCount = true);
 private:
     Ui::clearItemWidget ui;
 

@@ -15,7 +15,7 @@ CFtpClear::~CFtpClear()
 
 void CFtpClear::run()
 {
-    m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("开始目录[%1]清理").arg(CPathBuilder::getFtpUrl(m_oData.ip, m_oData.port, m_oData.m_fullPath)), 1);
+    //m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("开始目录[%1]清理").arg(CPathBuilder::getFtpUrl(m_oData.ip, m_oData.port, m_oData.m_fullPath)), 1);
     using namespace FTP;
     CFtp oFtp;
     do
@@ -67,6 +67,6 @@ void CFtpClear::run()
         }
     }
     while (0);
-    m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("目录[%1]清理结束").arg(CPathBuilder::getFtpUrl(m_oData.ip, m_oData.port, m_oData.m_fullPath)), 1);
+    //m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("目录[%1]清理结束").arg(CPathBuilder::getFtpUrl(m_oData.ip, m_oData.port, m_oData.m_fullPath)), 1);
 }
 
