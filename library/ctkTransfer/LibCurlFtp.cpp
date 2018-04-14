@@ -48,6 +48,9 @@ int CFtp::connectToHost(const QString &host, quint16 port /*= 21*/)
 
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_NOSIGNAL, 1L);
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_NOSIGNAL, 1L);
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+
     return m_iRetCode;
 }
 
@@ -66,10 +69,12 @@ int CFtp::enableDebugLevel(bool flag /*= true*/)
     if (flag)
     {
         m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_VERBOSE, 1L);
+        m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_VERBOSE, 1L);
     }
     else
     {
         m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_VERBOSE, 0);
+        m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_VERBOSE, 0);
     }
     return m_iRetCode;
 }
@@ -292,6 +297,7 @@ int CFtp::remove(const QString &file)
         filename = file;
         url = makeUrl("");
     }
+
     QString szCmd = QString("DELE %1").arg(filename);
     //m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url);
     struct curl_slist *headerlist = NULL;
@@ -336,6 +342,7 @@ int CFtp::setTransferMode(TransferMode mode)
     if (mode == Active)
     {
         m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_FTPPORT, "-");
+        m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_FTPPORT, "-");
     }
     return m_iRetCode;
 }
