@@ -867,7 +867,7 @@ std::string CChangeName::change_name_by_id(const char *orig_file_name, const cha
 std::vector<std::string> CChangeName::get_rules()
 {
     std::vector<std::string> rules;
-    rules.push_back("нч");
+    rules.push_back("NULL");
     for (size_t i = 0; i < rule.size(); ++i)
     {
         rules.push_back(rule[i].header);
