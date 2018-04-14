@@ -788,3 +788,8 @@ QString CPathBuilder::getFinalPathFromUrlV2(const QString &path, const QString &
     }
     return finalUrl;
 }
+
+QString CPathBuilder::getFtpUrl(const QString &ip, int port, const QString &path)
+{
+    return QString("ftp://%1:%2/%3").arg(ip).arg(port).arg(path);
+}

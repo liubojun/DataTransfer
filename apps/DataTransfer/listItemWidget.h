@@ -59,7 +59,7 @@ private:
 
     ICONTYPE m_curIcon;
 
-    int m_nFinish;
+    quint64 m_nFinish;
 };
 
 #endif

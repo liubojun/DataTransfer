@@ -343,7 +343,6 @@ void MainWindow::addLog(const CollectTask &task, const QString &info, int infoTy
     QMutexLocker guard(&m_oLocker2);
     QDateTime qDT = QDateTime::currentDateTime();
     QString strTime = qDT.toString("MM-dd hh:mm:ss");
-    // QTableWidgetItem *pItem = new QTableWidgetItem(strTime);;
     QTableWidgetItem *pItem = NULL;
     if (1 == infoType)
     {
@@ -354,7 +353,6 @@ void MainWindow::addLog(const CollectTask &task, const QString &info, int infoTy
         pItem = new QTableWidgetItem(QIcon(":/03.png"), strTime);
     }
 
-    //QTableWidgetItem *pItem = new QTableWidgetItem(strTime);
     ui.tableWidget->setItem(0, 0, pItem);
     pItem = new QTableWidgetItem(task.dirName);
     ui.tableWidget->setItem(0, 1, pItem);
@@ -368,10 +366,10 @@ void MainWindow::addLog(const CollectTask &task, const QString &info, int infoTy
     else if (infoType == 1)
     {
         // 发送成功
-        MyItemWidget *pIwidget = getItemWidget(task.dirID);
+        ClearItemWidget *pIwidget = static_cast<ClearItemWidget*>(getItemWidget(task.dirID));
         if (pIwidget != NULL)
         {
-            pIwidget->AddSuccess(qDT);
+            pIwidget->addSuccess(qDT);
         }
     }
     else
@@ -391,7 +389,7 @@ void MainWindow::addLog(const CollectTask &task, const QString &info, int infoTy
 }
 
 //void MainWindow::print(const string &dirName, const string &dirId, const string &info, int infoType)
-void MainWindow::print(const QString &dirName, const QString &dirId, const QString &info, int infoType)
+void MainWindow::printCollectLog(const QString &dirName, const QString &dirId, const QString &info, int infoType)
 {
     //QSLOG_DEBUG("PRINT2");
     if (m_logNum >= 500)
@@ -434,10 +432,63 @@ void MainWindow::print(const QString &dirName, const QString &dirId, const QStri
     {
         // 发送成功
         // MyItemWidget *pIwidget = getItemWidget(QString::fromLocal8Bit(dirId.c_str()));
-        MyItemWidget *pIwidget = getItemWidget(dirId);
+        MyItemWidget *pIwidget = static_cast<MyItemWidget*>(getItemWidget(dirId));
         if (pIwidget != NULL)
         {
             pIwidget->AddSuccess(qDT);
+        }
+    }
+    else
+    {
+        // 发送失败
+    }
+}
+
+void MainWindow::printClearLog(const QString &dirName, const QString &dirId, const QString &info, int infoType)
+{
+    if (m_logNum >= 500)
+    {
+        // 清空tablewidget的内容
+        ui.tableWidget->setRowCount(0);
+        ui.tableWidget->clearContents();
+
+        m_logNum = 0;
+    }
+
+    m_logNum++;
+    ui.tableWidget->insertRow(0);
+    QMutexLocker guard(&m_oLocker2);
+    QDateTime qDT = QDateTime::currentDateTime();
+    QString strTime = qDT.toString("MM-dd hh:mm:ss");
+    QTableWidgetItem *pItem = NULL;
+    if (1 == infoType)
+    {
+        pItem = new QTableWidgetItem(QIcon(":/01.png"), strTime);
+    }
+    else if (2 == infoType)
+    {
+        pItem = new QTableWidgetItem(QIcon(":/03.png"), strTime);
+    }
+
+    ui.tableWidget->setItem(0, 0, pItem);
+
+    pItem = new QTableWidgetItem(dirName);
+    ui.tableWidget->setItem(0, 1, pItem);
+
+    pItem = new QTableWidgetItem(info);
+    ui.tableWidget->setItem(0, 2, pItem);
+
+    if (infoType == 0)
+    {
+        // 系统消息
+    }
+    else if (infoType == 1)
+    {
+        // 发送成功
+        ClearItemWidget *pIwidget = (ClearItemWidget *)getItemWidget(dirId);
+        if (pIwidget != NULL)
+        {
+            pIwidget->addSuccess(qDT);
         }
     }
     else
@@ -1083,15 +1134,15 @@ void MainWindow::setGif(const QString &dirID, bool bFlag)
     }
 }
 
-MyItemWidget * MainWindow::getItemWidget(const QString &taskID)
+QWidget * MainWindow::getItemWidget(const QString &taskID)
 {
-    MyItemWidget *pIwidget = NULL;
+    QWidget *pIwidget = NULL;
     QMap<QListWidgetItem*, QString>::const_iterator it = m_ItemTask.begin();
     while (it != m_ItemTask.end())
     {
         if (it.value() == taskID)
         {
-            pIwidget = (MyItemWidget *)ui.listWidget->itemWidget(it.key());
+            pIwidget =  ui.listWidget->itemWidget(it.key());
             break;
         }
         it++;

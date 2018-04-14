@@ -137,7 +137,6 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
         ${QT_QTUITOOLS_LIBRARY}
         ${QT_QTQML_LIBRARY}
         ${QT_QTQUICK_LIBRARY}
-		${QT_QTNETWORK_LIBRARY}
         ctkLogger
         ctkPublicFun
         ctkPluginManager

@@ -6,6 +6,9 @@
 #include <QDebug>
 #include <QHostAddress>
 
+const QString COLLECTMSG = "Collect";
+const QString CLEARMSG = "Clear";
+
 LogPrintImpl::LogPrintImpl(MainWindow *in_pWnd) : m_pWnd(in_pWnd)//, server(RCF::TcpEndpoint(50001))
 {
 
@@ -17,8 +20,11 @@ LogPrintImpl::LogPrintImpl(MainWindow *in_pWnd) : m_pWnd(in_pWnd)//, server(RCF:
     bool enableLog;
     DataBase::getInstance()->queryBaseInfo(threadnum, m_iLogPort, enableLog);
     // server = new RCF::RcfServer(RCF::TcpEndpoint(logport));
-    connect(this, SIGNAL(showLog(const QString &, const QString &, const QString &, int)), m_pWnd,
-            SLOT(print(const QString &, const QString &, const QString &, int)));
+    connect(this, SIGNAL(showCollectLog(const QString &, const QString &, const QString &, int)), m_pWnd,
+            SLOT(printCollectLog(const QString &, const QString &, const QString &, int)));
+
+    connect(this, SIGNAL(showClearLog(const QString &, const QString &, const QString &, int)), m_pWnd,
+            SLOT(printClearLog(const QString &, const QString &, const QString &, int)));
     //m_oThread.start();
     //this->moveToThread(&m_oThread);
     if (!m_oUdpSocket.bind(QHostAddress::LocalHost, m_iLogPort))
@@ -78,11 +84,17 @@ void LogPrintImpl::readPendingDatagrams()
         QString strDirName;
         QString strDirId;
         QString strLogInfo;
+        QString msgType;
         int iInfoType;
-        stream >> iMsgLen >> strDirName >> strDirId >> strLogInfo >> iInfoType;
-        emit showLog(strDirName, strDirId, strLogInfo, iInfoType);
-        // QSLOG_DEBUG("rcv msg");
-        // processTheDatagram(datagram);
+        stream >> iMsgLen >> msgType  >> strDirName >> strDirId >> strLogInfo >> iInfoType;
+        if (msgType == COLLECTMSG)
+        {
+            emit showCollectLog(strDirName, strDirId, strLogInfo, iInfoType);
+        }
+        else if (msgType == CLEARMSG)
+        {
+            emit showClearLog(strDirName, strDirId, strLogInfo, iInfoType);
+        }
     }
 
 

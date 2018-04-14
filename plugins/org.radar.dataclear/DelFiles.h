@@ -9,12 +9,15 @@
 #include <BaseDatas.h>
 #include <QRegExp>
 
+#include "udplogsender.h"
+
 class DelFiles:public QObject
 {
     Q_OBJECT
 public:
-    DelFiles(const QString &fullPath,const QString &style,const QString &freeSpace,const int &timeLine,const QString &regex);
-    DelFiles(const QString &fullPath,const QString &style,const QString &freeSpace,const int &timeLine,const QStringList &regexs);
+    DelFiles(BaseDatas &in_oData);
+    //DelFiles(const QString &fullPath,const QString &style,const QString &freeSpace,const int &timeLine,const QString &regex);
+    //DelFiles(const QString &fullPath,const QString &style,const QString &freeSpace,const int &timeLine,const QStringList &regexs);
     ~DelFiles();
 public:
     bool delFiles();
@@ -58,14 +61,17 @@ private:
     bool getFreeTotalSpace(const QString& sDirPath, double& fFree);
 private:
     QStringList m_fileList;
-    QString m_style;         //清楚方案
+    //QString m_style;         //清楚方案
     QString m_strFullPath; //文件全路径
-    double m_freeSpace;		//剩余空间（单位：M）
-    int m_time;			//时间期限
-    QString m_match ;		//文件正则表达式
-    QList<BaseDatas> m_datas;
+    //double m_freeSpace;		//剩余空间（单位：M）
+    //int m_time;			//时间期限
+    //QString m_match ;		//文件正则表达式
+    //QList<BaseDatas> m_datas;
     QRegExp reg;
-    QStringList m_matches;
+    //QStringList m_matches;
+    BaseDatas &m_oData;
+
+    CUdpLogSender m_oLogSender;
 };
 
 #endif // DelFiles_h__

@@ -24,6 +24,7 @@ private:
     Ui::clearItemWidget ui;
 
     QMovie *m_pMovie;
+    quint64 m_nFinish;
     //CStatusLabel *m_pStatusWnd;
 };
 #endif // clearItemWidget_h__

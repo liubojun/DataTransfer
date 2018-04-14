@@ -6,7 +6,7 @@ ClearItemWidget::ClearItemWidget(const QString &name, QWidget *parent /*= NULL*/
     ui.setupUi(this);
     setWindowFlags(Qt::FramelessWindowHint);
     ui.label->setText(name);
-    // 设置无边�?
+    // 设置无边�?
     QPixmap picuture(":/dirclean.png");
     ui.leIcon->setPixmap(picuture);
 
@@ -23,6 +23,8 @@ ClearItemWidget::ClearItemWidget(const QString &name, QWidget *parent /*= NULL*/
     QString state = QString::fromLocal8Bit("%1/%2 %3:%4 启动").arg(strTime.mid(4, 2)).arg(strTime.mid(6, 2))
                     .arg(strTime.mid(8,2)).arg(strTime.mid(10,2));
     ui.label_2->setText(state);
+
+    m_nFinish = 0;
 }
 
 void ClearItemWidget::ShowGif(bool bFlag)
@@ -62,8 +64,10 @@ void ClearItemWidget::setName(const QString &name)
 
 void ClearItemWidget::addSuccess(const QDateTime &dt)
 {
-    QString strTime =  dt.toString("yyyyMMddhhmmss");
-    QString state = QString::fromLocal8Bit("最近：%1/%2 %3:%4").arg(strTime.mid(4,2)).arg(strTime.mid(6,2))
-                    .arg(strTime.mid(8,2)).arg(strTime.mid(10,2));
+    m_nFinish++;
+
+    QString strTime = dt.toString("yyyyMMddhhmmss");
+    QString state = QStringLiteral("完成%5个，最近：%1/%2 %3:%4").arg(strTime.mid(4, 2)).arg(strTime.mid(6, 2))
+                    .arg(strTime.mid(8, 2)).arg(strTime.mid(10, 2)).arg(m_nFinish);
     ui.label_2->setText(state);
 }

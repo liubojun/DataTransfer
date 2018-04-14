@@ -36,8 +36,9 @@ using namespace std;
 #include "lastCollectTime.h"
 #include "logprotocol.h"
 #include "macro.h"
+#include "udplogsender.h"
 //#include "RCF/RCF.hpp"
-#include <QUdpSocket>
+//#include <QUdpSocket>
 class IRadarBaseDataParse;
 
 /**
@@ -418,9 +419,11 @@ protected:
     //RcfClient<I_LogPrint> *m_oRcfClient;
 
     // 日志端口
-    int m_iUdpLogPort;
+    //int m_iUdpLogPort;
 
-    QUdpSocket m_oLogSocket;
+    //QUdpSocket m_oLogSocket;
+
+    CUdpLogSender m_oLogSender;
 
     // 当前收集器的唯一标识
     QUuid m_oId;

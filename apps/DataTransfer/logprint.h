@@ -2,7 +2,7 @@
 #define logprint_h__
 
 #include <string>
-#include <RCF/RCF.hpp>
+//#include <RCF/RCF.hpp>
 #include <QThread>
 #include <QUdpSocket>
 //#include "tcpserver.h"
@@ -42,7 +42,9 @@ public slots:
 
     void timerUpDate();
 signals:
-    void showLog(const QString &dirName, const QString &dirId, const QString &info, int infoType);
+    void showCollectLog(const QString &dirName, const QString &dirId, const QString &info, int infoType);
+
+    void showClearLog(const QString &dirName, const QString &dirId, const QString &info, int infoType);
 private:
     MainWindow *m_pWnd;
     //RCF::RcfInitDeinit rcfInit;

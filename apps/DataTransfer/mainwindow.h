@@ -67,7 +67,9 @@ public slots:
     * @return ：无
     */
     //void print(const string &dirName, const string &dirId, const string &info, int infoType);
-    void print(const QString &dirName, const QString &dirId, const QString &info, int infoType);
+    void printCollectLog(const QString &dirName, const QString &dirId, const QString &info, int infoType);
+
+    void printClearLog(const QString &dirName, const QString &dirId, const QString &info, int infoType);
 protected:
     virtual void closeEvent(QCloseEvent *);
     virtual void changeEvent(QEvent *);
@@ -148,7 +150,7 @@ private:
     QString getCurTaskID(QListWidgetItem *&pItem);
 
     // 根据任务ID获取Item窗体
-    MyItemWidget *getItemWidget(const QString &taskID);
+    QWidget *getItemWidget(const QString &taskID);
 
 private:
     Ui::MainWindow ui;								///< 主窗体UI对象

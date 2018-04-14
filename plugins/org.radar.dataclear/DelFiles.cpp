@@ -28,24 +28,29 @@ bool olderThen( const QString &str1,const QString &str2 )
     QFileInfo f2(str2);
     return f1.lastModified() < f2.lastModified();
 }
-DelFiles::DelFiles(const QString &fullPath,const QString &style,const QString &freeSpace,const int &timeLine,const QString &regex)
-    :m_strFullPath(fullPath),m_freeSpace(freeSpace.toDouble()),m_style(style),m_match(regex),m_time(timeLine)
-{
-    reg.setPatternSyntax(QRegExp::RegExp);
-}
+//DelFiles::DelFiles(const QString &fullPath,const QString &style,const QString &freeSpace,const int &timeLine,const QString &regex)
+//    :m_strFullPath(fullPath),m_freeSpace(freeSpace.toDouble()),m_style(style),m_match(regex),m_time(timeLine)
+//{
+//    reg.setPatternSyntax(QRegExp::RegExp);
+//}
 
 // DelFiles::DelFiles(QList<BaseDatas> datas):m_datas(datas)
 // {
 // 	reg.setPatternSyntax(QRegExp::RegExp);
 // }
 
-DelFiles::DelFiles(const QString &fullPath,const QString &style,const QString &freeSpace,const int &timeLine,const QStringList &regexs)
+//DelFiles::DelFiles(const QString &fullPath,const QString &style,const QString &freeSpace,const int &timeLine,const QStringList &regexs)
+//{
+//    m_strFullPath = fullPath;
+//    m_style = style;
+//    m_freeSpace = freeSpace.toDouble();
+//    m_time = timeLine;
+//    m_matches = regexs;
+//}
+
+DelFiles::DelFiles(BaseDatas &in_oData) : m_oData(in_oData)
 {
-    m_strFullPath = fullPath;
-    m_style = style;
-    m_freeSpace = freeSpace.toDouble();
-    m_time = timeLine;
-    m_matches = regexs;
+
 }
 
 DelFiles::~DelFiles()
@@ -55,36 +60,39 @@ DelFiles::~DelFiles()
 
 bool DelFiles::delFiles()
 {
-    QSLOG_INFO(QString("Clear data from %1 in the way of %2").arg(m_strFullPath).arg(m_style));
-    bool flag = true;
+    //QSLOG_INFO(QString("Clear data from %1 in the way of %2").arg(m_strFullPath).arg(m_style));
+    return delByTime();
 
-    if(m_style == "0")
-    {
-        flag = delByTime();
-    }
-    else if(m_style == "1")
-    {
-        flag = delBySize();
-    }
-    else
-    {
-        flag = (delByTime()&& delBySize());
-    }
+    //bool flag = true;
 
-    return flag;
+    //if(m_style == "0")
+    //{
+    //    //m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("开始目录[%1]清理").arg(CPathBuilder::getFtpUrl(m_oData.ip, m_oData.port, m_oData.m_fullPath)), 1);
+    //    flag = delByTime();
+    //}
+    //else if(m_style == "1")
+    //{
+    //    flag = delBySize();
+    //}
+    //else
+    //{
+    //    flag = (delByTime()&& delBySize());
+    //}
+
+    //return flag;
 }
 
 bool DelFiles::delByTime()
 {
-    if (!QDir(m_strFullPath).exists())
+    if (!QDir(m_oData.m_fullPath).exists())
     {
         return false;
     }
 
-    QDir dir(m_strFullPath);
+    QDir dir(m_oData.m_fullPath);
     QFileInfoList all = dir.entryInfoList();
     // QDateTime m_DateTime = QDateTime::currentDateTime().addDays(-m_time.toInt());
-    QDateTime m_DateTime = QDateTime::currentDateTime().addMSecs(-qint64(m_time) * 1000);
+    QDateTime m_DateTime = QDateTime::currentDateTime().addMSecs(-qint64(m_oData.m_time) * 1000);
 
     foreach (const QFileInfo &f, all)
     {
@@ -100,15 +108,23 @@ bool DelFiles::delByTime()
         {
             if (f.lastModified() <= m_DateTime)
             {
-                qDebug() << f.absoluteFilePath() << f.lastModified() << m_DateTime;
-                foreach (const QString str, m_matches)
+                //qDebug() << f.absoluteFilePath() << f.lastModified() << m_DateTime;
+                reg.setPattern(m_oData.m_regex.at(0));
+                if (reg.exactMatch(f.absoluteFilePath()))
                 {
-                    reg.setPattern(str);
-                    if (reg.exactMatch(f.absoluteFilePath()))
+                    if (QFile::remove(f.absoluteFilePath()))
                     {
-                        QFile::remove(f.absoluteFilePath());
+                        m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("删除文件[%1]成功").arg(f.fileName()), 1);
                     }
                 }
+                //foreach (const QString str, m_matches)
+                //{
+                //    reg.setPattern(str);
+                //    if (reg.exactMatch(f.absoluteFilePath()))
+                //    {
+                //        QFile::remove(f.absoluteFilePath());
+                //    }
+                //}
             }
         }
     }
@@ -119,48 +135,48 @@ bool DelFiles::delByTime()
 
 bool DelFiles::delBySize()
 {
-    if (!QDir(m_strFullPath).exists())
-    {
-        return false;
-    }
+    //if (!QDir(m_strFullPath).exists())
+    //{
+    //    return false;
+    //}
 
-    loaPlugins(m_strFullPath, m_fileList);	//获取目录下的所有文件
+    //loaPlugins(m_strFullPath, m_fileList);	//获取目录下的所有文件
 
-    if(!m_fileList.isEmpty() && m_fileList.count()>0)
-    {
-        //按照最后修改时间进行排序(从最旧至最新)
-        m_fileList.sort();
-        qSort(m_fileList.begin(),m_fileList.end(),::olderThen);
-        //当剩余空间满足前进行顺序删除
-        double freeSpace;
-        getFreeTotalSpace(m_strFullPath, freeSpace);
-        int i = 0;
-        while(freeSpace <= m_freeSpace && i<m_fileList.count())
-        {
-            foreach (const QString str, m_matches)
-            {
-                reg.setPattern(str);
-                if (reg.exactMatch(m_fileList[i]))
-                {
-                    QFile::remove(m_fileList[i]);
-                }
-            }
-            i++;
-        }
-    }
+    //if(!m_fileList.isEmpty() && m_fileList.count()>0)
+    //{
+    //    //按照最后修改时间进行排序(从最旧至最新)
+    //    m_fileList.sort();
+    //    qSort(m_fileList.begin(),m_fileList.end(),::olderThen);
+    //    //当剩余空间满足前进行顺序删除
+    //    double freeSpace;
+    //    getFreeTotalSpace(m_strFullPath, freeSpace);
+    //    int i = 0;
+    //    while(freeSpace <= m_freeSpace && i<m_fileList.count())
+    //    {
+    //        foreach (const QString str, m_matches)
+    //        {
+    //            reg.setPattern(str);
+    //            if (reg.exactMatch(m_fileList[i]))
+    //            {
+    //                QFile::remove(m_fileList[i]);
+    //            }
+    //        }
+    //        i++;
+    //    }
+    //}
     return true;
 }
 
 bool DelFiles::delByTime(const QString &fullpath)
 {
-    m_strFullPath = fullpath;
-    if (!QDir(m_strFullPath).exists())
+    //m_strFullPath = fullpath;
+    if (!QDir(fullpath).exists())
     {
         return false;
     }
-    QDir dir(m_strFullPath);
+    QDir dir(fullpath);
     QFileInfoList all = dir.entryInfoList();
-    QDateTime m_DateTime = QDateTime::currentDateTime().addMSecs(-(qint64(m_time) * 1000));
+    QDateTime m_DateTime = QDateTime::currentDateTime().addMSecs(-(qint64(m_oData.m_time) * 1000));
     foreach (const QFileInfo &f, all)
     {
         if (f.fileName() == "." || f.fileName() == "..")
@@ -175,14 +191,22 @@ bool DelFiles::delByTime(const QString &fullpath)
         {
             if (f.lastModified()<=m_DateTime)
             {
-                foreach (const QString &str, m_matches)
+                reg.setPattern(m_oData.m_regex.at(0));
+                if (reg.exactMatch(f.absoluteFilePath()))
                 {
-                    reg.setPattern(str);
-                    if (reg.exactMatch(f.absoluteFilePath()))
+                    if (QFile::remove(f.absoluteFilePath()))
                     {
-                        QFile::remove(f.absoluteFilePath());
+                        m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("删除文件[%1]成功").arg(f.fileName()), 1);
                     }
                 }
+                //foreach (const QString &str, m_matches)
+                //{
+                //    reg.setPattern(str);
+                //    if (reg.exactMatch(f.absoluteFilePath()))
+                //    {
+                //        QFile::remove(f.absoluteFilePath());
+                //    }
+                //}
                 //QFile::remove(f.absoluteFilePath());
             }
         }
@@ -196,28 +220,28 @@ bool DelFiles::delByTime(const QString &fullpath)
 
 bool DelFiles::delBySize( const QString &fullpath )
 {
-    m_strFullPath = fullpath;
-    if (!QDir(m_strFullPath).exists())
-    {
-        return false;
-    }
-    loaPlugins(m_strFullPath,m_fileList);
-    if(!m_fileList.isEmpty()&&m_fileList.count()>0)
-    {
-        //按照最后修改时间进行排序(从最旧至最新)
-        m_fileList.sort();
-        qSort(m_fileList.begin(),m_fileList.end(),::olderThen);
-        //当剩余空间满足前进行顺序删除
-        double freeSpace;
-        getFreeTotalSpace(m_strFullPath,freeSpace);
-        int i = 0;
-        while(freeSpace <= m_freeSpace && i<m_fileList.count())
-        {
-            QString STR = m_fileList[i];
-            QFile::remove(m_fileList[i]);
-            i++;
-        }
-    }
+    //m_strFullPath = fullpath;
+    //if (!QDir(m_strFullPath).exists())
+    //{
+    //    return false;
+    //}
+    //loaPlugins(m_strFullPath,m_fileList);
+    //if(!m_fileList.isEmpty()&&m_fileList.count()>0)
+    //{
+    //    //按照最后修改时间进行排序(从最旧至最新)
+    //    m_fileList.sort();
+    //    qSort(m_fileList.begin(),m_fileList.end(),::olderThen);
+    //    //当剩余空间满足前进行顺序删除
+    //    double freeSpace;
+    //    getFreeTotalSpace(m_strFullPath,freeSpace);
+    //    int i = 0;
+    //    while(freeSpace <= m_freeSpace && i<m_fileList.count())
+    //    {
+    //        QString STR = m_fileList[i];
+    //        QFile::remove(m_fileList[i]);
+    //        i++;
+    //    }
+    //}
 
     return true;
 }

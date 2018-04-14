@@ -1,5 +1,7 @@
 #include "ftpclear.h"
 #include "BaseDatas.h"
+#include "pathbuilder.h"
+
 #include <QSharedPointer>
 CFtpClear::CFtpClear(BaseDatas &in_oData) : m_oData(in_oData)
 {
@@ -13,6 +15,7 @@ CFtpClear::~CFtpClear()
 
 void CFtpClear::run()
 {
+    m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("开始目录[%1]清理").arg(CPathBuilder::getFtpUrl(m_oData.ip, m_oData.port, m_oData.m_fullPath)), 1);
     using namespace FTP;
     CFtp oFtp;
     do
@@ -56,10 +59,14 @@ void CFtpClear::run()
                 {
                     QSLOG_DEBUG(QString::fromLocal8Bit("删除远程文件[%1]失败:%2").arg(fi.name).arg(pFtp->errorString()));
                 }
+                else
+                {
+                    m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("删除文件:%1").arg(fi.name), 1);
+                }
             }
         }
     }
     while (0);
-
+    m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("目录[%1]清理结束").arg(CPathBuilder::getFtpUrl(m_oData.ip, m_oData.port, m_oData.m_fullPath)), 1);
 }
 

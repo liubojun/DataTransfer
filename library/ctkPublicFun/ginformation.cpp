@@ -152,7 +152,7 @@ int GPARAM::readPictureInfo()
         return -1;
     }
 
-    int nPos = picinfo.find_first_of('\r');
+    size_t nPos = picinfo.find_first_of('\r');
     if (nPos > 0)
     {
         picinfo = picinfo.substr(0, nPos);
@@ -372,7 +372,7 @@ int GPARAM::readProductColor()
             memset(buf, 0, bufsize);
 
             PRODUCTRGBCOLOR pcolor;
-            int pos = strLine.find_first_of(']');
+            size_t pos = strLine.find_first_of(']');
             pcolor.name = strLine.substr(1, pos-1).c_str();
 
             while((fgets(buf, bufsize, fp)) != NULL)
@@ -387,7 +387,7 @@ int GPARAM::readProductColor()
                 if(buf[0] == '[')
                 {
                     int fpos = ftell(fp);
-                    int buflen = strlen(buf);
+                    size_t buflen = strlen(buf);
                     fseek(fp, fpos-buflen-2, SEEK_SET);
                     memset(buf, 0, bufsize);
                     break;

@@ -138,6 +138,15 @@ public:
      */
     static int setChildProcessEnv();
 
+    /**
+     * @brief  组装ftp全路径
+     * @param[in]  const QString &ip
+     * @param[in]  const QString &port
+     * @param[in]  const QString &path
+     * @return QString：返回ftp全路径
+     */
+    static QString getFtpUrl(const QString &ip, int port, const QString &path);
+
 protected:
     bool makeBuilderOrRunning();
 
