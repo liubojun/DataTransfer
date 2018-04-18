@@ -11,6 +11,26 @@
 #include "macro.h"
 #include "commontypedef.h"
 
+class MyDataBase
+{
+public:
+    MyDataBase();
+
+    bool connect();
+
+    ~MyDataBase();
+
+    inline QSqlQuery &sqlquery()
+    {
+        return *m_pQuery;
+    }
+
+private:
+    QSqlDatabase *m_pDataBase;
+    QSqlQuery *m_pQuery;
+    QString m_strConName;
+};
+
 class DLL_EXPORT_CLASS_DECL DataBase
 {
 public:

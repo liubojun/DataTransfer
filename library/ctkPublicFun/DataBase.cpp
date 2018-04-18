@@ -182,18 +182,15 @@ bool DataBase::InitDB()
 
 void DataBase::QueryCollectTask(QList<CollectTask> &colTasks)
 {
-    QSqlDatabase t_oDb;
+    MyDataBase t_oDb;
+
     try
     {
-
-        if (!ConnectDB(t_oDb))
+        if (!t_oDb.connect())
         {
             return;
         }
-
-        QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-
-        QSqlQuery query(t_oDb);
+        QSqlQuery &query(t_oDb.sqlquery());
         QString sql = "SELECT DIRID, DIRNAME, ENABLE, COLLECTTYPE, FTPTRANSFERMODE, FTPCONNECTMODE, RLTVPATH, DISPATCH,"
                       "FILETEMPLATE, SUBDIRCHECK, MOVEFLAG, COLTIMERANGE, RECORDLATESTTIME, COMPARE_CONTENT, LOGINUSER, LOGINPASS,"
                       "IP, PORT FROM T_DIR_COL ORDER BY DIRNAME";
@@ -239,16 +236,15 @@ void DataBase::QueryCollectTask(QList<CollectTask> &colTasks)
 
 bool DataBase::QueryCollectTask(CollectTask &task)
 {
-    QSqlDatabase t_oDb;
+    MyDataBase t_oDb;
+
     try
     {
-        if (!ConnectDB(t_oDb))
+        if (!t_oDb.connect())
         {
-            QSLOG_ERROR("connect to db failure.");
             return false;
         }
-        QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-        QSqlQuery query(t_oDb);
+        QSqlQuery &query(t_oDb.sqlquery());
         QString sql = QString("SELECT DIRID, DIRNAME, ENABLE, COLLECTTYPE, FTPTRANSFERMODE, FTPCONNECTMODE, RLTVPATH, DISPATCH,"
                               "FILETEMPLATE, SUBDIRTEMPLATE, SUBDIRCHECK, MOVEFLAG, COLTIMERANGE, RECORDLATESTTIME, COMPARE_CONTENT, LOGINUSER, LOGINPASS,"
                               "IP, PORT from T_DIR_COL where DIRID = '%1'").arg(task.dirID);
@@ -293,16 +289,15 @@ bool DataBase::QueryCollectTask(CollectTask &task)
 bool DataBase::QueryUserInfo(TaskUser &user)
 {
     user.lstUser.clear();
-    QSqlDatabase t_oDb;
+    MyDataBase t_oDb;
+
     try
     {
-
-        if (!ConnectDB(t_oDb))
+        if (!t_oDb.connect())
         {
             return false;
         }
-        QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-        QSqlQuery query(t_oDb);
+        QSqlQuery &query(t_oDb.sqlquery());
         // 先查收集用户表
         QString sql = QString("SELECT USERID, RLTVPATH, RENAME_RULE FROM T_COL_USER WHERE DIRID = '%1'").arg(user.taskID);
 
@@ -369,17 +364,15 @@ bool DataBase::QueryUserInfo(TaskUser &user)
 
 bool DataBase::QueryUserInfo(QList<UserInfo> &lstUser)
 {
-    QSqlDatabase t_oDb;
+    MyDataBase t_oDb;
+
     try
     {
-
-        if (!ConnectDB(t_oDb))
+        if (!t_oDb.connect())
         {
-            t_oDb.close();
             return false;
         }
-        QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-        QSqlQuery query(t_oDb);
+        QSqlQuery &query(t_oDb.sqlquery());
         // 先查收集用户表
         QString sql = QString("SELECT USERID, USERNAME, SENDTYPE, FTPTRANSFERTYPE, FTPTRANSFERMODE, SENDSUFFIX, RLTVPATH, TIMEBASEDRULE, LOGINUSER, LOGINPASS, IP, PORT, KEEPDIR, COMPRESS, ENCRYPT, CONPUT, MAXTRYCOUNS FROM T_SEND_USER");
         bool res = query.exec(sql);
@@ -420,16 +413,15 @@ bool DataBase::QueryUserInfo(QList<UserInfo> &lstUser)
 
 bool DataBase::InsertUserInfo(const UserInfo &user)
 {
-    QSqlDatabase t_oDb;
+    MyDataBase t_oDb;
+
     try
     {
-
-        if (!ConnectDB(t_oDb))
+        if (!t_oDb.connect())
         {
             return false;
         }
-        QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-        QSqlQuery query(t_oDb);
+        QSqlQuery &query(t_oDb.sqlquery());
         // 先查收集用户表
         QString sql = QString("REPLACE INTO T_SEND_USER(USERID, USERNAME, SENDTYPE, FTPTRANSFERTYPE, FTPTRANSFERMODE, SENDSUFFIX, RLTVPATH, TIMEBASEDRULE, LOGINUSER, LOGINPASS, IP, PORT, KEEPDIR, COMPRESS, ENCRYPT, CONPUT, MAXTRYCOUNS)"
                               "VALUES(:USERID, :USERNAME, :SENDTYPE, :FTPTRANSFERTYPE, :FTPTRANSFERMODE, :SENDSUFFIX, :RLTVPATH, :TIMEBASEDRULE, :LOGINUSER, :LOGINPASS, :IP, :PORT, :KEEPDIR, :COMPRESS, :ENCRYPT, :CONPUT, :MAXTRYCOUNS)");
@@ -470,15 +462,15 @@ bool DataBase::InsertUserInfo(const UserInfo &user)
 
 bool DataBase::DeleteSendUser(const QString &userID)
 {
+    MyDataBase t_oDb;
+
     try
     {
-        QSqlDatabase t_oDb;
-        if (!ConnectDB(t_oDb))
+        if (!t_oDb.connect())
         {
             return false;
         }
-        QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-        QSqlQuery query(t_oDb);
+        QSqlQuery &query(t_oDb.sqlquery());
         QString sql = QString("DELETE FROM T_SEND_USER WHERE USERID = '%1'").arg(userID);
         bool res = query.exec(sql);
         if (!res)
@@ -510,17 +502,15 @@ bool DataBase::DeleteSendUser(const QString &userID)
 
 bool DataBase::InsertCollectUser(const TaskUser &user)
 {
-    QSqlDatabase t_oDb;
+    MyDataBase t_oDb;
+
     try
     {
-
-        if (!ConnectDB(t_oDb))
+        if (!t_oDb.connect())
         {
             return false;
         }
-        QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-        //m_db.transaction();
-        QSqlQuery query(t_oDb);
+        QSqlQuery &query(t_oDb.sqlquery());
         //QString sql;
         for (int i=0; i<user.lstUser.size(); i++)
         {
@@ -548,16 +538,15 @@ bool DataBase::InsertCollectUser(const TaskUser &user)
 
 bool DataBase::DeleteCollectSenderUser(const QString &dirId, const QString &userId)
 {
-    QSqlDatabase t_oDb;
+    MyDataBase t_oDb;
+
     try
     {
-
-        if (!ConnectDB(t_oDb))
+        if (!t_oDb.connect())
         {
             return false;
         }
-        QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-        QSqlQuery query(t_oDb);
+        QSqlQuery &query(t_oDb.sqlquery());
         //QString sql;
         // for (int i=0; i<user.lstUser.size(); i++)
         {
@@ -583,16 +572,15 @@ bool DataBase::DeleteCollectSenderUser(const QString &dirId, const QString &user
 
 bool DataBase::InsertCollectTask(const CollectTask &task)
 {
-    QSqlDatabase t_oDb;
+    MyDataBase t_oDb;
+
     try
     {
-
-        if (!ConnectDB(t_oDb))
+        if (!t_oDb.connect())
         {
             return false;
         }
-        QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-        QSqlQuery query(t_oDb);
+        QSqlQuery &query(t_oDb.sqlquery());
         QString sql = QString("REPLACE INTO T_DIR_COL(DIRID, DIRNAME, ENABLE, COLLECTTYPE, FTPTRANSFERMODE, FTPCONNECTMODE, RLTVPATH, DISPATCH,"
                               "FILETEMPLATE, SUBDIRTEMPLATE, SUBDIRCHECK, MOVEFLAG, COLTIMERANGE, RECORDLATESTTIME, COMPARE_CONTENT, LOGINUSER, LOGINPASS,"
                               "IP, PORT)"
@@ -639,16 +627,15 @@ bool DataBase::InsertCollectTask(const CollectTask &task)
 
 bool DataBase::DeltCollectTask(const QString &dirID)
 {
-    QSqlDatabase t_oDb;
+    MyDataBase t_oDb;
+
     try
     {
-
-        if (!ConnectDB(t_oDb))
+        if (!t_oDb.connect())
         {
             return false;
         }
-        QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-        QSqlQuery query(t_oDb);
+        QSqlQuery &query(t_oDb.sqlquery());
         QString sql;
         bool res;
         // 先删除收集任务表
@@ -806,13 +793,13 @@ bool DataBase::updateDirLatestTime(const QString &db, const QString &dir, const 
 
 bool DataBase::queryClearTask(QList<ClearTask> &tasks)
 {
-    QSqlDatabase t_oDb;
-    if (!ConnectDB(t_oDb))
+    MyDataBase t_oDb;
+
+    if (!t_oDb.connect())
     {
         return false;
     }
-    QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-    QSqlQuery query(t_oDb);
+    QSqlQuery &query(t_oDb.sqlquery());
 
     QString sql = QString("SELECT NAME,TYPE,IP,PORT,USER,PASSWORD,TRANSFERMODE,DIR,QUARTZ,FILE,UNIT,VALUE,ACTIVE FROM T_DIR_CLEAR");
     bool res = query.exec(sql);
@@ -849,13 +836,13 @@ bool DataBase::queryClearTask(QList<ClearTask> &tasks)
 
 bool DataBase::queryClearTask(ClearTask &task)
 {
-    QSqlDatabase t_oDb;
-    if (!ConnectDB(t_oDb))
+    MyDataBase t_oDb;
+
+    if (!t_oDb.connect())
     {
         return false;
     }
-    QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-    QSqlQuery query(t_oDb);
+    QSqlQuery &query(t_oDb.sqlquery());
 
     QString sql = QString("SELECT NAME,TYPE,IP,PORT,USER,PASSWORD,TRANSFERMODE,DIR,QUARTZ,FILE,UNIT,VALUE,ACTIVE FROM T_DIR_CLEAR WHERE NAME = '%1'").arg(task.taskName);
     bool res = query.exec(sql);
@@ -897,13 +884,13 @@ bool DataBase::queryClearTask(ClearTask &task)
 
 bool DataBase::queryClearTask(const QString &dir, QString &name)
 {
-    QSqlDatabase t_oDb;
-    if (!ConnectDB(t_oDb))
+    MyDataBase t_oDb;
+
+    if (!t_oDb.connect())
     {
         return false;
     }
-    QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-    QSqlQuery query(t_oDb);
+    QSqlQuery &query(t_oDb.sqlquery());
 
     QString sql = QString("select NAME from T_DIR_CLEAR where DIR = '%1'").arg(dir);
     bool res = query.exec(sql);
@@ -931,13 +918,13 @@ bool DataBase::queryClearTask(const QString &dir, QString &name)
 
 bool DataBase::checkTable(const QString &table, const QString &createSql)
 {
-    QSqlDatabase t_oDb;
-    if (!ConnectDB(t_oDb))
+    MyDataBase t_oDb;
+
+    if (!t_oDb.connect())
     {
         return false;
     }
-    QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-    QSqlQuery query(t_oDb);
+    QSqlQuery &query(t_oDb.sqlquery());
     QString sql(QString("SELECT COUNT(*) FROM sqlite_master where type = 'table' and name = '%1'").arg(table));
 
     bool res = query.exec(sql);
@@ -979,16 +966,14 @@ bool DataBase::checkTable(const QString &table, const QString &createSql)
 
 bool DataBase::insertClearTask(const ClearTask &task)
 {
-    QSqlDatabase t_oDb;
+    MyDataBase t_oDb;
     try
     {
-
-        if (!ConnectDB(t_oDb))
+        if (!t_oDb.connect())
         {
             return false;
         }
-        QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-        QSqlQuery query(t_oDb);
+        QSqlQuery &query(t_oDb.sqlquery());
         QString sql = QString("REPLACE INTO T_DIR_CLEAR(NAME,TYPE,IP,PORT,USER,PASSWORD,TRANSFERMODE,DIR,QUARTZ,FILE,UNIT,VALUE,ACTIVE)"
                               "VALUES(:NAME,:TYPE,:IP,:PORT,:USER,:PASSWORD,:TRANSFERMODE,:DIR,:QUARTZ,:FILE,:UNIT,:VALUE,:ACTIVE)");
         query.prepare(sql);
@@ -1025,16 +1010,14 @@ bool DataBase::insertClearTask(const ClearTask &task)
 
 bool DataBase::deleteClearTask(const QString &name)
 {
-    QSqlDatabase t_oDb;
+    MyDataBase t_oDb;
     try
     {
-
-        if (!ConnectDB(t_oDb))
+        if (!t_oDb.connect())
         {
             return false;
         }
-        QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-        QSqlQuery query(t_oDb);
+        QSqlQuery &query(t_oDb.sqlquery());
         QString sql;
         bool res;
         // 先删除收集任务表
@@ -1056,16 +1039,21 @@ bool DataBase::deleteClearTask(const QString &name)
 
 bool DataBase::queryBaseInfo(int &threadNum, int &logPort, bool &writeLog)
 {
-    QSqlDatabase t_oDb;
+    // QSqlDatabase t_oDb;
+    MyDataBase t_oDb;
     try
     {
-
-        if (!ConnectDB(t_oDb))
+        if (!t_oDb.connect())
         {
             return false;
         }
-        QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-        QSqlQuery query(t_oDb);
+        QSqlQuery &query(t_oDb.sqlquery());
+        //if (!ConnectDB(t_oDb))
+        //{
+        //    return false;
+        //}
+        //QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
+        //QSqlQuery query(t_oDb);
         QString sql;
         bool res;
         // 先删除收集任务表
@@ -1105,16 +1093,22 @@ bool DataBase::queryBaseInfo(int &threadNum, int &logPort, bool &writeLog)
 
 bool DataBase::updateBaseInfo(int threadNum, int logPort, bool enableLog)
 {
-    QSqlDatabase t_oDb;
+    // QSqlDatabase t_oDb;
+    MyDataBase t_oDb;
     try
     {
-
-        if (!ConnectDB(t_oDb))
+        if (!t_oDb.connect())
         {
             return false;
         }
-        QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
-        QSqlQuery query(t_oDb);
+
+        //if (!ConnectDB(t_oDb))
+        //{
+        //    return false;
+        //}
+        //QSharedPointer<QSqlDatabase> autoclose(&t_oDb, &QSqlDatabase::close);
+        //QSqlQuery query(t_oDb);
+        QSqlQuery &query(t_oDb.sqlquery());
         QString sql;
         bool res;
 
@@ -1146,79 +1140,51 @@ bool DataBase::updateBaseInfo(int threadNum, int logPort, bool enableLog)
     return false;
 }
 
-//bool DataBase::queryLogListenPort(int &portNum)
-//{
-//    try
-//    {
-//        if (!ConnectDB())
-//        {
-//            return false;
-//        }
-//
-//        QSqlQuery query(m_db);
-//        QString sql;
-//        bool res;
-//        // 先删除收集任务表
-//        sql = QString("SELECT LOGPORT FROM T_GLOBALINFO WHERE PROGRAMID = %1").arg(MAGIC_NUM);
-//        res = query.exec(sql);
-//        if (res)
-//        {
-//            if (query.next())
-//            {
-//                portNum = query.value(0).toInt();
-//                return true;
-//            }
-//            else
-//            {
-//                return false;
-//            }
-//
-//            QSLOG_ERROR(QString("Error: %1").arg(query.lastError().text()));
-//        }
-//    }
-//    catch (std::exception &e)
-//    {
-//        QSLOG_ERROR(QStringLiteral("Error：") + QString(e.what()));
-//    }
-//
-//    return false;
-//}
+MyDataBase::MyDataBase()
+{
+    m_pQuery = NULL;
+    m_pDataBase = NULL;
 
-//bool DataBase::updateLogListemPort(int portNum)
-//{
-//    try
-//    {
-//        if (!ConnectDB())
-//        {
-//            return false;
-//        }
-//
-//        QSqlQuery query(m_db);
-//        QString sql;
-//        bool res;
-//
-//        // 先删除收集任务表
-//        sql = QString("REPLACE INTO T_GLOBALINFO(PROGRAMID, THREADNUM, LOGPORT) VALUES(:PROGRAMID, :THREADNUM, :LOGPORT)");// .arg(MAGIC_NUM).arg(portNum);
-//
-//        if (!query.prepare(sql))
-//        {
-//            QSLOG_ERROR(QString("Error: %1").arg(query.lastError().text()));
-//            return false;
-//        }
-//        query.bindValue(":PROGRAMID", MAGIC_NUM);
-//        query.bindValue(":THREADNUM", threadNum);
-//        res = query.exec(sql);
-//        if (res)
-//        {
-//            return true;
-//        }
-//
-//        QSLOG_ERROR(QString("Error: %1").arg(query.lastError().text()));
-//    }
-//    catch (std::exception &e)
-//    {
-//        QSLOG_ERROR(QStringLiteral("Error：") + QString(e.what()));
-//    }
-//
-//    return false;
-//}
+    m_pDataBase = new QSqlDatabase();
+    m_strConName = QUuid::createUuid().toString();
+    *m_pDataBase = QSqlDatabase::addDatabase("QSQLITE", m_strConName);
+    QString strDbPath = qApp->applicationDirPath() + "/config/Transfer.db";
+    m_pDataBase->setDatabaseName(strDbPath);
+}
+
+
+bool MyDataBase::connect()
+{
+    if (!m_pDataBase->open())
+    {
+        QSLOG_ERROR(QStringLiteral("连接数据库失败：%1").arg(m_pDataBase->lastError().text()));
+        return false;
+    }
+    else
+    {
+        m_pQuery = new QSqlQuery(*m_pDataBase);
+        return true;
+    }
+}
+
+
+MyDataBase::~MyDataBase()
+{
+    if (NULL != m_pQuery)
+    {
+        delete m_pQuery;
+        m_pQuery = NULL;
+    }
+
+    if (NULL != m_pDataBase)
+    {
+        if (m_pDataBase->isOpen())
+        {
+            m_pDataBase->close();
+        }
+        delete m_pDataBase;
+        m_pDataBase = NULL;
+    }
+
+    QSqlDatabase::removeDatabase(m_strConName);
+}

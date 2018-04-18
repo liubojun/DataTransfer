@@ -15,6 +15,7 @@
 #include "pathbuilder.h"
 #include "IDispatchTimer.h"
 #include "systemset.h"
+
 //#include "quartz.h"
 //--
 
@@ -311,8 +312,11 @@ void MainWindow::addLog(const QString &dirName, const QString &info, int infoTyp
     ui.tableWidget->insertRow(0);
 
     QString strTime = QDateTime::currentDateTime().toString("MM-dd hh:mm:ss");
-    //QTableWidgetItem *pItem = new QTableWidgetItem(QIcon(":/02.png"), strTime);
+#ifdef _WIN32
+    QTableWidgetItem *pItem = new QTableWidgetItem(QIcon(":/02.png"), strTime);
+#else
     QTableWidgetItem *pItem = new QTableWidgetItem(strTime);
+#endif
     ui.tableWidget->setItem(0, 0, pItem);
     pItem = new QTableWidgetItem(dirName);
     ui.tableWidget->setItem(0, 1, pItem);
@@ -344,6 +348,7 @@ void MainWindow::addLog(const CollectTask &task, const QString &info, int infoTy
     QDateTime qDT = QDateTime::currentDateTime();
     QString strTime = qDT.toString("MM-dd hh:mm:ss");
     QTableWidgetItem *pItem = NULL;
+#ifdef _WIN32
     if (1 == infoType)
     {
         pItem = new QTableWidgetItem(QIcon(":/01.png"), strTime);
@@ -352,6 +357,9 @@ void MainWindow::addLog(const CollectTask &task, const QString &info, int infoTy
     {
         pItem = new QTableWidgetItem(QIcon(":/03.png"), strTime);
     }
+#else
+    pItem = new QTableWidgetItem(strTime);
+#endif
 
     ui.tableWidget->setItem(0, 0, pItem);
     pItem = new QTableWidgetItem(task.dirName);
@@ -407,6 +415,7 @@ void MainWindow::printCollectLog(const QString &dirName, const QString &dirId, c
     QDateTime qDT = QDateTime::currentDateTime();
     QString strTime = qDT.toString("MM-dd hh:mm:ss");
     QTableWidgetItem *pItem = NULL;
+#ifdef _WIN32
     if (1 == infoType)
     {
         pItem = new QTableWidgetItem(QIcon(":/01.png"), strTime);
@@ -415,7 +424,9 @@ void MainWindow::printCollectLog(const QString &dirName, const QString &dirId, c
     {
         pItem = new QTableWidgetItem(QIcon(":/03.png"), strTime);
     }
-
+#else
+    pItem = new QTableWidgetItem(strTime);
+#endif
     ui.tableWidget->setItem(0, 0, pItem);
     //pItem = new QTableWidgetItem(QString::fromLocal8Bit(dirName.c_str()));
     pItem = new QTableWidgetItem(dirName);
@@ -461,6 +472,7 @@ void MainWindow::printClearLog(const QString &dirName, const QString &dirId, con
     QDateTime qDT = QDateTime::currentDateTime();
     QString strTime = qDT.toString("MM-dd hh:mm:ss");
     QTableWidgetItem *pItem = NULL;
+#ifdef _WIN32
     if (1 == infoType)
     {
         pItem = new QTableWidgetItem(QIcon(":/01.png"), strTime);
@@ -469,6 +481,9 @@ void MainWindow::printClearLog(const QString &dirName, const QString &dirId, con
     {
         pItem = new QTableWidgetItem(QIcon(":/03.png"), strTime);
     }
+#else
+    pItem = new QTableWidgetItem(strTime);
+#endif
 
     ui.tableWidget->setItem(0, 0, pItem);
 
