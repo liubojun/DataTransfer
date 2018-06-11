@@ -154,48 +154,50 @@ void SharedDirCollector::getNewFiles()
     // E:/workspace/DataTransfer/DataTransfer_code_20170831/vs2013/apps/DataTransfer/%T-1H%t%y/%t%m/%td
     // modified by liubojun. 支持按照特定时间获取数据
     QStringList finalDirs = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
-    //m_collectSet.rltvPath =
 
-    bool bConnect = true;
-    // 先测试源路径是否正常
-
-    bConnect = testFileConnection(m_collectSet.rltvPath);
-
-    if (!bConnect)
+    foreach (QString strDir, finalDirs)
     {
-        m_nLineState = 1;
-        //emit taskState(m_collectSet, m_userInfo.user.sendType, m_nLineState);
-        emit taskState(m_collectSet, 0, m_nLineState);
-        return;
-    }
 
-    if (bConnect)
-    {
-        //QSLOG_INFO(QString("[%1] begin to getNewFiles.").arg(m_collectSet.dirName));
-        m_nLineState = 0;
-        //emit taskState(m_collectSet, m_userInfo.user.sendType, m_nLineState);
-        emit taskState(m_collectSet, 0, m_nLineState);
-        emit startGif(m_collectSet.dirID, true);
-        QTime tt;
-        tt.start();
-        CDirRecord oRecord(m_collectSet.dirName);
-        if (m_collectSet.recordLatestTime)
+        bool bConnect = true;
+        // 先测试源路径是否正常
+
+        bConnect = testFileConnection(strDir);
+
+        if (!bConnect)
         {
-            oRecord.loadLatestFileSize();
+            m_nLineState = 1;
+            emit taskState(m_collectSet, 0, m_nLineState);
+            return;
         }
-        getSynclessFiles(m_collectSet.rltvPath, m_collectSet.subdirFlag, oRecord);
-        if (m_collectSet.recordLatestTime)
+
+        if (bConnect)
         {
-            oRecord.reflush();
+            //QSLOG_INFO(QString("[%1] begin to getNewFiles.").arg(m_collectSet.dirName));
+            m_nLineState = 0;
+            //emit taskState(m_collectSet, m_userInfo.user.sendType, m_nLineState);
+            emit taskState(m_collectSet, 0, m_nLineState);
+            emit startGif(m_collectSet.dirID, true);
+            QTime tt;
+            tt.start();
+            CDirRecord oRecord(m_collectSet.dirName);
+            if (m_collectSet.recordLatestTime)
+            {
+                oRecord.loadLatestFileSize();
+            }
+            getSynclessFiles(strDir, m_collectSet.subdirFlag, oRecord);
+            if (m_collectSet.recordLatestTime)
+            {
+                oRecord.reflush();
+            }
+            emit startGif(m_collectSet.dirID, false);
+            QSLOG_INFO(QString("[%1] finish to getNewFiles, cost time: %2.").arg(m_collectSet.dirName).arg(tt.elapsed()/1000.f));
         }
-        emit startGif(m_collectSet.dirID, false);
-        QSLOG_INFO(QString("[%1] finish to getNewFiles, cost time: %2.").arg(m_collectSet.dirName).arg(tt.elapsed()/1000.f));
-    }
-    else
-    {
-        m_nLineState = 1;
-        //emit taskState(m_collectSet, m_userInfo.user.sendType, m_nLineState);
-        emit taskState(m_collectSet, 0, m_nLineState);
+        else
+        {
+            m_nLineState = 1;
+            emit taskState(m_collectSet, 0, m_nLineState);
+        }
+
     }
 }
 
@@ -451,53 +453,53 @@ bool SharedDirCollector::testCollection()
 
 void SharedDirCollector::taskDone(bool bFlag, const FileInfo &file)
 {
-//     //static unsigned int s_count = 0;	// 测试
-//     if (bFlag)
-//     {
-//         //发送消息队列通知其他插件
-//         MSGSTRUCT msg;
-//         FileInfoToString(msg.body.m_msgdata, file);
-//         foreach (string qName, m_strQueNames)
-//         {
-//             msg.head.m_queuename = qName;
-//             m_pManager->m_msgLock.lock();
-//             if (!m_pManager->m_pIClient->pushMsg(msg))	//阻塞式
-//             {
-//                 QSLOG_ERROR(QString("pushMsg error."));
-//             }
-//
-//             //s_count++;
-//         }
-//
-//         //QSLOG_DEBUG(QString("has send %1").arg(s_count));
-//     }
-//
-//     // 若主动停止收集，记录当前处理文件的时间
-//     if (m_watchtype == TIMER_SCAN)
-//     {
-//         // 更新内存中的时间
-//         QString strDirPath;
-//         QString strFullPath = QString::fromLocal8Bit(file.strOrgFilePath.c_str());
-//         int nPos = strFullPath.lastIndexOf("/");
-//         if (nPos != -1)
-//         {
-//             QMutexLocker autoLocker(&m_pManager->m_timeLock);
-//             strDirPath = strFullPath.left(nPos);
-//             m_pLastTime->dir_time[strDirPath.toStdString()] = file.strMdyTime;
-//         }
-//
-//         // 更新文件中的时间
-// //         if (!m_bRun)
-// //         {
-// //             m_pManager->writeLastTime();
-// //         }
-//     }
-//
-//     if (file.nFileType < X_TYPE)
-//     {
-//         QMutexLocker autoLocker(&m_threadNumMutex);
-//         m_nVtbCount--;
-//     }
+    //     //static unsigned int s_count = 0;	// 测试
+    //     if (bFlag)
+    //     {
+    //         //发送消息队列通知其他插件
+    //         MSGSTRUCT msg;
+    //         FileInfoToString(msg.body.m_msgdata, file);
+    //         foreach (string qName, m_strQueNames)
+    //         {
+    //             msg.head.m_queuename = qName;
+    //             m_pManager->m_msgLock.lock();
+    //             if (!m_pManager->m_pIClient->pushMsg(msg))	//阻塞式
+    //             {
+    //                 QSLOG_ERROR(QString("pushMsg error."));
+    //             }
+    //
+    //             //s_count++;
+    //         }
+    //
+    //         //QSLOG_DEBUG(QString("has send %1").arg(s_count));
+    //     }
+    //
+    //     // 若主动停止收集，记录当前处理文件的时间
+    //     if (m_watchtype == TIMER_SCAN)
+    //     {
+    //         // 更新内存中的时间
+    //         QString strDirPath;
+    //         QString strFullPath = QString::fromLocal8Bit(file.strOrgFilePath.c_str());
+    //         int nPos = strFullPath.lastIndexOf("/");
+    //         if (nPos != -1)
+    //         {
+    //             QMutexLocker autoLocker(&m_pManager->m_timeLock);
+    //             strDirPath = strFullPath.left(nPos);
+    //             m_pLastTime->dir_time[strDirPath.toStdString()] = file.strMdyTime;
+    //         }
+    //
+    //         // 更新文件中的时间
+    // //         if (!m_bRun)
+    // //         {
+    // //             m_pManager->writeLastTime();
+    // //         }
+    //     }
+    //
+    //     if (file.nFileType < X_TYPE)
+    //     {
+    //         QMutexLocker autoLocker(&m_threadNumMutex);
+    //         m_nVtbCount--;
+    //     }
 }
 
 void SharedDirCollector::getNewDirs2(QString strDir, QStringList &lstDir)
@@ -718,9 +720,9 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir, CDirReco
                 if (m_collectSet.recordLatestTime)
                 {
                     /*                if (!bHasFileUpdate)
-                    				{
-                    				continue;
-                    				}*/
+                                    {
+                                    continue;
+                                    }*/
 
                     QString ifiletime_t = qf.lastModified().toString("yyyyMMddhhmmss");
                     //if (!iRecordMaxTime.isEmpty() && ifiletime_t < iLatestTime)
