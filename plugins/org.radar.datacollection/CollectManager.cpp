@@ -167,7 +167,8 @@ bool CollectManager::deltSyncTransfer(const QString &dirID)
     if (NULL != pCollect)
     {
         pCollect->stop();
-        pCollect->deleteLater();
+        pCollect->deleteSelf();
+        //pCollect->deleteLater();
     }
 
     return true;
@@ -183,8 +184,9 @@ bool CollectManager::mdfySyncTransfer(const CollectTask &set)
         // QSharedPointer<CollectorBase> pCollect = m_pCollects.take(set.dirID);
         CollectorBase *pCollect = m_pCollects.take(set.dirID);
         pCollect->stop();
+        pCollect->deleteSelf();
         addSyncTransfer(set);
-        pCollect->deleteLater();
+        //pCollect->deleteLater();
 
         // 停止与该收集任务相关的各项内容
     }

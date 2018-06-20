@@ -406,6 +406,11 @@ int SharedDirCollector::stop()
     return 0;
 }
 
+void SharedDirCollector::deleteSelf()
+{
+    deleteLater();
+}
+
 // bool SharedDirCollector::connectToWinRemote(QString strURL,const QString& strUser,const QString& strPwd)
 // {
 //     // 排除"@"

@@ -205,6 +205,12 @@ public slots:
      */
     virtual int stop() = 0;
 
+    /**
+     * @brief  删除收集实例
+     * @return void
+     */
+    virtual void deleteSelf() = 0;
+
     void onBegined();
 
     // 发送日志信号 infoType：1-文件发送成功，2-失败

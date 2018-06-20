@@ -1,15 +1,15 @@
 /**
   * @file   shareddirCollector.h
-  * @brief  ¹²Ïí(±¾µØ)Ä¿Â¼ÊÕ¼¯Æ÷.
+  * @brief  å…±äº«(æœ¬åœ°)ç›®å½•æ”¶é›†å™¨.
   *
-  *  ÕâÀïÊÇÏêÏ¸ËµÃ÷¡£
+  *  è¿™é‡Œæ˜¯è¯¦ç»†è¯´æ˜ã€‚
   * @author nriet
   * @par   Copyright (c):
   *          nriet.
   *         All Rights Reserved
   * @date   2016:04:07
-  * @note   ÕâÀïÊÇ×¢ÒâÊÂÏî¡£
-  * @version <°æ±¾ºÅ>
+  * @note   è¿™é‡Œæ˜¯æ³¨æ„äº‹é¡¹ã€‚
+  * @version <ç‰ˆæœ¬å·>
   */
 
 #ifndef shareddirCollector_H_
@@ -36,18 +36,18 @@ class DLL_EXPORT_CLASS_DECL SharedDirCollector : public CollectorBase
     Q_OBJECT
 public:
     /**
-     * @brief  Ä¬ÈÏ¹¹Ôìº¯Êı
+     * @brief  é»˜è®¤æ„é€ å‡½æ•°
      */
     SharedDirCollector(QWaitCondition &in_oCond, QMutex &in_oLocker, int &in_iLogsize);
 
     /**
-     * @brief  Ä¬ÈÏÎö¹¹º¯Êı
+     * @brief  é»˜è®¤ææ„å‡½æ•°
      */
     virtual ~SharedDirCollector();
 
     /**
-     * @brief  Æô¶¯¹²ÏíÄ¿Â¼ÊÕ¼¯
-     * @return int£ºÆô¶¯³É¹¦·µ»Ø0£¬Ê§°Ü·µ»Ø-1
+     * @brief  å¯åŠ¨å…±äº«ç›®å½•æ”¶é›†
+     * @return intï¼šå¯åŠ¨æˆåŠŸè¿”å›0ï¼Œå¤±è´¥è¿”å›-1
      */
     virtual int start();
 
@@ -57,10 +57,17 @@ public slots:
     virtual int stop();
     //void onCheckDir(QSet<QString>);
     //void fileCreated(const QString &strFilePath);
+
+
+    /**
+     * @brief  åˆ é™¤æ”¶é›†å®ä¾‹
+     * @return void
+     */
+    virtual void deleteSelf();
 public:
     /**
-     * @brief  ÖØĞ´¸¸ÀàĞéº¯Êı£¬±»¶¨Ê±µ÷ÓÃ£¬²éÕÒĞÂÎÄ¼ş
-     * @return void£ºÎŞ
+     * @brief  é‡å†™çˆ¶ç±»è™šå‡½æ•°ï¼Œè¢«å®šæ—¶è°ƒç”¨ï¼ŒæŸ¥æ‰¾æ–°æ–‡ä»¶
+     * @return voidï¼šæ— 
      */
     virtual void getNewFiles();
 
@@ -74,31 +81,31 @@ public:
 
     void getSynclessFiles(QString strDir, bool bSubdir, CDirRecord &oRecord);
 
-    // ÏàÍ¬·µ»Øtrue£¬²»Í¬·µ»Øfalse
+    // ç›¸åŒè¿”å›trueï¼Œä¸åŒè¿”å›false
     bool compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi, TransTask &tTask);
 
     /**
-     * @brief  Êı¾İ´«Êä¼ìË÷ĞÂÎÄ¼ş
-     * @param  QString strDir£ºÄ¿Â¼Â·¾¶
-     * @param  FileInfoList & fileList£ºĞÂÎÄ¼şÁĞ±í
-     * @param  bool bRoot£ºÊÇ·ñÎª¸ùÄ¿Â¼
-     * @return void£ºÎŞ
+     * @brief  æ•°æ®ä¼ è¾“æ£€ç´¢æ–°æ–‡ä»¶
+     * @param  QString strDirï¼šç›®å½•è·¯å¾„
+     * @param  FileInfoList & fileListï¼šæ–°æ–‡ä»¶åˆ—è¡¨
+     * @param  bool bRootï¼šæ˜¯å¦ä¸ºæ ¹ç›®å½•
+     * @return voidï¼šæ— 
      */
     void getNewFiles(QString strDir, FileInfoList &fileList, bool bRoot=false);
 
     /**
-     * @brief  »ñÈ¡ĞŞ¸ÄÊ±¼ä±ä»¯ÁËµÄËùÓĞÄ¿Â¼
-     * @param  QString strDir£º¸¸Ä¿Â¼
-     * @param  QStringList & lstDir£º×ÓÄ¿Â¼
-     * @return void£ºÎŞ
+     * @brief  è·å–ä¿®æ”¹æ—¶é—´å˜åŒ–äº†çš„æ‰€æœ‰ç›®å½•
+     * @param  QString strDirï¼šçˆ¶ç›®å½•
+     * @param  QStringList & lstDirï¼šå­ç›®å½•
+     * @return voidï¼šæ— 
      */
     void getNewDirs(QString strDir, QStringList &lstDir);
 
     /**
-     * @brief  ±éÀúlstDir£¬²éÕÒĞÂÎÄ¼ş
-     * @param  const QStringList & lstDir£ºÄ¿Â¼ÁĞ±í
-     * @param  FileInfoList & fileList£ºÎÄ¼şÁĞ±í
-     * @return void£ºÎŞ
+     * @brief  éå†lstDirï¼ŒæŸ¥æ‰¾æ–°æ–‡ä»¶
+     * @param  const QStringList & lstDirï¼šç›®å½•åˆ—è¡¨
+     * @param  FileInfoList & fileListï¼šæ–‡ä»¶åˆ—è¡¨
+     * @return voidï¼šæ— 
      */
     void getNewFilesFromDir(const QStringList &lstDir, FileInfoList &fileList);
 
@@ -106,23 +113,23 @@ public:
     void getNewFilesFromDir2(const QStringList &lstDir, FileInfoList &fileList);
 
     /**
-     * @brief  Êı¾İ´«ÊäÏµÍ³ÊÕ¼¯Êı¾İ
-     * @return void£ºÎŞ
+     * @brief  æ•°æ®ä¼ è¾“ç³»ç»Ÿæ”¶é›†æ•°æ®
+     * @return voidï¼šæ— 
      */
     void GetNewFilesToTransfer();
 
     /**
-     * @brief  Í¨ÓÃÊı¾İÊÕ¼¯
-     * @return void£ºÎŞ
+     * @brief  é€šç”¨æ•°æ®æ”¶é›†
+     * @return voidï¼šæ— 
      */
     void CollectNewFiles();
 
     /**
-     * @brief  Á¬½Ó¹²ÏíÄ¿Â¼
-     * @param  const QString & strURL£º¹²ÏíÄ¿Â¼Â·¾¶
-     * @param  const QString & strUser£ºÓÃ»§Ãû
-     * @param  const QString & strPwd£ºÃÜÂë
-     * @return bool£ºÁ¬½Ó³É¹¦·µ»Øtrue£¬·ñÔò·µ»Øfalse
+     * @brief  è¿æ¥å…±äº«ç›®å½•
+     * @param  const QString & strURLï¼šå…±äº«ç›®å½•è·¯å¾„
+     * @param  const QString & strUserï¼šç”¨æˆ·å
+     * @param  const QString & strPwdï¼šå¯†ç 
+     * @return boolï¼šè¿æ¥æˆåŠŸè¿”å›trueï¼Œå¦åˆ™è¿”å›false
      */
     //bool connectToWinRemote(QString strURL,const QString& strUser,const QString& strPwd);
 
@@ -136,7 +143,7 @@ private:
     QSharedPointer<QObject> m_pTimerObject;
     QSharedPointer<CltDispatch> m_oProcessor;
 
-    /// ÊµÊ±¼à¿Ø¶ÔÏó£¬¹²ÏíÄ¿Â¼·½Ê½¶ÀÓĞ
+    /// å®æ—¶ç›‘æ§å¯¹è±¡ï¼Œå…±äº«ç›®å½•æ–¹å¼ç‹¬æœ‰
     QSharedPointer<IFileWatcher> m_pWatcher;
 
     void Init();
@@ -146,9 +153,9 @@ private:
 
     //static void makeVtbFun(SharedDirCollector *pParent, FileInfo fileinfo);
 
-    QList<QFuture<void> > m_threadFun;	///< ¼ÇÂ¼µ±Ç°ÔËĞĞµÄ±ê×¼»¯Ïß³Ì
+    QList<QFuture<void> > m_threadFun;	///< è®°å½•å½“å‰è¿è¡Œçš„æ ‡å‡†åŒ–çº¿ç¨‹
 
-    //QSharedPointer<FileWatcher> m_pFileWatcher;		///< ÊµÊ±¼à¿Ø
+    //QSharedPointer<FileWatcher> m_pFileWatcher;		///< å®æ—¶ç›‘æ§
 };
 
 #endif

@@ -16,6 +16,7 @@
 FtpCollector::FtpCollector(QWaitCondition &in_oCond, QMutex &in_oLocker, int &in_iLogsize)
     : CollectorBase(in_oCond, in_oLocker, in_iLogsize)
 {
+    m_bBeingDeleted = false;
 }
 
 FtpCollector::~FtpCollector()
@@ -60,6 +61,11 @@ int FtpCollector::stop()
 
 
     return 0;
+}
+
+void FtpCollector::deleteSelf()
+{
+    m_bBeingDeleted = true;
 }
 
 void FtpCollector::stoprcv(int exitcode, QProcess::ExitStatus status)
@@ -116,7 +122,6 @@ void FtpCollector::getNewFiles()
         QSLOG_DEBUG("test ftp error");
         return;
     }
-    //QSLOG_DEBUG("test ftp success.");
 
     // 如果连接是正常的话
     m_nLineState = 0;
@@ -138,10 +143,26 @@ void FtpCollector::getNewFiles()
     {
         QCoreApplication::processEvents();
         QThread::sleep(1);
+        // added by liubojun @20180620
+        if (!m_bRun)
+        {
+            oProcess.kill();
+            QSLOG_DEBUG("task is stopped.");
+            break;
+        }
     }
 
     emit startGif(m_collectSet.dirID, false);
     QSLOG_DEBUG("finish process.");
+    if (m_bBeingDeleted)
+    {
+        if (m_bChildProcessRunning)
+        {
+            oProcess.kill();
+            QSLOG_DEBUG("kill child process.");
+        }
+        deleteLater();
+    }
     return;
 
 }

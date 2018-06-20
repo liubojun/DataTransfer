@@ -1,15 +1,15 @@
 /**
   * @file   ftpCollector.h
-  * @brief  ftp·½Ê½ÊÕ¼¯Êı¾İ.
+  * @brief  ftpæ–¹å¼æ”¶é›†æ•°æ®.
   *
-  *  ÕâÀïÊÇÏêÏ¸ËµÃ÷¡£
+  *  è¿™é‡Œæ˜¯è¯¦ç»†è¯´æ˜ã€‚
   * @author wujun
   * @par   Copyright (c):
   *          wujun.
   *         All Rights Reserved
   * @date   2016:05:24
-  * @note   ÕâÀïÊÇ×¢ÒâÊÂÏî¡£
-  * @version <°æ±¾ºÅ>
+  * @note   è¿™é‡Œæ˜¯æ³¨æ„äº‹é¡¹ã€‚
+  * @version <ç‰ˆæœ¬å·>
   */
 
 #ifndef ftpCollector_H_
@@ -33,7 +33,14 @@ public:
 public slots:
     virtual int stop();
 
-    // ½ÓÊÕµ½×Ó½ø³ÌÍË³öÏûÏ¢
+
+    /**
+     * @brief  åˆ é™¤æ”¶é›†å®ä¾‹
+     * @return void
+     */
+    virtual void deleteSelf();
+
+    // æ¥æ”¶åˆ°å­è¿›ç¨‹é€€å‡ºæ¶ˆæ¯
     void stoprcv(int exitcode, QProcess::ExitStatus status);
 public:
     virtual void getNewFiles();
@@ -44,7 +51,7 @@ public:
 
     virtual void taskDone(bool bFlag, const FileInfo &file);
 
-    // ÏàÍ¬·µ»Øtrue£¬²»Í¬·µ»Øfalse
+    // ç›¸åŒè¿”å›trueï¼Œä¸åŒè¿”å›false
     bool compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransTask &tTask);
 
     void setProcess(QProcess *in_pro);
@@ -57,13 +64,15 @@ private slots:
 private:
     QSharedPointer<QObject> m_pTimerObj;
 
-    QSharedPointer<CurlFtp> m_pCftp;	///< libcurl ftp ²âÊÔ
+    QSharedPointer<CurlFtp> m_pCftp;	///< libcurl ftp æµ‹è¯•
 
     FileInfoList m_fileList;
 
-    bool m_bChildProcessRunning;	// ×Ó½ø³ÌÔËĞĞ±êÊ¶
+    bool m_bChildProcessRunning;	// å­è¿›ç¨‹è¿è¡Œæ ‡è¯†
 
     QProcess *m_pro;
+
+    bool m_bBeingDeleted;   // è®¾ç½®åˆ é™¤æ ‡è¯†
 };
 
 #endif
