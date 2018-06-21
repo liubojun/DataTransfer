@@ -208,6 +208,8 @@ void SharedDirCollector::getNewFiles()
         }
 
     }
+	
+	emit finished();
 }
 
 void SharedDirCollector::getNewDirs(QString strDir, QStringList &lstDir)
@@ -396,7 +398,7 @@ void SharedDirCollector::getAllFiles(FileInfoList &fileList, QString strPath)
 
 int SharedDirCollector::stop()
 {
-    //m_bRun = false;
+    m_bRun = false;
 
     //// 停止调度
     //if (m_pManager != NULL)
@@ -417,7 +419,8 @@ int SharedDirCollector::stop()
 
 void SharedDirCollector::deleteSelf()
 {
-    deleteLater();
+	connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
+    // deleteLater();
 }
 
 // bool SharedDirCollector::connectToWinRemote(QString strURL,const QString& strUser,const QString& strPwd)
@@ -643,6 +646,10 @@ void SharedDirCollector::syncTransfer()
 
 void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, CDirRecord &oRecord)
 {
+	if (!m_bRun)
+	{
+		return;
+	}
     if (m_tUser.lstUser.empty()/* && !readSet()*/)
     {
         return;
@@ -679,6 +686,10 @@ void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, 
     CurlFtp m_ftp;
     for (int i=0; i<qfileList.size(); ++i)
     {
+		if (!m_bRun)
+		{
+			return;
+		}
         //tt.start();
 
         const QFileInfo &qf = qfileList.at(i);
@@ -741,7 +752,7 @@ void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, 
                 if (filterFileName(qf.fileName()))
                 {
                     TransTask tTask;
-                    if (!compareWithDest(m_ftp, qf, tTask))
+                    if (!compareWithDest(m_ftp, qf, tTask) && m_bRun)
                     {
                         tTask.collectSet = m_collectSet;
                         //tTask.userInfo = m_userInfo.user;

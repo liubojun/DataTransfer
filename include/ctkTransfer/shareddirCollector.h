@@ -54,6 +54,8 @@ public:
 
     virtual int reStart();
 
+signals:
+	void finished();
 public slots:
     virtual int stop();
     //void onCheckDir(QSet<QString>);
