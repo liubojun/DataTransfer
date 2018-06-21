@@ -17,6 +17,7 @@
 #include "DistributeFile.h"
 #include "change_name.h"
 
+
 bool _olderThen(const FileInfo &f1, const FileInfo &f2)
 {
     if (!f1.strFileTime.empty() && !f2.strFileTime.empty())
@@ -155,6 +156,7 @@ void SharedDirCollector::getNewFiles()
     // modified by liubojun. 支持按照特定时间获取数据
     QStringList finalDirs = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
 
+    m_oSubDirFilter.init();
     foreach (QString strDir, finalDirs)
     {
 
@@ -184,7 +186,14 @@ void SharedDirCollector::getNewFiles()
             {
                 oRecord.loadLatestFileSize();
             }
-            getSynclessFiles(strDir, m_collectSet.subdirFlag, oRecord);
+
+            DIRLEVEL oDirLevel;
+            oDirLevel.dir = strDir;
+            oDirLevel.level = 0;	// 根目录层级为0
+            m_strSubDirTemplate = m_collectSet.subDirTemplate;
+
+
+            getSynclessFiles(oDirLevel, m_collectSet.subdirFlag, oRecord);
             if (m_collectSet.recordLatestTime)
             {
                 oRecord.reflush();
@@ -632,7 +641,7 @@ void SharedDirCollector::syncTransfer()
 
 }
 
-void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir, CDirRecord &oRecord)
+void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, CDirRecord &oRecord)
 {
     if (m_tUser.lstUser.empty()/* && !readSet()*/)
     {
@@ -641,11 +650,12 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir, CDirReco
 
     //QTime tt;
     //tt.start();
-
+    QString strDir = in_processDir.dir;
     QDir qdir(strDir);
     QMap<QString, QStringList> mapFileUser;
-    QStringList lstFile, lstSubDir;
-
+    // QStringList lstFile, lstSubDir;
+    QStringList lstFile;
+    QList<DIRLEVEL> lstSubDir;
     // 遍历当前目录下的文件和子目录
     QFileInfoList qfileList;
     if (bSubdir)
@@ -657,61 +667,43 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir, CDirReco
         qfileList = qdir.entryInfoList(QDir::Files | QDir::NoSymLinks);
     }
 
-    //QSLOG_DEBUG(QString("list " + strDir + " ,time=%1").arg(tt.elapsed() / 1000.f));
-
-
-    //QString strDBPath = qApp->applicationDirPath() + "/work/record/" + m_collectSet.dirID + "/record.index";
-
-    // 当前目录的最新时间列表
-    //QString strFileListPath = qApp->applicationDirPath() + "/work/record/" + m_collectSet.dirID + "/latestFileList.xml";
-    //list<string> t_oLatestFileList = initilizeLatestFileLists(strFileListPath);
-
-    // 当前目录数据库中记录的最后处理时间
-    //QString iLatestTime("");
-
-    //QSLOG_DEBUG(QStringLiteral("开始处理目录:%1， 收集时间范围:%2, 目录最后处理时间记录标识:%3").arg(strDir).arg(m_collectSet.col_timerange).arg(m_collectSet.recordLatestTime));
 
     bool bHasFileUpdate = false;
-    //if (m_collectSet.recordLatestTime)
-    //{
-    //    recordLatestTime(strDBPath, strDir, iLatestTime);
 
-    //    QString iMaxtime = QFileInfo(strDir).lastModified().toString("yyyyMMddhhmmss");
-
-    //    QSLOG_DEBUG(QStringLiteral("当前处理目录最后修改时间:time_t[%1], datetime[%2],数据库记录最后修改时间:time_t[%3], datetime[%4]").arg(iMaxtime).
-    //                arg(iMaxtime).arg(iLatestTime).arg(iMaxtime));
-    //    if (iMaxtime <= iLatestTime)
-    //    {
-    //        QSLOG_DEBUG(QStringLiteral("当前目录[%1]下没有文件更新").arg(strDir));
-
-    //    }
-    //    else
-    //    {
-    //        bHasFileUpdate = true;
-    //    }
-    //}
 
     // 测试 wujun
     bHasFileUpdate = true;
 
     QDateTime qdtCollect = QDateTime::currentDateTime().addSecs(-m_collectSet.col_timerange*60);
 
-    // modified by liubojun @20170604
-    //QString iRecordMaxTime = iLatestTime;
-
-    // 新的最新文件列表
-    //list<string> t_oNewLatestFiles = t_oLatestFileList;
-    //bool listUpdate = false;
-    //QSLOG_DEBUG("scan dir");
     CurlFtp m_ftp;
     for (int i=0; i<qfileList.size(); ++i)
     {
         //tt.start();
 
         const QFileInfo &qf = qfileList.at(i);
+
         if (qf.isDir())
         {
-            lstSubDir.append(qfileList.at(i).filePath());
+            // 如果需要遍历子目录
+            QString strPath = qf.absoluteFilePath() + "/";
+            DIRLEVEL oDirLevel;
+            oDirLevel.dir = strPath;
+            oDirLevel.level = in_processDir.level + 1;
+
+            // modified by liubojun @20180222,针对北京民航张睿之现场反馈问题提出的新需求
+            // 在此处加入过滤条件，支持针对子目录的模糊匹配
+            QString strDirName = qf.fileName();
+            if (m_oSubDirFilter.match(m_strSubDirTemplate, strDirName, oDirLevel.level))
+            {
+                lstSubDir.append(oDirLevel);
+            }
+            else
+            {
+                QSLOG_DEBUG(QString("subdir %1 is not match the rule").arg(oDirLevel.dir));
+            }
+
+            //lstSubDir.append(qfileList.at(i).filePath());
         }
         else
         {
@@ -724,16 +716,8 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir, CDirReco
                 // 新增加判断条件（记录目录最后修改时间，此处需要判断当前文件时间是否大于等于当前目录的保存上次处理最后修改时间，如果小于则不对该文件进行处理）
                 if (m_collectSet.recordLatestTime)
                 {
-                    /*                if (!bHasFileUpdate)
-                                    {
-                                    continue;
-                                    }*/
 
                     QString ifiletime_t = qf.lastModified().toString("yyyyMMddhhmmss");
-                    //if (!iRecordMaxTime.isEmpty() && ifiletime_t < iLatestTime)
-                    //{
-                    //    continue;
-                    //}
                     oRecord.updateLatestFileSize(qf.absolutePath(), qf.fileName(), ifiletime_t, qf.size());
 
                     if (!oRecord.checkIsNewFile(qf.absolutePath(), qf.fileName(), ifiletime_t, qf.size()))
@@ -748,7 +732,6 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir, CDirReco
                 if (m_collectSet.col_timerange != -1)
                 {
                     // 分钟转秒
-                    //if (qf.lastModified()  < QDateTime::currentDateTime().addSecs(-m_collectSet.col_timerange*60))
                     if (qf.lastModified() < qdtCollect)
                     {
                         continue;
@@ -772,24 +755,11 @@ void SharedDirCollector::getSynclessFiles(QString strDir, bool bSubdir, CDirReco
         }
     }
 
-
-    // 判断是否需要记录当前目录的最后处理时间
-    // 记录当前目录最后修改时间
-    //if (m_collectSet.recordLatestTime)
-    //{
-    //    //time_t iMaxtime = QFileInfo(strDir).lastModified().toTime_t();
-    //    //if (iMaxtime > iLatestTime)
-    //    if (iRecordMaxTime > iLatestTime)
-    //    {
-    //        updateLatestTime(strDBPath, strDir, iRecordMaxTime);
-    //    }
-
-    //}
-
     // 入库
 
     // 遍历子目录
-    for (int i=0; i<lstSubDir.size(); ++i)
+    // for (int i=0; i<lstSubDir.size(); ++i)
+    for (int i = 0; i<lstSubDir.size(); ++i)
     {
         getSynclessFiles(lstSubDir.at(i), bSubdir, oRecord);
     }

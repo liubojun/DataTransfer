@@ -17,6 +17,7 @@
 
 #include "CollectorBase.h"
 #include "commontypedef.h"
+#include "curlftp.h"
 #ifdef WITH_QT5
 #include <QtConcurrent/QtConcurrent>
 #else
@@ -79,7 +80,7 @@ public:
 
     void syncTransfer();
 
-    void getSynclessFiles(QString strDir, bool bSubdir, CDirRecord &oRecord);
+    void getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, CDirRecord &oRecord);
 
     // 相同返回true，不同返回false
     bool compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi, TransTask &tTask);
@@ -154,6 +155,10 @@ private:
     //static void makeVtbFun(SharedDirCollector *pParent, FileInfo fileinfo);
 
     QList<QFuture<void> > m_threadFun;	///< 记录当前运行的标准化线程
+
+    //QList<DIRLEVEL> m_lstDirs;  ///< 等待遍历的目录
+    CSubDirFilter m_oSubDirFilter;	// 子目录过滤器
+    QString m_strSubDirTemplate;	// 子目录模板
 
     //QSharedPointer<FileWatcher> m_pFileWatcher;		///< 实时监控
 };
