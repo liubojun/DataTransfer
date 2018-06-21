@@ -89,7 +89,7 @@ int SharedDirCollector::start()
     //QObject::connect(m_pWatcher.data(), SIGNAL(filerename(const QString&, const QString&)), this, SLOT(fileCreated(const QString&)));
     //}*/
 
-    //m_bRun = true;
+    m_bRun = true;
 
     return 0;
 }
