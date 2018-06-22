@@ -199,7 +199,7 @@ void SharedDirCollector::getNewFiles()
                 oRecord.reflush();
             }
             emit startGif(m_collectSet.dirID, false);
-            QSLOG_INFO(QString("[%1] finish to getNewFiles, cost time: %2.").arg(m_collectSet.dirName).arg(tt.elapsed()/1000.f));
+            QSLOG_INFO(QString("[%1] finish to getNewFiles, cost time: %2 seconds").arg(m_collectSet.dirName).arg(tt.elapsed()/1000.f));
         }
         else
         {
@@ -208,8 +208,8 @@ void SharedDirCollector::getNewFiles()
         }
 
     }
-	
-	emit finished();
+
+    emit finished();
 }
 
 void SharedDirCollector::getNewDirs(QString strDir, QStringList &lstDir)
@@ -419,7 +419,7 @@ int SharedDirCollector::stop()
 
 void SharedDirCollector::deleteSelf()
 {
-	connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
+    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     // deleteLater();
 }
 
@@ -646,10 +646,10 @@ void SharedDirCollector::syncTransfer()
 
 void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, CDirRecord &oRecord)
 {
-	if (!m_bRun)
-	{
-		return;
-	}
+    if (!m_bRun)
+    {
+        return;
+    }
     if (m_tUser.lstUser.empty()/* && !readSet()*/)
     {
         return;
@@ -686,10 +686,10 @@ void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, 
     CurlFtp m_ftp;
     for (int i=0; i<qfileList.size(); ++i)
     {
-		if (!m_bRun)
-		{
-			return;
-		}
+        if (!m_bRun)
+        {
+            return;
+        }
         //tt.start();
 
         const QFileInfo &qf = qfileList.at(i);
