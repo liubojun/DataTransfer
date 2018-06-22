@@ -120,6 +120,8 @@ private slots:
     void onSystemSet();
     // 广播测试
     void onBroadcastTest();
+    // 帮助
+    void onHelp();
 
     void onSelectTask(int index);
 
@@ -190,6 +192,7 @@ private:
     QAction *m_pDataClean;
     QAction *m_pClearAct;
     QAction *m_pUserInfoAct;		///< 用户管理设置
+    QAction *m_pHelp;			// 广播测试
 
     TaskUser	m_tUser;			///< 记录当前选择的任务的分发用户
 

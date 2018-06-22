@@ -56,6 +56,7 @@ void DistributeFile::transfer(TransTask &task)
     QByteArray baTmp = tmpFilePath.toLocal8Bit();
     fileData.filename = baTmp.data();
 
+    QString strBroadMsgFile;
     // 1. 获取文件数据
     if (1 == task.collectSet.collectType)	// ftp收集
     {
@@ -64,6 +65,7 @@ void DistributeFile::transfer(TransTask &task)
         //char usrPwd[100] = {0};
         // modified by liubojun@20170928,与收集统一方式
         QString ftpUrl = QString("ftp://%1:%2%3").arg(strIP.c_str()).arg(task.collectSet.port).arg(task.srcFileFullPath);
+        strBroadMsgFile = ftpUrl;
         //sprintf(ftpUrl, "ftp://%s:%d%s", strIP.c_str(), task.collectSet.port, task.srcFileFullPath.toLocal8Bit().data());
         QString usrPwd = QString("%1:%2").arg(task.collectSet.loginUser).arg(task.collectSet.loginPass);
         //sprintf(usrPwd, "%s:%s", task.collectSet.loginUser.toLocal8Bit().data(), task.collectSet.loginPass.toLocal8Bit().data());
@@ -97,6 +99,7 @@ void DistributeFile::transfer(TransTask &task)
         // QUrl ourl(QString::fromLocal8Bit(url));
         QUrl ourl(url);
         QString strFile = ourl.toLocalFile();
+        strBroadMsgFile = strFile;
         QFile f(strFile);
         qint64 size = f.size();
         QSLOG_DEBUG(QString("%1").arg(f.size()));
@@ -161,7 +164,7 @@ void DistributeFile::transfer(TransTask &task)
             //m_pBase->emitLog(task.collectSet.dirName, strInfo);
             //m_pBase->emitLog(strInfo, GOOD);
             emit emitLog(strInfo, GOOD);
-            emit emitBroadCast(task.srcFileFullPath);
+            emit emitBroadCast(strBroadMsgFile);
         }
     }
 

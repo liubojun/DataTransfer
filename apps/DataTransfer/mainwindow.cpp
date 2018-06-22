@@ -69,6 +69,7 @@ void MainWindow::InitUI()
     m_pSet = new QAction(QIcon(":/set.png"), QStringLiteral("设置"), this);
 
     m_pBroadCastTest = new QAction(QIcon(":/broadcast.png"), QStringLiteral("广播测试"), this);
+    m_pHelp = new QAction(QIcon(":/help.png"), QStringLiteral("帮助"), this);
 
     ui.toolBar->addAction(m_pOpenSrcAct);
     ui.toolBar->addAction(m_pOpenDstAct);
@@ -89,6 +90,7 @@ void MainWindow::InitUI()
     ui.toolBar->addAction(m_pTrayAct);
     ui.toolBar->addSeparator();
     ui.toolBar->addAction(m_pSet);
+    ui.toolBar->addAction(m_pHelp);
 
     ui.tableWidget->setColumnWidth(0, 110);
     ui.tableWidget->setColumnWidth(1, 140);
@@ -108,6 +110,7 @@ void MainWindow::InitUI()
     connect(m_pTrayAct, SIGNAL(triggered()), this, SLOT(hideWin()));
     connect(m_pSet, SIGNAL(triggered()), this, SLOT(onSystemSet()));
     connect(m_pBroadCastTest, SIGNAL(triggered()), this, SLOT(onBroadcastTest()));
+    connect(m_pHelp, SIGNAL(triggered()), this, SLOT(onHelp()));
     connect(ui.listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(onSelectTask(int)));
 
     // 初始化状态栏
@@ -1281,4 +1284,9 @@ void MainWindow::onBroadcastTest()
 {
     CBroadCastWnd oBroadWnd;
     oBroadWnd.exec();
+}
+
+void MainWindow::onHelp()
+{
+
 }

@@ -34,9 +34,9 @@
         <file>working.gif</file>
         <file>startPic.png</file>
         <file>dirclean.png</file>
-        <file>help.jpg</file>
         <file>set.png</file>
         <file>broadcast.png</file>
         <file>dataclean.png</file>
+        <file>help.png</file>
     </qresource>
 </RCC>
