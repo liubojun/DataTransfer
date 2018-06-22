@@ -19,11 +19,18 @@ void CBaseSetDlg::onApply()
     int iThreadCount = ui.spinBox_threadnum->text().toInt();
     int iLogPort = ui.spinBox_logport->text().toInt();
     bool enableLog = ui.checkBox_writeLog->isChecked();
+    int iBroadcastPort = ui.broadcastport->text().toInt();
+    bool enableBroadCast = ui.checkBox_enableBroadCast->isChecked();
 
-    DataBase::getInstance()->updateBaseInfo(iThreadCount, iLogPort, enableLog);
+    GlobalConfig oGConfig;
+    oGConfig.bEnableLog = enableLog;
+    oGConfig.nLogPort = iLogPort;
+    oGConfig.nThreadNum = iThreadCount;
+    oGConfig.nBroadcastPort = iBroadcastPort;
+    oGConfig.bEnableBroadcast = enableBroadCast;
+    DataBase::getInstance()->updateBaseInfo(oGConfig);
     QThreadPool::globalInstance()->setMaxThreadCount(iThreadCount);
 }
-
 
 void CBaseSetDlg::onOk()
 {
@@ -38,12 +45,11 @@ void CBaseSetDlg::init()
     connect(ui.btn_ok, SIGNAL(pressed()), this, SLOT(onOk()));
 
     // ²éÑ¯Êý¾Ý¿â
-    int threadnum = 0;
-    int portNum = 0;
-    bool enableLog = false;
-    DataBase::getInstance()->queryBaseInfo(threadnum, portNum, enableLog);
-    ui.spinBox_threadnum->setValue(threadnum);
-    ui.spinBox_logport->setValue(portNum);
-    ui.checkBox_writeLog->setChecked(enableLog);
+    GlobalConfig oGConfig;
+    DataBase::getInstance()->queryBaseInfo(oGConfig);
+    ui.spinBox_threadnum->setValue(oGConfig.nThreadNum);
+    ui.spinBox_logport->setValue(oGConfig.nLogPort);
+    ui.checkBox_writeLog->setChecked(oGConfig.bEnableLog);
+    ui.checkBox_enableBroadCast->setChecked(oGConfig.bEnableBroadcast);
 }
 

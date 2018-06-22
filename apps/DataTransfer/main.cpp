@@ -251,13 +251,11 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
 
     // 查询基本信息
-    int threadnum = 0;
-    int logPort = 0;
-    bool enableLog = false;
-    DataBase::getInstance()->queryBaseInfo(threadnum, logPort, enableLog);
+    GlobalConfig oGConfig;
+    DataBase::getInstance()->queryBaseInfo(oGConfig);
 
     // 设置是否启用日志文件输出
-    QLogger::getInstance()->enableLog(enableLog);
+    QLogger::getInstance()->enableLog(oGConfig.bEnableLog);
 
     CChangeName::init_rename_rules((app.applicationDirPath() + "/config/rename.rule").toStdString().c_str());
     // CChangeName::change_name("H08_B03_R030_20171112_1700.AWX", "KuiHua");
@@ -265,7 +263,7 @@ int main(int argc, char **argv)
     CPathBuilder::setChildProcessEnv();
 
     // 设置工作的线程池
-    QThreadPool::globalInstance()->setMaxThreadCount(threadnum);
+    QThreadPool::globalInstance()->setMaxThreadCount(oGConfig.nThreadNum);
 
     QSLOG_INFO(QString("START DATA TRANSFER PROGRAM, max thread count %1").arg(QThreadPool::globalInstance()->maxThreadCount()));
     //std::cout << "START DATA TRANSFER PROGRAM" << std::endl;

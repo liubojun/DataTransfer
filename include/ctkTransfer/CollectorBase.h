@@ -216,6 +216,9 @@ public slots:
     // 发送日志信号 infoType：1-文件发送成功，2-失败
     void emitLog(const QString &info, int infoType);
 
+    // added by liubojun @20180622, 收集文件成功之后，发送广播消息
+    void emitBroadCast(const QString &file);
+
 public:
     void doWork();
     //virtual void setEnable(bool bFlag) = 0;

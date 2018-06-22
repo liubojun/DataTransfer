@@ -114,8 +114,12 @@ private slots:
     void onProperty();
     // 清空日志
     void onClearLog();
+    // 数据清理
+    void onDataClean();
     // 系统设置
     void onSystemSet();
+    // 广播测试
+    void onBroadcastTest();
 
     void onSelectTask(int index);
 
@@ -181,7 +185,9 @@ private:
     QAction *m_pEditAct;
     QAction *m_pAddAct;
     QAction *m_pTrayAct;
-    QAction *m_pSet;			// 系统设置
+    QAction *m_pSet;					// 系统设置
+    QAction *m_pBroadCastTest;			// 广播测试
+    QAction *m_pDataClean;
     QAction *m_pClearAct;
     QAction *m_pUserInfoAct;		///< 用户管理设置
 

@@ -526,6 +526,16 @@ struct ClearTask
     }
 };
 
+struct GlobalConfig
+{
+    int nProgramId;
+    int nThreadNum;
+    int nLogPort;
+    bool bEnableLog;
+    int nBroadcastPort;
+    bool bEnableBroadcast;
+};
+
 Q_DECLARE_METATYPE(ClearTask)
 
 #endif

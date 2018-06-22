@@ -44,12 +44,12 @@ int main(int argc, char **argv)
     //oFtp.remove("/20171225/Z_QH_QPE60_20170605061800.bin.bz2");
     //qDebug() << oFtp.errorString();
     // 查询基本信息
-    int threadNum, port;
-    bool enableLog;
-    DataBase::getInstance()->queryBaseInfo(threadNum, port, enableLog);
+
+    GlobalConfig oGConfig;
+    DataBase::getInstance()->queryBaseInfo(oGConfig);
 
     // 设置是否启用日志文件输出
-    QLogger::getInstance()->enableLog(enableLog);
+    QLogger::getInstance()->enableLog(oGConfig.bEnableLog);
 
     if (argc != 2)
     {

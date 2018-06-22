@@ -16,9 +16,9 @@ LogPrintImpl::LogPrintImpl(MainWindow *in_pWnd) : m_pWnd(in_pWnd)//, server(RCF:
     //m_bRun = true;
     //qDebug() << QThread::currentThreadId();
 
-    int threadnum;
-    bool enableLog;
-    DataBase::getInstance()->queryBaseInfo(threadnum, m_iLogPort, enableLog);
+    GlobalConfig oGConfig;
+    DataBase::getInstance()->queryBaseInfo(oGConfig);
+    m_iLogPort = oGConfig.nLogPort;
     // server = new RCF::RcfServer(RCF::TcpEndpoint(logport));
     connect(this, SIGNAL(showCollectLog(const QString &, const QString &, const QString &, int)), m_pWnd,
             SLOT(printCollectLog(const QString &, const QString &, const QString &, int)));

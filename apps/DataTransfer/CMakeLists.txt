@@ -19,6 +19,7 @@ SET(SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/systemset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/baseset.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/subdirtemplateedit.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/broadcastwnd.cpp
 )
 
 # .h文件
@@ -39,6 +40,7 @@ SET(HDRS
   ${CMAKE_CURRENT_SOURCE_DIR}/systemset.h
   ${CMAKE_CURRENT_SOURCE_DIR}/baseset.h
   ${CMAKE_CURRENT_SOURCE_DIR}/subdirtemplateedit.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/broadcastwnd.h
 )
 
 SET(MOC_HDRS
@@ -59,6 +61,7 @@ SET(MOC_HDRS
 	${CMAKE_CURRENT_SOURCE_DIR}/systemset.h
 	${CMAKE_CURRENT_SOURCE_DIR}/baseset.h
 	${CMAKE_CURRENT_SOURCE_DIR}/subdirtemplateedit.h
+	${CMAKE_CURRENT_SOURCE_DIR}/broadcastwnd.h
 	${RadarProjectInclude}/ctkTransfer/CollectorBase.h
 
 )
@@ -77,6 +80,7 @@ SET(UI
 	${CMAKE_CURRENT_SOURCE_DIR}/ui/systemset.ui
 	${CMAKE_CURRENT_SOURCE_DIR}/ui/baseset.ui
 	${CMAKE_CURRENT_SOURCE_DIR}/ui/subdirtemplateedit.ui
+	${CMAKE_CURRENT_SOURCE_DIR}/ui/broadcastwnd.ui
 	)
 
 SET (ICON_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/Transfer.rc)

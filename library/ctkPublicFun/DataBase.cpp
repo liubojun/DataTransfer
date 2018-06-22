@@ -131,6 +131,8 @@ DataBase::DataBase()
                "[THREADNUM] INT,"
                "[LOGPORT] INT,"
                "[ENABLELOG] BOOL,"
+               "[BROADCASTPORT] INT DEFAULT 50002,"
+               "[ENABLEBROADCAST] BOOL,"
                "CONSTRAINT [] PRIMARY KEY ([PROGRAMID]) ON CONFLICT FAIL)");
 
 }
@@ -1037,7 +1039,7 @@ bool DataBase::deleteClearTask(const QString &name)
     return false;
 }
 
-bool DataBase::queryBaseInfo(int &threadNum, int &logPort, bool &writeLog)
+bool DataBase::queryBaseInfo(GlobalConfig &io_globalConfig)
 {
     // QSqlDatabase t_oDb;
     MyDataBase t_oDb;
@@ -1058,7 +1060,7 @@ bool DataBase::queryBaseInfo(int &threadNum, int &logPort, bool &writeLog)
         bool res;
         // 先删除收集任务表
         // sql = QString("SELECT THREADNUM, LOGPORT FROM T_GLOBALINFO WHERE PROGRAMID = %1").arg(MAGIC_NUM);
-        sql = QString("SELECT THREADNUM, LOGPORT, ENABLELOG FROM T_GLOBALINFO WHERE PROGRAMID = :PROGRAMID");
+        sql = QString("SELECT THREADNUM, LOGPORT, ENABLELOG, BROADCASTPORT, ENABLEBROADCAST, ENABLEBROADCAST FROM T_GLOBALINFO WHERE PROGRAMID = :PROGRAMID");
         query.prepare(sql);
         query.bindValue(":PROGRAMID", MAGIC_NUM);
         res = query.exec();
@@ -1066,16 +1068,20 @@ bool DataBase::queryBaseInfo(int &threadNum, int &logPort, bool &writeLog)
         {
             if (query.next())
             {
-                threadNum = query.value(0).toInt();
-                logPort = query.value(1).toInt();
-                writeLog = query.value(2).toBool();
+                io_globalConfig.nThreadNum = query.value(0).toInt();
+                io_globalConfig.nLogPort = query.value(1).toInt();
+                io_globalConfig.bEnableLog = query.value(2).toBool();
+                io_globalConfig.nBroadcastPort = query.value(3).toInt();
+                io_globalConfig.bEnableBroadcast = query.value(4).toBool();
+                m_oGConfig = io_globalConfig;
                 return true;
             }
             else
             {
-                threadNum = 4;
-                logPort = 50001;
-
+                io_globalConfig.nThreadNum = 4;
+                io_globalConfig.nLogPort = 50001;
+                io_globalConfig.nBroadcastPort = 50002;
+                m_oGConfig = io_globalConfig;
                 return false;
             }
 
@@ -1091,7 +1097,7 @@ bool DataBase::queryBaseInfo(int &threadNum, int &logPort, bool &writeLog)
 }
 
 
-bool DataBase::updateBaseInfo(int threadNum, int logPort, bool enableLog)
+bool DataBase::updateBaseInfo(GlobalConfig &io_globalConfig)
 {
     // QSqlDatabase t_oDb;
     MyDataBase t_oDb;
@@ -1114,7 +1120,7 @@ bool DataBase::updateBaseInfo(int threadNum, int logPort, bool enableLog)
 
         // 先删除收集任务表
         // sql = QString("REPLACE INTO T_GLOBALINFO(PROGRAMID,THREADNUM, LOGPORT) VALUES(%1, %2)").arg(MAGIC_NUM).arg(threadNum);
-        sql = QString("REPLACE INTO T_GLOBALINFO(PROGRAMID,THREADNUM, LOGPORT, ENABLELOG) VALUES(:PROGRAMID,:THREADNUM, :LOGPORT, :ENABLELOG)");
+        sql = QString("REPLACE INTO T_GLOBALINFO(PROGRAMID,THREADNUM, LOGPORT, ENABLELOG, BROADCASTPORT, ENABLEBROADCAST ) VALUES(:PROGRAMID,:THREADNUM, :LOGPORT, :ENABLELOG, :BROADCASTPORT, :ENABLEBROADCAST)");
         if (!query.prepare(sql))
         {
             QSLOG_ERROR(QString("Error: %1").arg(query.lastError().text()));
@@ -1122,12 +1128,15 @@ bool DataBase::updateBaseInfo(int threadNum, int logPort, bool enableLog)
         }
 
         query.bindValue(":PROGRAMID", MAGIC_NUM);
-        query.bindValue(":THREADNUM", threadNum);
-        query.bindValue(":LOGPORT", logPort);
-        query.bindValue(":ENABLELOG", enableLog);
+        query.bindValue(":THREADNUM", io_globalConfig.nThreadNum);
+        query.bindValue(":LOGPORT", io_globalConfig.nLogPort);
+        query.bindValue(":ENABLELOG", io_globalConfig.bEnableLog);
+        query.bindValue(":BROADCASTPORT", io_globalConfig.nBroadcastPort);
+        query.bindValue(":ENABLEBROADCAST", io_globalConfig.bEnableBroadcast);
         res = query.exec();
         if (res)
         {
+            m_oGConfig = io_globalConfig;
             return true;
         }
 

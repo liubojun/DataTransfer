@@ -16,6 +16,9 @@ DistributeFile::DistributeFile(CollectorBase *pBase, CurlFtp &oCurlFtp)
     if (pBase != NULL)
     {
         QObject::connect(this, SIGNAL(emitLog(const QString &, int)), pBase, SLOT(emitLog(const QString &, int)));
+
+        QObject::connect(this, SIGNAL(emitBroadCast(const QString &)), pBase, SLOT(emitBroadCast(const QString &)));
+
     }
     //m_pFtp = QSharedPointer<CurlFtp>(new CurlFtp());
     //if (m_pFtp == NULL)
@@ -158,6 +161,7 @@ void DistributeFile::transfer(TransTask &task)
             //m_pBase->emitLog(task.collectSet.dirName, strInfo);
             //m_pBase->emitLog(strInfo, GOOD);
             emit emitLog(strInfo, GOOD);
+            emit emitBroadCast(task.srcFileFullPath);
         }
     }
 

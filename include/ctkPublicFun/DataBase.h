@@ -25,10 +25,13 @@ public:
         return *m_pQuery;
     }
 
+
 private:
     QSqlDatabase *m_pDataBase;
     QSqlQuery *m_pQuery;
     QString m_strConName;
+
+
 };
 
 class DLL_EXPORT_CLASS_DECL DataBase
@@ -101,7 +104,7 @@ public:
      * @param: bool &writeLog 是否记录日志
      * @return:bool 查询成功，返回true，失败返回false
      */
-    bool queryBaseInfo(int &threadNum, int &logPort, bool &writeLog);
+    bool queryBaseInfo(GlobalConfig &io_globalConfig);
 
     /**
      * @brief:更新基本信息
@@ -110,7 +113,7 @@ public:
      * @param: bool enableLog 是否启用日志文件记录
      * @return:bool 更新成功，返回true，失败返回false
      */
-    bool updateBaseInfo(int threadNum, int logPort, bool enableLog);
+    bool updateBaseInfo(GlobalConfig &io_globalConfig);
 
     /**
      * @brief:查询日志监听端口号
@@ -135,6 +138,11 @@ public:
 
     bool checkTable(const QString &table, const QString &createSql);
 
+    const GlobalConfig &globalConfig()
+    {
+        return m_oGConfig;
+    }
+
 private:
     DataBase();
     static DataBase *s_db;
@@ -150,6 +158,8 @@ private:
     //QString	m_strTbSendUser;	///< 分发用户表
 
     QMap<QString, QSqlDatabase> m_name2db;	// 数据库地址与数据库实例映射
+
+    GlobalConfig m_oGConfig;
 };
 
 #endif

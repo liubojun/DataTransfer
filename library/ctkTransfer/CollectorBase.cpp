@@ -168,6 +168,13 @@ void CollectorBase::emitLog(const QString &info, int infoType)
     // QThread::msleep(20);
 }
 
+
+void CollectorBase::emitBroadCast(const QString &file)
+{
+    m_oLogSender.sendBroadCastMsg(m_collectSet.dirName, file);
+}
+
+
 QString CollectorBase::getDestFilePath(const QString &srcFileFullPath, const QString &fileName, const CollectUser &cUser, const QDateTime &dt, bool enableTimeRule)
 {
     QString destPath = cUser.user.rootPath + cUser.rltvPath;

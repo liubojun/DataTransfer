@@ -15,6 +15,7 @@
 #include "pathbuilder.h"
 #include "IDispatchTimer.h"
 #include "systemset.h"
+#include "broadcastwnd.h"
 
 //#include "quartz.h"
 //--
@@ -62,9 +63,12 @@ void MainWindow::InitUI()
     m_pAddAct = new QAction(QIcon(":/add.png"), QStringLiteral("新增"), this);
     m_pUserInfoAct = new QAction(QIcon(":/allUser.png"), QStringLiteral("分发用户"), this);
 
-    m_pClearAct = new QAction(QIcon(":/clear.png"), QStringLiteral("清空"), this);
+    m_pClearAct = new QAction(QIcon(":/clear.png"), QStringLiteral("清屏"), this);
+    m_pDataClean = new QAction(QIcon(":/dataclean.png"), QStringLiteral("清理"), this);
     m_pTrayAct = new QAction(QIcon(":/back.png"), QStringLiteral("后台"), this);
     m_pSet = new QAction(QIcon(":/set.png"), QStringLiteral("设置"), this);
+
+    m_pBroadCastTest = new QAction(QIcon(":/broadcast.png"), QStringLiteral("广播测试"), this);
 
     ui.toolBar->addAction(m_pOpenSrcAct);
     ui.toolBar->addAction(m_pOpenDstAct);
@@ -78,7 +82,10 @@ void MainWindow::InitUI()
     ui.toolBar->addSeparator();
     ui.toolBar->addAction(m_pUserInfoAct);
     ui.toolBar->addSeparator();
+    ui.toolBar->addAction(m_pDataClean);
+    ui.toolBar->addSeparator();
     ui.toolBar->addAction(m_pClearAct);
+    ui.toolBar->addAction(m_pBroadCastTest);
     ui.toolBar->addAction(m_pTrayAct);
     ui.toolBar->addSeparator();
     ui.toolBar->addAction(m_pSet);
@@ -97,9 +104,12 @@ void MainWindow::InitUI()
     connect(m_pDeletAct, SIGNAL(triggered()), this, SLOT(deltTask()));
     connect(m_pEditAct, SIGNAL(triggered()), this, SLOT(onProperty()));
     connect(m_pClearAct, SIGNAL(triggered()), this, SLOT(onClearLog()));
+    connect(m_pDataClean, SIGNAL(triggered()), this, SLOT(onDataClean()));
     connect(m_pTrayAct, SIGNAL(triggered()), this, SLOT(hideWin()));
     connect(m_pSet, SIGNAL(triggered()), this, SLOT(onSystemSet()));
+    connect(m_pBroadCastTest, SIGNAL(triggered()), this, SLOT(onBroadcastTest()));
     connect(ui.listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(onSelectTask(int)));
+
     // 初始化状态栏
     m_pRunTime = new QLabel(QStringLiteral("运行时长："));
     m_pSysTime = new QLabel(QStringLiteral("系统时间："));
@@ -1029,18 +1039,18 @@ void MainWindow::onProperty()
     }
 }
 
-void MainWindow::onClearLog()
+void MainWindow::onDataClean()
 {
-    //ui.tableWidget->clearContents();
-    //ui.tableWidget->setRowCount(0);
-    //m_logNum = 0;
-    // 弹出清除设置框
-    //
-
-
     m_pClearDlg = QSharedPointer<DataClearDlg>(new DataClearDlg());
     connect(m_pClearDlg.data(), SIGNAL(newTaskCreated(const ClearTask &)), this, SLOT(onNewClearTaskCreated(const ClearTask &)));
     m_pClearDlg->exec();
+}
+
+void MainWindow::onClearLog()
+{
+    ui.tableWidget->clearContents();
+    ui.tableWidget->setRowCount(0);
+    m_logNum = 0;
 }
 
 void MainWindow::setTaskIcon(const CollectTask &task, int sendWay, int normal)
@@ -1265,4 +1275,10 @@ void MainWindow::onSystemSet()
 {
     CSystemSetDlg oSetDlg;
     oSetDlg.exec();
+}
+
+void MainWindow::onBroadcastTest()
+{
+    CBroadCastWnd oBroadWnd;
+    oBroadWnd.exec();
 }

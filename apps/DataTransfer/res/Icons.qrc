@@ -36,5 +36,7 @@
         <file>dirclean.png</file>
         <file>help.jpg</file>
         <file>set.png</file>
+        <file>broadcast.png</file>
+        <file>dataclean.png</file>
     </qresource>
 </RCC>

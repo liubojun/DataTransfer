@@ -17,11 +17,17 @@ public:
 
     void sendClearMsg(const QString &taskName, const QString &taskId, const QString &taskContent, int level);
 
+    void sendBroadCastMsg(const QString &taskName, const QString &file);
+
 protected:
     void sendMsg(const QString &msgType, const QString &taskName, const QString &taskId, const QString &taskContent, int level);
 
+
+
 private:
-    QUdpSocket m_oSocket;
+    QUdpSocket m_oLogSocket;
+    QUdpSocket m_oBroadCastSocket;
     int m_iUdpLogPort;
+    int m_iUdpBroadCastPort;
 };
 #endif // udplogsender_h__

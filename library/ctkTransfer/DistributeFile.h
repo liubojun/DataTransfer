@@ -24,6 +24,7 @@ public:
 signals:
     void emitLog(const QString &info, int infoType);
 
+    void emitBroadCast(const QString &file);
 protected:
     /**
      * @brief  发送文件到共享目录
