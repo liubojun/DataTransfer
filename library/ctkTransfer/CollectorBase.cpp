@@ -169,9 +169,9 @@ void CollectorBase::emitLog(const QString &info, int infoType)
 }
 
 
-void CollectorBase::emitBroadCast(const QString &file)
+void CollectorBase::emitBroadCast(const QString &srcfile, const QString &dstfile)
 {
-    m_oLogSender.sendBroadCastMsg(m_collectSet.dirName, file);
+    m_oLogSender.sendBroadCastMsg(m_collectSet.dirName, srcfile, dstfile);
 }
 
 

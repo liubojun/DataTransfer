@@ -217,7 +217,7 @@ public slots:
     void emitLog(const QString &info, int infoType);
 
     // added by liubojun @20180622, 收集文件成功之后，发送广播消息
-    void emitBroadCast(const QString &file);
+    void emitBroadCast(const QString &srcfile, const QString &dstfile);
 
 public:
     void doWork();

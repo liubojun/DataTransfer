@@ -17,7 +17,7 @@ public:
 
     void sendClearMsg(const QString &taskName, const QString &taskId, const QString &taskContent, int level);
 
-    void sendBroadCastMsg(const QString &taskName, const QString &file);
+    void sendBroadCastMsg(const QString &taskName, const QString &srcfile, const QString &dstfile);
 
 protected:
     void sendMsg(const QString &msgType, const QString &taskName, const QString &taskId, const QString &taskContent, int level);

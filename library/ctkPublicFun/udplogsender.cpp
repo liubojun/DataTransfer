@@ -43,7 +43,7 @@ void CUdpLogSender::sendMsg(const QString &msgType, const QString &taskName, con
     qint64 iLen = m_oLogSocket.writeDatagram(datagram, QHostAddress::LocalHost, m_iUdpLogPort);
 }
 
-void CUdpLogSender::sendBroadCastMsg(const QString &taskName, const QString &file)
+void CUdpLogSender::sendBroadCastMsg(const QString &taskName, const QString &srcfile, const QString &dstfile)
 {
     if (!DataBase::getInstance()->globalConfig().bEnableBroadcast)
     {
@@ -58,8 +58,13 @@ void CUdpLogSender::sendBroadCastMsg(const QString &taskName, const QString &fil
     QString strMsg = QString("{\n"
                              "      \"TaskName\" :\"%1\",\n"
                              "      \"DateTime\" :\"%2\",\n"
-                             "      \"File\" :\"%3\"\n"
-                             "}\n").arg(taskName).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).arg(file);
+                             "      \"SourceFile\" :\"%3\",\n"
+                             "      \"DestFile\" :\"%4\"\n"
+                             "}\n").
+                     arg(taskName).
+                     arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).
+                     arg(srcfile).
+                     arg(dstfile);
     std::string strStdMsg = strMsg.toStdString();
     //QSLOG_DEBUG(strStdMsg.c_str());
     m_oBroadCastSocket.writeDatagram(strStdMsg.c_str(), strStdMsg.length(), QHostAddress::Broadcast, m_iUdpBroadCastPort);

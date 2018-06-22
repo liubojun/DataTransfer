@@ -17,7 +17,7 @@ DistributeFile::DistributeFile(CollectorBase *pBase, CurlFtp &oCurlFtp)
     {
         QObject::connect(this, SIGNAL(emitLog(const QString &, int)), pBase, SLOT(emitLog(const QString &, int)));
 
-        QObject::connect(this, SIGNAL(emitBroadCast(const QString &)), pBase, SLOT(emitBroadCast(const QString &)));
+        QObject::connect(this, SIGNAL(emitBroadCast(const QString &, const QString &)), pBase, SLOT(emitBroadCast(const QString &, const QString &)));
 
     }
     //m_pFtp = QSharedPointer<CurlFtp>(new CurlFtp());
@@ -143,15 +143,22 @@ void DistributeFile::transfer(TransTask &task)
         QSLOG_DEBUG(QString::fromLocal8Bit("文件:%1分发到[%2]").arg(fileData.filename).arg(user.userName));
         // 3.分发数据
         bool bRes = false;
+        QString strDstFile;
         if (0 == user.sendType)		//目录分发
         {
             // bRes = sendToDir(fileData.filename,  task, i);
             bRes = sendToDir(fileData.filename, task);
+            strDstFile = task.dstFilePath + task.strDestFileName;
         }
         else if (1 == user.sendType)	//ftp分发
         {
             //bRes = sendToFtp(fileData.filename, task, i);
             bRes = sendToFtp(fileData.filename, task);
+            strDstFile = QString("ftp://%1:%2%3%4").
+                         arg(task.userInfo.ip.toStdString().c_str()).
+                         arg(task.userInfo.port).
+                         arg(task.dstFilePath.toLocal8Bit().toStdString().c_str()).
+                         arg(task.strDestFileName);
         }
         else
         {
@@ -164,7 +171,7 @@ void DistributeFile::transfer(TransTask &task)
             //m_pBase->emitLog(task.collectSet.dirName, strInfo);
             //m_pBase->emitLog(strInfo, GOOD);
             emit emitLog(strInfo, GOOD);
-            emit emitBroadCast(strBroadMsgFile);
+            emit emitBroadCast(strBroadMsgFile, strDstFile);
         }
     }
 
