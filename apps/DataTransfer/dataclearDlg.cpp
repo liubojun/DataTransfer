@@ -146,7 +146,7 @@ void DataClearDlg::onApply()
     }
     foreach (const ClearTask &task, tasks)
     {
-        if (task.taskName == ui.lineEdit_name->text() || QFileInfo(task.taskDir).absoluteFilePath() == QFileInfo(ui.lineEdit_dir->text()).absoluteFilePath())
+        if (task.taskName == ui.lineEdit_name->text())
         {
             QMessageBox::warning(this, QString::fromLocal8Bit("参数检查错误"), QString::fromLocal8Bit("存在相同的任务?"));
             return;
