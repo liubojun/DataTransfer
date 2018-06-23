@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFileInfo>
+#include <QUuid>
 
 DataClearDlg::DataClearDlg(QDialog *parent /*= NULL*/) : QDialog(parent)
 {
@@ -54,7 +55,7 @@ void DataClearDlg::InitUI()
 
 void DataClearDlg::InitUI(const QString &taskName)
 {
-    ClearTask task;
+    ClearTask &task = m_task;
     task.taskName = taskName;
     if (!DataBase::getInstance()->queryClearTask(task))
     {
@@ -154,6 +155,7 @@ void DataClearDlg::onApply()
     }
 
     ClearTask task;
+	task.taskId = QUuid::createUuid().toString();
     task.taskName = ui.lineEdit_name->text();
 	task.taskType = ui.rBt_dir->isChecked() ? 0 : 1;
 	task.ip = ui.lineEdit_ip->text();
@@ -351,18 +353,18 @@ void DataClearDlg::onApply2()
     //// 查表，判断表中是否存在相同的名称或者目�?
 
     //// 根据name查表，并将表中的信息返回到界面上
-    //QList<ClearTask> tasks;
-    //if (!DataBase::getInstance()->queryClearTask(tasks))
-    //{
-    //    return;
-    //}
-    //foreach (const ClearTask &task, tasks)
-    //{
-    //    if (task.taskName == ui.lineEdit_name->text() || QFileInfo(task.taskDir).absoluteFilePath() == QFileInfo(ui.lineEdit_dir->text()).absoluteFilePath())
-    //    {
-    //        return;
-    //    }
-    //}
+	/*QList<ClearTask> tasks;
+	if (!DataBase::getInstance()->queryClearTask(tasks))
+	{
+	return;
+	}
+	foreach(const ClearTask &task, tasks)
+	{
+	if (task.taskName == ui.lineEdit_name->text())
+	{
+	return;
+	}
+	}*/
 
     //ClearTask task;
     //m_task.taskName = ui.lineEdit_name->text();
@@ -373,7 +375,7 @@ void DataClearDlg::onApply2()
     //m_task.clearValue = ui.comboBox_value->currentText().toInt();
     //m_task.activeFlag = ui.checkBox_active->isChecked();
     //DataBase::getInstance()->insertClearTask(task);
-	ClearTask task;
+	ClearTask &task = m_task;
 	task.taskName = ui.lineEdit_name->text();
 	task.taskType = ui.rBt_dir->isChecked() ? 0 : 1;
 	task.ip = ui.lineEdit_ip->text();
@@ -395,7 +397,7 @@ void DataClearDlg::onApply2()
 	task.clearUnit = ui.comboBox_unit->currentIndex();
 	task.clearValue = ui.comboBox_value->currentText().toInt();
 	task.activeFlag = ui.checkBox_active->isChecked();
-	m_task = task;
+	//m_task = task;
     accept();
     //emit newTaskCreated(task);
 }

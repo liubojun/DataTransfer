@@ -482,6 +482,7 @@ enum TaskState
 
 struct ClearTask
 {
+	QString taskId;		// 清理任务ID
     QString taskName;	// 清理任务名
     int taskType;		// 任务类型 0：目录清理，1: ftp清理
     QString ip;			// ftp ip

@@ -62,6 +62,7 @@ DataBase::DataBase()
 
     // 判断清理表是否存在，如果不存在则自动创建
     checkTable("T_DIR_CLEAR", "CREATE TABLE T_DIR_CLEAR ("
+			   "[ID] VARCHAR2(20) NOT NULL, "
                "[NAME] VHARCHAR(64) NOT NULL, "
                "[TYPE] INT(1) NOT NULL DEFAULT (0), "
                "[IP] VARCHAR2(50), "
@@ -75,7 +76,7 @@ DataBase::DataBase()
                "[UNIT] INT NOT NULL, "
                "[VALUE] INT NOT NULL, "
                "[ACTIVE] INT NOT NULL,  "
-               "CONSTRAINT [sqlite_autoindex_T_DIR_CLEAR] PRIMARY KEY ([NAME]))");
+               "CONSTRAINT [sqlite_autoindex_T_DIR_CLEAR] PRIMARY KEY ([ID]))");
 
     checkTable("T_COL_USER", "CREATE TABLE [T_COL_USER] ("
                "[DIRID] VARCHAR(20) NOT NULL, "
@@ -803,7 +804,7 @@ bool DataBase::queryClearTask(QList<ClearTask> &tasks)
     }
     QSqlQuery &query(t_oDb.sqlquery());
 
-    QString sql = QString("SELECT NAME,TYPE,IP,PORT,USER,PASSWORD,TRANSFERMODE,DIR,QUARTZ,FILE,UNIT,VALUE,ACTIVE FROM T_DIR_CLEAR");
+    QString sql = QString("SELECT ID, NAME,TYPE,IP,PORT,USER,PASSWORD,TRANSFERMODE,DIR,QUARTZ,FILE,UNIT,VALUE,ACTIVE FROM T_DIR_CLEAR");
     bool res = query.exec(sql);
     if (res)
     {
@@ -811,6 +812,7 @@ bool DataBase::queryClearTask(QList<ClearTask> &tasks)
         {
             ClearTask task;
             int index = 0;
+			task.taskId = query.value(index++).toString();
             task.taskName = query.value(index++).toString();
             task.taskType = query.value(index++).toInt();
             task.ip = query.value(index++).toString();
@@ -846,13 +848,14 @@ bool DataBase::queryClearTask(ClearTask &task)
     }
     QSqlQuery &query(t_oDb.sqlquery());
 
-    QString sql = QString("SELECT NAME,TYPE,IP,PORT,USER,PASSWORD,TRANSFERMODE,DIR,QUARTZ,FILE,UNIT,VALUE,ACTIVE FROM T_DIR_CLEAR WHERE NAME = '%1'").arg(task.taskName);
+    QString sql = QString("SELECT ID, NAME,TYPE,IP,PORT,USER,PASSWORD,TRANSFERMODE,DIR,QUARTZ,FILE,UNIT,VALUE,ACTIVE FROM T_DIR_CLEAR WHERE NAME = '%1'").arg(task.taskName);
     bool res = query.exec(sql);
     if (res)
     {
         if (query.next())
         {
             int index = 0;
+			task.taskId = query.value(index++).toString();
             task.taskName = query.value(index++).toString();
             task.taskType = query.value(index++).toInt();
             task.ip = query.value(index++).toString();
@@ -976,9 +979,10 @@ bool DataBase::insertClearTask(const ClearTask &task)
             return false;
         }
         QSqlQuery &query(t_oDb.sqlquery());
-        QString sql = QString("REPLACE INTO T_DIR_CLEAR(NAME,TYPE,IP,PORT,USER,PASSWORD,TRANSFERMODE,DIR,QUARTZ,FILE,UNIT,VALUE,ACTIVE)"
-                              "VALUES(:NAME,:TYPE,:IP,:PORT,:USER,:PASSWORD,:TRANSFERMODE,:DIR,:QUARTZ,:FILE,:UNIT,:VALUE,:ACTIVE)");
+        QString sql = QString("REPLACE INTO T_DIR_CLEAR(ID, NAME,TYPE,IP,PORT,USER,PASSWORD,TRANSFERMODE,DIR,QUARTZ,FILE,UNIT,VALUE,ACTIVE)"
+                              "VALUES(:ID, :NAME,:TYPE,:IP,:PORT,:USER,:PASSWORD,:TRANSFERMODE,:DIR,:QUARTZ,:FILE,:UNIT,:VALUE,:ACTIVE)");
         query.prepare(sql);
+		query.bindValue(":ID", task.taskId);
         query.bindValue(":NAME", task.taskName);
         query.bindValue(":TYPE", task.taskType);
         query.bindValue(":IP", task.ip);
