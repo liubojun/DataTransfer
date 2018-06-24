@@ -15,7 +15,12 @@ public:
     DistributeFile(CollectorBase *pBase, CurlFtp &oCurlFtp);
     virtual ~DistributeFile();
 
-    void transfer(TransTask &task);
+	/**
+	 * @brief  文件分发
+	 * @param  TransTask &task：文件信息
+	 * @return bool：成功返回true
+	 */
+    bool transfer(TransTask &task);
 
     int getCurlAddr();
     TransTask m_fileInfo;

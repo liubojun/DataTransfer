@@ -195,7 +195,22 @@ bool CDirRecord::checkIsNewFile(const QString &dir, const QString &fn, const QSt
     //return true;
 }
 
+void CDirRecord::updateSendFailure(const QString &dir, const QString &fn)
+{
+	memfiletable_t::iterator iter = m_oMemThisFileInfo.find(dir);
+	if (iter != m_oMemThisFileInfo.end())
+	{
+		dir2filetable_t::iterator subiter = iter->find(fn);
+		if (subiter != iter->end())
+		{
+			iter->remove(fn);
+		}
+	}
+}
+
 void CDirRecord::reflush()
 {
     updateLatestFileSize(m_oMemThisFileInfo);
 }
+
+

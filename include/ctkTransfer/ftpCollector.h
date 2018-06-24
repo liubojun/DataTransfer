@@ -19,6 +19,7 @@
 
 
 class CurlFtp;
+class CDirRecord;
 
 class DLL_EXPORT_CLASS_DECL FtpCollector : public CollectorBase
 {
@@ -57,7 +58,7 @@ public:
     void setProcess(QProcess *in_pro);
 
 private slots:
-    void ftpDone();
+	void ftpDone(CDirRecord &io_record);
 
     void readOutput();
 

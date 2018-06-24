@@ -173,7 +173,7 @@ void FtpCollector::getNewFiles(const CollectTask &in_oTask)
     m_collectSet = in_oTask;
 
     m_pCftp = QSharedPointer<CurlFtp>(new CurlFtp(this));
-    QObject::connect(m_pCftp.data(), SIGNAL(done()), this, SLOT(ftpDone()));
+    //QObject::connect(m_pCftp.data(), SIGNAL(done()), this, SLOT(ftpDone()));
 
     m_bRun = (bool)m_collectSet.enable;
     if (!m_bRun)
@@ -231,6 +231,7 @@ void FtpCollector::getNewFiles(const CollectTask &in_oTask)
             m_fileList.clear();	//清空新文件列表
 
             m_pCftp->getNewFiles(m_fileList, oRecordSet);
+			ftpDone(oRecordSet);
             emit startGif(m_collectSet.dirID, false);
         }
         else
@@ -246,7 +247,7 @@ void FtpCollector::getNewFiles(const CollectTask &in_oTask)
     }
 }
 
-void FtpCollector::ftpDone()
+void FtpCollector::ftpDone(CDirRecord &io_record)
 {
     QSLOG_DEBUG(QString::fromLocal8Bit("本次收集共获取到新文件:%1").arg(m_fileList.size()));
     if (m_fileList.isEmpty() || !m_bRun)
@@ -267,7 +268,12 @@ void FtpCollector::ftpDone()
             //task.userInfo = m_userInfo.user;
             // 发送文件
             DistributeFile sendFile(this, m_ftp);
-            sendFile.transfer(task);
+
+			// 解决问题：当启用了记录收集时间时，当分发失败时，第二次无法重新分发
+			if (!sendFile.transfer(task) && m_collectSet.recordLatestTime)
+			{
+				io_record.updateSendFailure(task.srcFileFullPath.mid(0, task.srcFileFullPath.lastIndexOf("/")+1), task.fileName);
+			}
         }
     }
 	m_bFinish = true;

@@ -41,7 +41,7 @@ DistributeFile::~DistributeFile()
     //QSLOG_DEBUG("~DistributeTaskThread");
 }
 
-void DistributeFile::transfer(TransTask &task)
+bool DistributeFile::transfer(TransTask &task)
 {
     //QSLOG_DEBUG(QString("begin task: %1.").arg(task.srcFileFullPath));
 
@@ -77,7 +77,7 @@ void DistributeFile::transfer(TransTask &task)
             //m_pBase->emitLog(task.collectSet.dirName, logInfo);
             //m_pBase->emitLog(logInfo, BAD);
             emit emitLog(logInfo, BAD);
-            return;
+            return false;
         }
     }
     else	// 共享目录收集
@@ -111,10 +111,11 @@ void DistributeFile::transfer(TransTask &task)
             //m_pBase->emitLog(task.collectSet.dirName, logInfo);
             //m_pBase->emitLog(logInfo, BAD);
             emit emitLog(logInfo, BAD);
-            return;
+            return false;
         }
     }
 
+	bool bRes = false;
     // modified by liubojun @20180205
     //if (0 == task.userInfo.size())
     //{
@@ -142,7 +143,7 @@ void DistributeFile::transfer(TransTask &task)
         //}
         QSLOG_DEBUG(QString::fromLocal8Bit("文件:%1分发到[%2]").arg(fileData.filename).arg(user.userName));
         // 3.分发数据
-        bool bRes = false;
+        
         QString strDstFile;
         if (0 == user.sendType)		//目录分发
         {
@@ -172,11 +173,13 @@ void DistributeFile::transfer(TransTask &task)
             //m_pBase->emitLog(strInfo, GOOD);
             emit emitLog(strInfo, GOOD);
             emit emitBroadCast(strBroadMsgFile, strDstFile);
+
         }
     }
 
 
     QSLOG_DEBUG(QString("finish task: %1.").arg(task.srcFileFullPath));
+	return bRes;
 }
 
 // 加密压缩二进制流

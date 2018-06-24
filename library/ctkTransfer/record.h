@@ -68,6 +68,15 @@ public:
      */
     bool checkIsNewFile(const QString &dir, const QString &fn, const QString &dt, int size);
 
+	/**
+	 * @brief  检查当前文件是否在上次处理的文件列表中
+	 *		   根据文件名，文件的最后修改时间，以及文件的大小属性来判断
+	 * @param  const QString &dir 文件目录
+	 * @param  const QString &fn 文件名
+	 * @return bool：如果在上次处理的列表中，返回false,否则返回true
+	 */
+	void updateSendFailure(const QString &dir, const QString &fn);
+
     /**
      * @brief  查询目录的上一次处理的文件的列表以及文件，加载到内存中
      *         考虑到远程的ftp服务器的版本差异，获取远程的文件的时间不太靠谱
