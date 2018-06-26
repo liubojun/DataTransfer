@@ -19,6 +19,9 @@ public:
     // 根据收集目录ID获取分发用户名
     QString getSendUserNameFromDirID(const QString &CollectDirId);
 
+    // 根据收集目录ID获取分发用户全部信息
+    CollectUser getSendUserInfoFromDirID(const QString &CollectDirId);
+
     CollectTask m_task;
     TaskUser m_selUser;
 
@@ -62,7 +65,7 @@ private slots:
     void onSubDirFilterEdit();
 
 signals:
-    void commit(const CollectTask &task);
+    void commit(CollectTask &task);
 
     // 测试收集路径成功
     void testok(const QString &url);
@@ -76,8 +79,7 @@ private:
     // 根据分发用户名获取分发用户全部信息
     CollectUser getSendUserInfoFromName(const QString &name);
 
-    // 根据收集目录ID获取分发用户全部信息
-    CollectUser getSendUserInfoFromDirID(const QString &CollectDirId);
+
 
 
 

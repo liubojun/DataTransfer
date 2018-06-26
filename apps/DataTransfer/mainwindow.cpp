@@ -3,6 +3,7 @@
 #include <QMetaType>
 #include <QDesktopServices>
 #include <QTimer>
+#include <QUrl>
 //--测试
 #include <QFileInfo>
 #include <QDir>
@@ -194,7 +195,7 @@ void MainWindow::initialize()
 void MainWindow::addCollectSet()
 {
     m_pCollectDlg = QSharedPointer<CollectSetDlg>(new CollectSetDlg());
-    connect(m_pCollectDlg.data(), SIGNAL(commit(const CollectTask &)), this, SLOT(addCollect(const CollectTask &)));
+    connect(m_pCollectDlg.data(), SIGNAL(commit(CollectTask &)), this, SLOT(addCollect(CollectTask &)));
     m_pCollectDlg->exec();
 }
 
@@ -212,7 +213,7 @@ bool MainWindow::startCollect()
     m_sqlite->QueryCollectTask(collectTasks);
     for (int i=0; i<collectTasks.size(); ++i)
     {
-        addCollect(collectTasks.at(i), false);
+        addCollect(collectTasks[i], false);
     }
 
     //ui.listWidget->setCurrentRow(0);
@@ -236,7 +237,7 @@ bool MainWindow::startClear()
     return true;
 }
 
-bool MainWindow::addCollect(const CollectTask &task, bool bDb)
+bool MainWindow::addCollect(CollectTask &task, bool bDb /*= true*/)
 {
     TaskUser tUser;
     tUser.taskID = task.dirID;
@@ -250,6 +251,14 @@ bool MainWindow::addCollect(const CollectTask &task, bool bDb)
     itemWidget->show();
     ui.listWidget->setItemWidget(pItem, itemWidget);
     pItem->setSizeHint(QSize(itemWidget->rect().width(), itemWidget->rect().height()));
+
+    if (0 == task.collectType)
+    {
+        QUrl oUrl(task.rltvPath.replace("\\", "/"));
+        task.rltvPath = oUrl.url();
+        //qDebug() << oUrl.path();
+    }
+
     // 添加到数据库
     if (bDb && !DataBase::getInstance()->InsertCollectTask(task))
     {
@@ -958,6 +967,7 @@ void MainWindow::onProperty()
         if (QDialog::Accepted == m_pCollectDlg->exec())
         {
             bool bRestart = false;
+            CollectUser oSender = m_pCollectDlg->getSendUserInfoFromDirID(task.dirID);
             if (task.collectType != m_pCollectDlg->m_task.collectType ||
                     task.dispatch != m_pCollectDlg->m_task.dispatch ||
                     task.rltvPath != m_pCollectDlg->m_task.rltvPath ||
@@ -965,19 +975,30 @@ void MainWindow::onProperty()
                     task.recordLatestTime != m_pCollectDlg->m_task.recordLatestTime ||
                     task.ftp_transferMode != m_pCollectDlg->m_task.ftp_transferMode ||
                     task.ftp_connectMode != m_pCollectDlg->m_task.ftp_connectMode ||
-                    strOldSenderUser != m_pCollectDlg->getSendUserNameFromDirID(task.dirID) ||
+                    strOldSenderUser != oSender.user.userName ||
                     task.compareContent != m_pCollectDlg->m_task.compareContent ||
                     task.subDirTemplate != m_pCollectDlg->m_task.subDirTemplate)
             {
                 bRestart = true;
             }
 
+            if (!bRestart)
+            {
+                return;
+            }
             task = m_pCollectDlg->m_task;
             // 设置列表图标状态
-            int nIcon = m_pCollectDlg->m_task.collectType + 0 + task.enable * 4;
+            int nIcon = m_pCollectDlg->m_task.collectType + oSender.user.sendType * 2 + task.enable * 4;
+            // int nIcon = m_pCollectDlg->m_task.collectType + 0 + task.enable * 4;
             MyItemWidget *pItemWidget = (MyItemWidget *)ui.listWidget->itemWidget(pItem);
             pItemWidget->SetIcon((ICONTYPE)nIcon);
             pItemWidget->SetName(task.dirName);
+
+            if (0 == task.collectType)
+            {
+                QUrl oUrl(task.rltvPath.replace("\\", "/"));
+                task.rltvPath = oUrl.url();
+            }
             // 记录到数据库
             m_sqlite->InsertCollectTask(task);
             // 修改收集设置

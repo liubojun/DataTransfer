@@ -88,7 +88,7 @@ private slots:
     void addCollectSet();
     void manageUser();
 
-    bool addCollect(const CollectTask &task, bool bDb = true);
+    bool addCollect(CollectTask &task, bool bDb = true);
 
 
 
