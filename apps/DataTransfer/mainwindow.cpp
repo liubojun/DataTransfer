@@ -977,7 +977,8 @@ void MainWindow::onProperty()
                     task.ftp_connectMode != m_pCollectDlg->m_task.ftp_connectMode ||
                     strOldSenderUser != oSender.user.userName ||
                     task.compareContent != m_pCollectDlg->m_task.compareContent ||
-                    task.subDirTemplate != m_pCollectDlg->m_task.subDirTemplate)
+                    task.subDirTemplate != m_pCollectDlg->m_task.subDirTemplate ||
+                    task.fileTemplate != m_pCollectDlg->m_task.fileTemplate)
             {
                 bRestart = true;
             }
