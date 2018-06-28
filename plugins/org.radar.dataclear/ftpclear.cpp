@@ -15,7 +15,7 @@ CFtpClear::~CFtpClear()
 
 void CFtpClear::run()
 {
-    //m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("¿ªÊ¼Ä¿Â¼[%1]ÇåÀí").arg(CPathBuilder::getFtpUrl(m_oData.ip, m_oData.port, m_oData.m_fullPath)), 1);
+    //m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("å¼€å§‹ç›®å½•[%1]æ¸…ç†").arg(CPathBuilder::getFtpUrl(m_oData.ip, m_oData.port, m_oData.m_fullPath)), 1);
     using namespace FTP;
     CFtp oFtp;
     do
@@ -38,7 +38,7 @@ void CFtpClear::run()
         QSharedPointer<CFtp> pFtp;
         for (int i = 0; i < oFileList.size(); ++i)
         {
-            // Ã¿¸öftpÁ¬½Ó¶ÔÏó¹Ü10¸öÎÄ¼şµÄÉ¾³ı,½â¾öftpÁ¬½Ó³¬Ê±ÎÊÌâ
+            // æ¯ä¸ªftpè¿æ¥å¯¹è±¡ç®¡10ä¸ªæ–‡ä»¶çš„åˆ é™¤,è§£å†³ftpè¿æ¥è¶…æ—¶é—®é¢˜
             if (i % 10 == 0)
             {
                 pFtp.reset(new CFtp());
@@ -57,16 +57,16 @@ void CFtpClear::run()
             {
                 if (0 != pFtp->remove(fi.path))
                 {
-                    QSLOG_DEBUG(QString::fromLocal8Bit("É¾³ıÔ¶³ÌÎÄ¼ş[%1]Ê§°Ü:%2").arg(fi.name).arg(pFtp->errorString()));
+                    QSLOG_DEBUG(QString::fromLocal8Bit("åˆ é™¤è¿œç¨‹æ–‡ä»¶[%1]å¤±è´¥:%2").arg(fi.name).arg(pFtp->errorString()));
                 }
                 else
                 {
-                    m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("É¾³ıÎÄ¼ş:%1").arg(fi.name), 1);
+                    m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("åˆ é™¤æ–‡ä»¶:%1").arg(fi.name), 1);
                 }
             }
         }
     }
     while (0);
-    //m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("Ä¿Â¼[%1]ÇåÀí½áÊø").arg(CPathBuilder::getFtpUrl(m_oData.ip, m_oData.port, m_oData.m_fullPath)), 1);
+    //m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("ç›®å½•[%1]æ¸…ç†ç»“æŸ").arg(CPathBuilder::getFtpUrl(m_oData.ip, m_oData.port, m_oData.m_fullPath)), 1);
 }
 
