@@ -254,8 +254,8 @@ bool MainWindow::addCollect(CollectTask &task, bool bDb /*= true*/)
 
     if (0 == task.collectType)
     {
-        QUrl oUrl(task.rltvPath.replace("\\", "/"));
-        task.rltvPath = oUrl.url();
+        //QUrl oUrl(task.rltvPath.replace("\\", "/"));
+        task.rltvPath = task.rltvPath.replace("\\", "/");
         //qDebug() << oUrl.path();
     }
 
@@ -997,8 +997,8 @@ void MainWindow::onProperty()
 
             if (0 == task.collectType)
             {
-                QUrl oUrl(task.rltvPath.replace("\\", "/"));
-                task.rltvPath = oUrl.url();
+                //QUrl oUrl(task.rltvPath.replace("\\", "/"));
+                task.rltvPath = task.rltvPath.replace("\\", "/");
             }
             // 记录到数据库
             m_sqlite->InsertCollectTask(task);

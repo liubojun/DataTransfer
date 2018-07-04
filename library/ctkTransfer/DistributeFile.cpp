@@ -115,7 +115,7 @@ bool DistributeFile::transfer(TransTask &task)
         }
     }
 
-	bool bRes = false;
+    bool bRes = false;
     // modified by liubojun @20180205
     //if (0 == task.userInfo.size())
     //{
@@ -143,7 +143,7 @@ bool DistributeFile::transfer(TransTask &task)
         //}
         QSLOG_DEBUG(QString::fromLocal8Bit("文件:%1分发到[%2]").arg(fileData.filename).arg(user.userName));
         // 3.分发数据
-        
+
         QString strDstFile;
         if (0 == user.sendType)		//目录分发
         {
@@ -179,7 +179,7 @@ bool DistributeFile::transfer(TransTask &task)
 
 
     QSLOG_DEBUG(QString("finish task: %1.").arg(task.srcFileFullPath));
-	return bRes;
+    return bRes;
 }
 
 // 加密压缩二进制流
@@ -293,11 +293,11 @@ bool DistributeFile::sendToDir(const char *fullPath, TransTask &taskInfo)
     {
         strSendPath = "/" + strSendPath;
     }
-    string strPath = strSendPath.toLocal8Bit().data();
+    //string strPath = strSendPath.toLocal8Bit().data();
     //char url[512] = {0};
     //char usrPwd[100] = {0};
     //sprintf(url, "file://%s", strPath.c_str());
-    QString url = QString("file://%1").arg(strPath.c_str());
+    QString url = QString::fromLocal8Bit("file://%1").arg(strSendPath);
     //sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
 
     int bRet = -1;

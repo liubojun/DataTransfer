@@ -758,10 +758,10 @@ void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, 
                         //tTask.userInfo = m_userInfo.user;
                         // 发送文件
                         DistributeFile sendFile(this, m_ftp);
-						if (!sendFile.transfer(tTask) && m_collectSet.recordLatestTime)
-						{
-							oRecord.updateSendFailure(qf.absolutePath(), qf.fileName());
-						}
+                        if (!sendFile.transfer(tTask) && m_collectSet.recordLatestTime)
+                        {
+                            oRecord.updateSendFailure(qf.absolutePath(), qf.fileName());
+                        }
                     }
                 }
 
@@ -822,7 +822,7 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
         tTask.srcFileFullPath = fi.filePath();
         // dstFileFullPath += fi.fileName();
         //QSLOG_DEBUG(QString("name = %1, rule = %2").arg(fi.fileName()).arg(cUser.rename_rule));
-        tTask.strDestFileName = CChangeName::change_name_by_id(fi.fileName().toLocal8Bit().toStdString().c_str(), cUser.rename_rule.toLocal8Bit().toStdString().c_str()).c_str();
+        tTask.strDestFileName = QString::fromLocal8Bit(CChangeName::change_name_by_id(fi.fileName().toLocal8Bit().toStdString().c_str(), cUser.rename_rule.toLocal8Bit().toStdString().c_str()).c_str());
         dstFileFullPath += tTask.strDestFileName;
         //QSLOG_DEBUG("get dest name");
 
