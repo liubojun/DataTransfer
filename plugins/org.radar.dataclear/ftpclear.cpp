@@ -1,4 +1,4 @@
-#include "ftpclear.h"
+﻿#include "ftpclear.h"
 #include "BaseDatas.h"
 #include "pathbuilder.h"
 
@@ -32,25 +32,33 @@ void CFtpClear::run()
         {
             break;
         }
-        QList<CFileInfo> oFileList = oFtp.list(m_oData.m_fullPath);
+        QList<CFileInfo> oFileList = oFtp.listRecursion(m_oData.m_fullPath);
 
 
         QSharedPointer<CFtp> pFtp;
+        pFtp.reset(new CFtp());
+        pFtp->connectToHost(m_oData.ip, m_oData.port);
+        pFtp->setTransferMode(m_oData.transfermode == 0 ? Active : Passive);
+        if (0 != pFtp->login(m_oData.user, m_oData.password))
+        {
+            QSLOG_DEBUG(pFtp->errorString());
+            break;
+        }
         for (int i = 0; i < oFileList.size(); ++i)
         {
             // 每个ftp连接对象管10个文件的删除,解决ftp连接超时问题
-            if (i % 10 == 0)
-            {
-                pFtp.reset(new CFtp());
-                pFtp->connectToHost(m_oData.ip, m_oData.port);
-                pFtp->setTransferMode(m_oData.transfermode == 0 ? Active : Passive);
-                if (0 != pFtp->login(m_oData.user, m_oData.password))
-                {
-                    i = i + 9;
-                    QSLOG_DEBUG(pFtp->errorString());
-                    continue;
-                }
-            }
+            //if (i % 100 == 0)
+            //{
+            //    pFtp.reset(new CFtp());
+            //    pFtp->connectToHost(m_oData.ip, m_oData.port);
+            //    pFtp->setTransferMode(m_oData.transfermode == 0 ? Active : Passive);
+            //    if (0 != pFtp->login(m_oData.user, m_oData.password))
+            //    {
+            //        i = i + 9;
+            //        QSLOG_DEBUG(pFtp->errorString());
+            //        continue;
+            //    }
+            //}
             const CFileInfo &fi = oFileList.at(i);
             //qDebug() << fi.time << "--" << QDateTime::currentDateTime().addMSecs(-qint64(m_oData.m_time) * 1000);
             if (fi.type == FTP::FTP_FILE && fi.time < QDateTime::currentDateTime().addMSecs(-qint64(m_oData.m_time) * 1000))
@@ -61,7 +69,18 @@ void CFtpClear::run()
                 }
                 else
                 {
-                    m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("删除文件:%1").arg(fi.name), 1);
+                    m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString("删除文件:%1").arg(fi.name), 1);
+                }
+            }
+            if (fi.type == FTP::FTP_DIR && fi.time < QDateTime::currentDateTime().addMSecs(-qint64(m_oData.m_time) * 1000))
+            {
+                if (0 != pFtp->rmdir(fi.path))
+                {
+                    QSLOG_DEBUG(QString::fromLocal8Bit("删除远程目录[%1]失败:%2").arg(fi.name).arg(pFtp->errorString()));
+                }
+                else
+                {
+                    m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("删除空目录:%1").arg(fi.name), 1);
                 }
             }
         }

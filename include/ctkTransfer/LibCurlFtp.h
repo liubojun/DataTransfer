@@ -79,6 +79,9 @@ namespace FTP
         // 获取文件目录列表
         QList<CFileInfo> list(const QString &dir = QString());
 
+        // 获取文件目录列表（递归遍历子目录）
+        QList<CFileInfo> listRecursion(const QString &dir = QString());
+
         // 登陆到ftp服务器(30秒)
         int login(const QString &user = QString(), const QString &password = QString(), int timeout = 30);
 

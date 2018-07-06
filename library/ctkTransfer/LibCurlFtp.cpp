@@ -3,6 +3,12 @@
 #include <stdio.h>
 
 using namespace FTP;
+
+bool compareCFileInfo(const CFileInfo &f1, const CFileInfo &f2)
+{
+    return f1.path.length() > f2.path.length();
+}
+
 CFtp::CFtp()
 {
     m_pCurlHandler = NULL;
@@ -185,6 +191,51 @@ QList<CFileInfo> CFtp::list(const QString &dir /*= QString()*/)
     parseMlsdInfo(getCurrentUrl(), strInfo, files);
     return files;
 }
+
+QList<CFileInfo> CFtp::listRecursion(const QString &dir)
+{
+    // 存储所有的文件和目录
+    QList<CFileInfo> oFiles;
+    QList<CFileInfo> oDirsFinal;
+
+    // 存储所有的目录
+    QList<QString> oDirs;
+    oDirs.append(dir);
+    while (!oDirs.isEmpty())
+    {
+        QString strCurDir = oDirs.takeFirst();
+        if (strCurDir.length() >= 1 && strCurDir.right(1) != "/")
+        {
+            strCurDir += "/";
+        }
+
+        QList<CFileInfo> retFiles = list(strCurDir);
+        foreach(const CFileInfo &fi, retFiles)
+        {
+            if (fi.type == FTP_DIR)
+            {
+                oDirs.append(fi.path);
+                oDirsFinal.append(fi);
+            }
+            else if (fi.type == FTP_FILE)
+            {
+                oFiles.append(fi);
+
+            }
+        }
+    }
+
+    for (int i = oDirsFinal.size()-1; i >= 0; --i)
+    {
+        const CFileInfo &fi = oDirsFinal.at(i);
+        oFiles.push_front(fi);
+    }
+
+    qSort(oFiles.begin(), oFiles.end(), compareCFileInfo);
+
+    return oFiles;
+}
+
 
 int CFtp::login(const QString &user /*= QString()*/, const QString &password /*= QString()*/, int timeout /* = 30 s*/)
 {

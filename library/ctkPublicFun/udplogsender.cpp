@@ -1,4 +1,4 @@
-#include "udplogsender.h"
+ï»¿#include "udplogsender.h"
 #include "DataBase.h"
 #include "ctkLog.h"
 #include <QByteArray>
@@ -49,9 +49,9 @@ void CUdpLogSender::sendBroadCastMsg(const QString &taskName, const QString &src
     {
         return;
     }
-    // ¹¹ÔìjsonÏûÏ¢
+    // æ„é€ jsonæ¶ˆæ¯
     // {
-    //     "TaskName" : "À×´ïÎÄ¼ş´«Êä",
+    //     "TaskName" : "é›·è¾¾æ–‡ä»¶ä¼ è¾“",
     //     "DateTime" : "2018-06-22 15:40:32"
     //	   "File" : "Z_RADR_I_Z9220_20170423155400_O_DOR_SA_CAP.bin.bz2"
     // }
