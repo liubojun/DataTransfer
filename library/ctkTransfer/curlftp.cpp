@@ -977,7 +977,7 @@ int CurlFtp::deleteFtpFile(const char *url, const char *user_pwd, const string &
     if (CURLE_OK != res)
     {
         /* we failed */
-        QSLOG_ERROR(QString("remote file exists, remove remote file %1 failure, error reason: %2").arg(filename.c_str()).arg(curl_easy_strerror(res)));
+        QSLOG_ERROR(QString::fromLocal8Bit("remote file exists, remove remote file %1 failure, error reason: %2").arg(filename.c_str()).arg(curl_easy_strerror(res)));
         curl_slist_free_all(headerlist);
         return -1;
     }
@@ -1060,9 +1060,9 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
         QSLOG_ERROR(QStringLiteral("打开文件失败：%1").arg(localPath));
         return -1;
     }
-	fseek(pfile, 0, SEEK_END);
-	long filesize = ftell(pfile);
-	fseek(pfile, 0, SEEK_SET);
+    fseek(pfile, 0, SEEK_END);
+    long filesize = ftell(pfile);
+    fseek(pfile, 0, SEEK_SET);
     QSharedPointer<FILE> autoClose(pfile, fclose);
     //fseek(pfile, 0, SEEK_END);
     //long fsize = ftell(pfile);
@@ -1147,7 +1147,7 @@ int CurlFtp::uploadFileToFtp(const char *url, const char *user_pwd, const string
         QSLOG_ERROR("curl_easy_setopt error");
         return -1;
     }
-	if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)filesize))
+    if (CURLE_OK != curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)filesize))
     {
         QSLOG_ERROR("curl_easy_setopt error");
         return -1;

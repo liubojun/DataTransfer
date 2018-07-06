@@ -878,11 +878,11 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
             //char usrPwd[100] = {0};
             string strIp = cUser.user.ip.toStdString();
             int nPort = cUser.user.port;
-            string strPath = dstFileFullPath.toLocal8Bit().data();
+            //string strPath = dstFileFullPath.toLocal8Bit().data();
             string strName = tTask.strDestFileName.toLocal8Bit().data();
             string strUsr = cUser.user.lgUser.toLocal8Bit().data();
             string strPwd = cUser.user.lgPass.toLocal8Bit().data();
-            QString ftpUrl = QString("ftp://%1:%2%3").arg(strIp.c_str()).arg(nPort).arg(strPath.c_str());
+            QString ftpUrl = QString("ftp://%1:%2%3").arg(strIp.c_str()).arg(nPort).arg(dstFileFullPath);
             //sprintf(ftpUrl, "ftp://%s:%d%s", strIp.c_str(), nPort, strPath.c_str());
             QString usrPwd = QString("%1:%2").arg(strUsr.c_str()).arg(strPwd.c_str());
             //sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
