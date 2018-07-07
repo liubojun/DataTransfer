@@ -872,7 +872,7 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
         // 分发到FTP
         else
         {
-            QSLOG_DEBUG("SEND TO FTP");
+            //QSLOG_DEBUG("SEND TO FTP");
             //char ftpUrl[200] = {0};
             //char ftpPath[512] = { 0 };
             //char usrPwd[100] = {0};
