@@ -69,7 +69,7 @@ void CFtpClear::run()
                 }
                 else
                 {
-                    m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString("删除文件:%1").arg(fi.name), 1);
+                    m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("删除文件:%1").arg(fi.name), 1);
                 }
             }
             if (fi.type == FTP::FTP_DIR && fi.time < QDateTime::currentDateTime().addMSecs(-qint64(m_oData.m_time) * 1000))
