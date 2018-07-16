@@ -1,6 +1,7 @@
 ﻿#include "CollectManager.h"
 #include "shareddirCollector.h"
 #include "ftpCollector.h"
+#include "sftpCollector.h"
 #include "pathbuilder.h"
 
 #include "ctkPublicFun.h"
@@ -43,6 +44,10 @@ CollectorBase *CollectManager::creatCollector(collection_type type)
         //pCollect = QSharedPointer<CollectorBase>(new FtpCollector(this, m_oCond, m_oLocker, m_iLogsize));
         pCollect = new FtpCollector(m_oCond, m_oLocker, m_iLogsize);
         break;
+	case SFTP:
+		//pCollect = QSharedPointer<CollectorBase>(new FtpCollector(this, m_oCond, m_oLocker, m_iLogsize));
+		pCollect = new SFtpCollector(m_oCond, m_oLocker, m_iLogsize);
+		break;
     default:
         break;
     }

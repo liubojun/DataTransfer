@@ -27,6 +27,7 @@ typedef enum
 {
     SHARED_DIR = 0,		//< 共享目录或者本地目录收集
     FTP = 1,			//< FTP收集
+	SFTP = 2			//< SFTP收集
 } collection_type;
 
 /// 目录监控方式的枚举定义

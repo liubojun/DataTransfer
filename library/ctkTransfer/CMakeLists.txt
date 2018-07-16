@@ -7,10 +7,12 @@ SET(SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/curlftp.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/CollectorBase.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/ftpCollector.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/sftpCollector.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/shareddirCollector.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/DistributeFile.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/record.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/LibCurlFtp.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/LibCurlSFtp.cpp
 )
 
 # 工程头文件
@@ -18,8 +20,10 @@ SET(HDRS
    ${RadarProjectInclude}/ctkTransfer/curlftp.h
    ${RadarProjectInclude}/ctkTransfer/CollectorBase.h
    ${RadarProjectInclude}/ctkTransfer/ftpCollector.h
+   ${RadarProjectInclude}/ctkTransfer/sftpCollector.h
    ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
    ${RadarProjectInclude}/ctkTransfer/LibCurlFtp.h
+   ${RadarProjectInclude}/ctkTransfer/LibCurlSFtp.h
    ${CMAKE_CURRENT_SOURCE_DIR}/DistributeFile.h
    ${CMAKE_CURRENT_SOURCE_DIR}/record.h
    
@@ -30,6 +34,7 @@ SET(MOC_HDRS
 	${RadarProjectInclude}/ctkTransfer/curlftp.h
 	${RadarProjectInclude}/ctkTransfer/CollectorBase.h
 	${RadarProjectInclude}/ctkTransfer/ftpCollector.h
+	${RadarProjectInclude}/ctkTransfer/sftpCollector.h
     ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
 	${CMAKE_CURRENT_SOURCE_DIR}/DistributeFile.h
 	${CMAKE_CURRENT_SOURCE_DIR}/record.h

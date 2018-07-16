@@ -9,12 +9,14 @@ SET(SRCS
 SET(HDRS
 	${RadarProjectInclude}/ctkTransfer/CollectorBase.h
 	${RadarProjectInclude}/ctkTransfer/ftpCollector.h
+	${RadarProjectInclude}/ctkTransfer/sftpCollector.h
     ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
 )
 
 SET(MOC_HDRS
 	${RadarProjectInclude}/ctkTransfer/CollectorBase.h
 	${RadarProjectInclude}/ctkTransfer/ftpCollector.h
+	${RadarProjectInclude}/ctkTransfer/sftpCollector.h
     ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
   
   #${RadarProjectInclude}/interface/ILogPrint.h

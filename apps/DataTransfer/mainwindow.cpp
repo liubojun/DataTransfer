@@ -978,7 +978,11 @@ void MainWindow::onProperty()
                     strOldSenderUser != oSender.user.userName ||
                     task.compareContent != m_pCollectDlg->m_task.compareContent ||
                     task.subDirTemplate != m_pCollectDlg->m_task.subDirTemplate ||
-                    task.fileTemplate != m_pCollectDlg->m_task.fileTemplate)
+                    task.fileTemplate != m_pCollectDlg->m_task.fileTemplate ||
+					task.ip != m_pCollectDlg->m_task.ip || 
+					task.port != m_pCollectDlg->m_task.port || 
+					task.loginUser != m_pCollectDlg->m_task.loginUser || 
+					task.loginPass != m_pCollectDlg->m_task.loginPass)
             {
                 bRestart = true;
             }

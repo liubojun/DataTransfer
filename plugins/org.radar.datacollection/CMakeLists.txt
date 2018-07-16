@@ -23,6 +23,7 @@ set(PLUGIN_HDRS
   ${RadarProjectInclude}/ctkTransfer/CollectorBase.h
   ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
   ${RadarProjectInclude}/ctkTransfer/ftpCollector.h
+  ${RadarProjectInclude}/ctkTransfer/sftpCollector.h
   ${RadarProjectInclude}/ctkTransfer/streamCollector.h
 )
 
@@ -41,6 +42,7 @@ set(PLUGIN_MOC_SRCS
   ${RadarProjectInclude}/ctkTransfer/CollectorBase.h
   ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
   ${RadarProjectInclude}/ctkTransfer/ftpCollector.h
+  ${RadarProjectInclude}/ctkTransfer/sftpCollector.h
   ${RadarProjectInclude}/ctkTransfer/streamCollector.h
 )
 

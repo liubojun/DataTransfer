@@ -15,6 +15,8 @@
 #include "change_name.h"
 #include "subdirfilter.h"
 #include "subdirtemplateedit.h"
+#include "LibCurlSFtp.h"
+#include "LibCurlFtp.h"
 //#include "curlftp.h"
 
 CollectSetDlg::CollectSetDlg(int flag, QDialog *parent /*= NULL*/)
@@ -133,7 +135,19 @@ bool CollectSetDlg::onApply()
 {
     CollectTask &cSet = m_task;
     cSet.dirName = ui.le_DirName->text();
-    cSet.collectType = (ui.radFile->isChecked()) ?  0 : 1;
+	if (ui.radFile->isChecked())
+	{
+		cSet.collectType = 0;
+	}
+	else if (ui.radFtp->isChecked())
+	{
+		cSet.collectType = 1;
+	}
+	else
+	{
+		cSet.collectType = 2;
+	}
+    //cSet.collectType = (ui.radFile->isChecked()) ?  0 : 1;
     cSet.ftp_transferMode = ui.comboBox_bin->currentIndex();
     cSet.ftp_connectMode = ui.comboBox_passive->currentIndex();
     cSet.rltvPath = ui.le_RelvPath->text();
@@ -301,11 +315,16 @@ void CollectSetDlg::showTask(const CollectTask &task)
         ui.radFile->setChecked(true);
         bFile = true;
     }
-    else
+	else if (task.collectType == 1)
     {
         ui.radFtp->setChecked(true);
         bFile = false;
     }
+	else
+	{
+		ui.radSFtp->setChecked(true);
+		bFile = false;
+	}
     onSelFile(bFile);
 
 
@@ -474,43 +493,43 @@ CollectUser CollectSetDlg::getSendUserInfoFromDirID(const QString &CollectDirId)
     return retUser;
 }
 /// 在内存中缓存文件内容（加密压缩需要）
-struct MemoryData
-{
-    char *memdata;		///< 起始地址
-    size_t size;		///< 有效大小
-    size_t capacity;	///< 申请的空间大小
-
-    MemoryData()
-    {
-        memdata = NULL;
-        size = 0;
-        capacity = 0;
-    }
-
-    ~MemoryData()
-    {
-        free(memdata);
-    }
-};
-static size_t WriteInMemoryFun(void *contents, size_t size, size_t nmemb, void *userp)
-{
-    size_t realsize = size * nmemb;		//本次回调获取的数据
-    struct MemoryData *mem = (struct MemoryData *)userp;
-
-    mem->memdata = (char *)realloc(mem->memdata, mem->size + realsize + 1);
-    if (mem->memdata == NULL)
-    {
-        /* out of memory! */
-        printf("not enough memory (realloc returned NULL)\n");
-        return 0;
-    }
-
-    memcpy(&(mem->memdata[mem->size]), contents, realsize);
-    mem->size += realsize;
-    mem->memdata[mem->size] = 0;
-
-    return realsize;
-}
+//struct MemoryData
+//{
+//    char *memdata;		///< 起始地址
+//    size_t size;		///< 有效大小
+//    size_t capacity;	///< 申请的空间大小
+//
+//    MemoryData()
+//    {
+//        memdata = NULL;
+//        size = 0;
+//        capacity = 0;
+//    }
+//
+//    ~MemoryData()
+//    {
+//        free(memdata);
+//    }
+//};
+//static size_t WriteInMemoryFun(void *contents, size_t size, size_t nmemb, void *userp)
+//{
+//    size_t realsize = size * nmemb;		//本次回调获取的数据
+//    struct MemoryData *mem = (struct MemoryData *)userp;
+//
+//    mem->memdata = (char *)realloc(mem->memdata, mem->size + realsize + 1);
+//    if (mem->memdata == NULL)
+//    {
+//        /* out of memory! */
+//        printf("not enough memory (realloc returned NULL)\n");
+//        return 0;
+//    }
+//
+//    memcpy(&(mem->memdata[mem->size]), contents, realsize);
+//    mem->size += realsize;
+//    mem->memdata[mem->size] = 0;
+//
+//    return realsize;
+//}
 
 void CollectSetDlg::onRemoteColTest()
 {
@@ -545,60 +564,114 @@ void CollectSetDlg::onRemoteColTest()
 
 
     }
-    else
+	else if (ui.radFtp->isChecked())
     {
+		QStringList retUrls = CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text());
+		foreach(QString strUrl, retUrls)
+		{
+			FTP::CFtp oFtp;
+			// 使用主动，默认为被动
+			if (1 == ui.comboBox_passive->currentIndex())
+			{
+				oFtp.setTransferMode(FTP::Active);
+			}
+			char url[256] = { 0 };
+			//char usrPwd[100] = { 0 };
+			sprintf(url, "ftp://%s:%d%s", ui.lineEdit_7->text().toStdString().c_str(), ui.lineEdit_8->text().toInt(), strUrl.toLocal8Bit().data());
+			//sprintf(usrPwd, "%s:%s", ui.lineEdit_5->text().toStdString().c_str(), ui.lineEdit_6->text().toStdString().c_str());
+			oFtp.connectToHost(ui.lineEdit_7->text(), ui.lineEdit_8->text().toInt());
+			oFtp.login(ui.lineEdit_5->text(), ui.lineEdit_6->text());
+			if (CURLcode::CURLE_OK != oFtp.cd(strUrl))
+			{
+				oFtp.errorString();
+				emit testfail(QString(url));
+			}
+			else
+			{
+				emit testok(QString(url));
+			}
+		}
 
-        CURL *curl = curl_easy_init();
-        QStringList retUrls = CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text());
-        for (int i = 0; i < retUrls.size(); ++i)
-        {
-            if (1 == ui.comboBox_bin->currentIndex())
-            {
-                // 使用ascii
-                curl_easy_setopt(curl, CURLOPT_TRANSFERTEXT, 1L);
-            }
-            else
-            {
-                curl_easy_setopt(curl, CURLOPT_TRANSFERTEXT, 0);
-            }
+        //CURL *curl = curl_easy_init();
+        //QStringList retUrls = CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text());
+        //for (int i = 0; i < retUrls.size(); ++i)
+        //{
+        //    if (1 == ui.comboBox_bin->currentIndex())
+        //    {
+        //        // 使用ascii
+        //        curl_easy_setopt(curl, CURLOPT_TRANSFERTEXT, 1L);
+        //    }
+        //    else
+        //    {
+        //        curl_easy_setopt(curl, CURLOPT_TRANSFERTEXT, 0);
+        //    }
 
-            // 使用主动，默认为被动
-            if (1 == ui.comboBox_passive->currentIndex())
-            {
-                curl_easy_setopt(curl, CURLOPT_FTPPORT, "-");
-            }
+        //    // 使用主动，默认为被动
+        //    if (1 == ui.comboBox_passive->currentIndex())
+        //    {
+        //        curl_easy_setopt(curl, CURLOPT_FTPPORT, "-");
+        //    }
 
 
-            char url[256] = { 0 };
-            char usrPwd[100] = { 0 };
-            sprintf(url, "ftp://%s:%d%s", ui.lineEdit_7->text().toStdString().c_str(), ui.lineEdit_8->text().toInt(), retUrls.at(i).toLocal8Bit().data());
-            sprintf(usrPwd, "%s:%s", ui.lineEdit_5->text().toStdString().c_str(), ui.lineEdit_6->text().toStdString().c_str());
+        //    char url[256] = { 0 };
+        //    char usrPwd[100] = { 0 };
+        //    sprintf(url, "ftp://%s:%d%s", ui.lineEdit_7->text().toStdString().c_str(), ui.lineEdit_8->text().toInt(), retUrls.at(i).toLocal8Bit().data());
+        //    sprintf(usrPwd, "%s:%s", ui.lineEdit_5->text().toStdString().c_str(), ui.lineEdit_6->text().toStdString().c_str());
 
-            curl_easy_setopt(curl, CURLOPT_URL, url);
-            curl_easy_setopt(curl, CURLOPT_USERPWD, usrPwd);
+        //    curl_easy_setopt(curl, CURLOPT_URL, url);
+        //    curl_easy_setopt(curl, CURLOPT_USERPWD, usrPwd);
 
-            // modified by liubojun @2017-10-28,没有这两句话会出问题
-            struct MemoryData listInfo;
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&listInfo);
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
-            //curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
+        //    // modified by liubojun @2017-10-28,没有这两句话会出问题
+        //    struct MemoryData listInfo;
+        //    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&listInfo);
+        //    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
+        //    //curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
 
-            //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-            //curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
-            //curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
-            CURLcode res = curl_easy_perform(curl);
-            if (CURLE_OK != res)
-            {
-                emit testfail(QString(url));
-            }
-            else
-            {
-                emit testok(QString(url));
-            }
+        //    //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+        //    //curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
+        //    //curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
+        //    CURLcode res = curl_easy_perform(curl);
+        //    if (CURLE_OK != res)
+        //    {
+        //        emit testfail(QString(url));
+        //    }
+        //    else
+        //    {
+        //        emit testok(QString(url));
+        //    }
 
-        }
-        curl_easy_cleanup(curl);
+        //}
+        //curl_easy_cleanup(curl);
     }
+	else
+	{
+		
+		QStringList retUrls = CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text());
+		foreach(QString strUrl, retUrls)
+		{
+			SFTP::SFtp oSFtp;
+			// 使用主动，默认为被动
+			if (1 == ui.comboBox_passive->currentIndex())
+			{
+				oSFtp.setTransferMode(SFTP::Active);
+			}
+			char url[256] = { 0 };
+			//char usrPwd[100] = { 0 };
+			sprintf(url, "sftp://%s:%d%s", ui.lineEdit_7->text().toStdString().c_str(), ui.lineEdit_8->text().toInt(), strUrl.toLocal8Bit().data());
+			//sprintf(usrPwd, "%s:%s", ui.lineEdit_5->text().toStdString().c_str(), ui.lineEdit_6->text().toStdString().c_str());
+			oSFtp.connectToHost(ui.lineEdit_7->text(), ui.lineEdit_8->text().toInt());
+			oSFtp.login(ui.lineEdit_5->text(), ui.lineEdit_6->text());
+			if (CURLcode::CURLE_OK != oSFtp.cd(strUrl))
+			{
+				QString strError = oSFtp.errorString();
+				emit testfail(QString(url));
+			}
+			else
+			{
+				emit testok(QString(url));
+			}
+		}
+	}
 
 }
 

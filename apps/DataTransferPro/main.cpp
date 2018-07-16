@@ -16,8 +16,10 @@
 #include "DataBase.h"
 #include "CollectorBase.h"
 #include "ftpCollector.h"
+#include "sftpCollector.h"
 #include "subdirfilter.h"
 #include "LibCurlFtp.h"
+#include "LibCurlSFtp.h"
 #include <QDebug>
 #include <QByteArray>
 
@@ -45,6 +47,20 @@ int main(int argc, char **argv)
     //qDebug() << oFtp.errorString();
     // 查询基本信息
 
+	//FTP::CFtp oFtp;
+	//oFtp.connectToHost("58.213.107.90", 9015);
+	//oFtp.login("serv", "nrietserv123");
+	//oFtp.cd("/home/serv");
+	//oFtp.list();
+
+	//SFTP::SFtp osFtp;
+	//osFtp.enableDebugLevel(true);
+	//osFtp.connectToHost("218.94.36.211", 10051);
+	//osFtp.login("nankong", "123456");
+	//osFtp.cd("/home/nankong");
+	//osFtp.list();
+	////osFtp.put("F:/TEST/DataTransfer_20170928.rar", "/home/nankong/DataTransfer_20170928.rar", ".tmp");
+	//qDebug() << osFtp.getFileSize("/home/nankong/DataTransfer_20170928.rar");
     GlobalConfig oGConfig;
     DataBase::getInstance()->queryBaseInfo(oGConfig);
 
@@ -90,7 +106,16 @@ int main(int argc, char **argv)
     oTask.dirID = argv[1];
     DataBase::getInstance()->QueryCollectTask(oTask);
 
-    CollectorBase *pCollect = new FtpCollector(oCnd, oLocker, iLogSize);
+	CollectorBase *pCollect = NULL;
+	if (oTask.collectType == 1)
+	{
+		pCollect = new FtpCollector(oCnd, oLocker, iLogSize);
+	}
+	else
+	{
+		pCollect = new SFtpCollector(oCnd, oLocker, iLogSize);
+	}
+     
     pCollect->getNewFiles(oTask);
 
     QCoreApplication::processEvents();
