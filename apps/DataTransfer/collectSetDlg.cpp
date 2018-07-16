@@ -569,11 +569,11 @@ void CollectSetDlg::onRemoteColTest()
 		QStringList retUrls = CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text());
 		foreach(QString strUrl, retUrls)
 		{
-			FTP::CFtp oFtp;
+			CFtp oFtp;
 			// 使用主动，默认为被动
 			if (1 == ui.comboBox_passive->currentIndex())
 			{
-				oFtp.setTransferMode(FTP::Active);
+				oFtp.setTransferMode(Active);
 			}
 			char url[256] = { 0 };
 			//char usrPwd[100] = { 0 };
@@ -649,11 +649,11 @@ void CollectSetDlg::onRemoteColTest()
 		QStringList retUrls = CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text());
 		foreach(QString strUrl, retUrls)
 		{
-			SFTP::SFtp oSFtp;
+			SFtp oSFtp;
 			// 使用主动，默认为被动
 			if (1 == ui.comboBox_passive->currentIndex())
 			{
-				oSFtp.setTransferMode(SFTP::Active);
+				oSFtp.setTransferMode(Active);
 			}
 			char url[256] = { 0 };
 			//char usrPwd[100] = { 0 };

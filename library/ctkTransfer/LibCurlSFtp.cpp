@@ -2,9 +2,8 @@
 #include <QDataStream>
 #include <stdio.h>
 
-using namespace SFTP;
 
-bool compareCFileInfo(const CFileInfo &f1, const CFileInfo &f2)
+static bool compareCFileInfo(const CFileInfo &f1, const CFileInfo &f2)
 {
     return f1.path.length() > f2.path.length();
 }
@@ -201,6 +200,7 @@ QList<CFileInfo> SFtp::listRecursion(const QString &dir)
     // 存储所有的目录
     QList<QString> oDirs;
     oDirs.append(dir);
+	int level = 1;
     while (!oDirs.isEmpty())
     {
         QString strCurDir = oDirs.takeFirst();
@@ -223,6 +223,7 @@ QList<CFileInfo> SFtp::listRecursion(const QString &dir)
 
             }
         }
+		level++;
     }
 
     for (int i = oDirsFinal.size()-1; i >= 0; --i)

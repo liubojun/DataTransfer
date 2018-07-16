@@ -12,37 +12,44 @@
 #include <curl/curl.h>
 #include "../macro.h"
 #include "curlftp.h"
+#include "LibCurlFtp.h"
 
-namespace SFTP
-{
-// FTP传输模式
-    enum TransferMode
-    {
-        Active = 0,
-        Passive = 1
-    };
 
-    enum TransferType
-    {
-        Binary = 0,
-        Ascii = 1
-    };
+	//// FTP传输模式
+ //   enum TransferMode
+ //   {
+ //       Active = 0,
+ //       Passive = 1
+ //   };
 
-    enum FileType
-    {
-        FTP_FILE = 0,
-        FTP_DIR = 1
-    };
+ //   enum TransferType
+ //   {
+ //       Binary = 0,
+ //       Ascii = 1
+ //   };
 
-    class DLL_EXPORT_CLASS_DECL CFileInfo
-    {
-    public:
-        QString name;		// 文件名
-        QString path;		// 全路径
-        FileType type;		// 文件类型
-        QDateTime time;		// 最后修改时间
-        qint64 size;		// 文件大小（单位：字节）
-    };
+ //   enum FileType
+ //   {
+ //       FTP_FILE = 0,
+ //       FTP_DIR = 1
+ //   };
+
+ //   class DLL_EXPORT_CLASS_DECL CFileInfo
+ //   {
+ //   public:
+ //       QString name;		// 文件名
+ //       QString path;		// 全路径
+ //       FileType type;		// 文件类型
+ //       QDateTime time;		// 最后修改时间
+ //       qint64 size;		// 文件大小（单位：字节）
+ //   };
+
+	//bool compareCFileInfo(const CFileInfo &f1, const CFileInfo &f2)
+	//{
+	//	return f1.path.length() > f2.path.length();
+	//	
+	//}
+
 
     class DLL_EXPORT_CLASS_DECL SFtp
     {
@@ -68,10 +75,10 @@ namespace SFTP
         int enableDebugLevel(bool flag = true);
 
         // 从ftp下载文件
-        int get(const QString &file, const QString &dir, TransferType type = Binary);
+		int get(const QString &file, const QString &dir, TransferType type = Binary);
 
         // 从ftp下载文件(支持文件不落地，直接走内存)
-        int get(const QString &file, QIODevice *dev, TransferType type = Binary);
+		int get(const QString &file, QIODevice *dev, TransferType type = Binary);
 
         // 获取ftp文件大小
         double getFileSize(const QString &file);
@@ -80,7 +87,7 @@ namespace SFTP
         QList<CFileInfo> list(const QString &dir = QString());
 
         // 获取文件目录列表（递归遍历子目录）
-        QList<CFileInfo> listRecursion(const QString &dir = QString());
+		QList<CFileInfo> listRecursion(const QString &dir = QString());
 
         // 登陆到ftp服务器(30秒)
         int login(const QString &user = QString(), const QString &password = QString(), int timeout = 30);
@@ -89,10 +96,10 @@ namespace SFTP
         int mkdir(const QString &dir);
 
         // 上传到目标文件
-        int	put(const QString & localFile, const QString & remoteFile, const QString &suffix = QString(".tmp"), TransferType type = Binary);
+		int	put(const QString & localFile, const QString & remoteFile, const QString &suffix = QString(".tmp"), TransferType type = Binary);
 
         // 上传到目标文件
-        int	put(const QByteArray & data, const QString & file, TransferType type = Binary);
+		int	put(const QByteArray & data, const QString & file, TransferType type = Binary);
 
         // 重命名
         int rename(const QString &oldname, const QString &newname);
@@ -104,7 +111,7 @@ namespace SFTP
         int rmdir(const QString &dir);
 
         // 设置ftp传输模式（主被动）
-        int setTransferMode(TransferMode mode);
+		int setTransferMode(TransferMode mode);
 
     private:
         // 根据主机ip及端口组装url
@@ -121,7 +128,7 @@ namespace SFTP
 
 
         // 解析ftp LIST命令返回的字符串
-        void parseMlsdInfo(const QString &rootPath, const QString &info, QList<CFileInfo> &fileList);
+		void parseMlsdInfo(const QString &rootPath, const QString &info, QList<CFileInfo> &fileList);
 
         // 解析4段分隔符的ftp
         void process4Ftp(CListInfo &oneInfo, const QStringList &lstParts);
@@ -149,5 +156,5 @@ namespace SFTP
 
         QList<QString> m_urlBody;
     };
-}
+
 #endif

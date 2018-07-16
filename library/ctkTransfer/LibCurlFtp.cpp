@@ -2,11 +2,11 @@
 #include <QDataStream>
 #include <stdio.h>
 
-using namespace FTP;
 
-bool compareCFileInfo(const CFileInfo &f1, const CFileInfo &f2)
+static bool compareCFileInfo(const CFileInfo &f1, const CFileInfo &f2)
 {
-    return f1.path.length() > f2.path.length();
+	return f1.path.length() > f2.path.length();
+
 }
 
 CFtp::CFtp()
@@ -115,7 +115,7 @@ int CFtp::get(const QString &file, const QString &dir, TransferType type /*= Bin
 }
 
 
-int FTP::CFtp::get(const QString &file, QIODevice *dev, TransferType type /*= Binary*/)
+int CFtp::get(const QString &file, QIODevice *dev, TransferType type /*= Binary*/)
 {
     // 获知当前所在目录
     QString url = makeUrl("");
@@ -231,7 +231,7 @@ QList<CFileInfo> CFtp::listRecursion(const QString &dir)
         oFiles.push_front(fi);
     }
 
-    qSort(oFiles.begin(), oFiles.end(), compareCFileInfo);
+	qSort(oFiles.begin(), oFiles.end(), compareCFileInfo);
 
     return oFiles;
 }
@@ -404,7 +404,7 @@ QString CFtp::makeUrl(const QString &host, quint16 port)
     return makeUrl("");
 }
 
-QString FTP::CFtp::makeUrl(const QString &dir)
+QString CFtp::makeUrl(const QString &dir)
 {
     QStringList dirbodies = dir.split("/");
     if (dir.startsWith("/"))
@@ -445,7 +445,7 @@ QString FTP::CFtp::makeUrl(const QString &dir)
     return url;
 }
 
-QString FTP::CFtp::getCurrentUrl()
+QString CFtp::getCurrentUrl()
 {
     QString url("/");
     for (int i = 1; i < m_urlBody.size(); ++i)

@@ -321,10 +321,10 @@ void UserManageDlg::onRemoteColTest()
     }
     else
     {
-        FTP::CFtp oFtp;
+        CFtp oFtp;
 
         // 使用主动，默认为被动
-        oFtp.setTransferMode(1 == ui.cbx_ftpTransferMode->currentIndex() ? FTP::Active : FTP::Passive);
+        oFtp.setTransferMode(1 == ui.cbx_ftpTransferMode->currentIndex() ? Active : Passive);
         oFtp.connectToHost(ui.lineEdit_ip->text(), ui.lineEdit_port->text().toInt());
         int ret = oFtp.login(ui.lineEdit_user->text(), ui.lineEdit_pwd->text(), 5);
 

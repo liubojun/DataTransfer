@@ -16,7 +16,6 @@ CFtpClear::~CFtpClear()
 void CFtpClear::run()
 {
     //m_oLogSender.sendClearMsg(m_oData.m_taskName, "", QString::fromLocal8Bit("开始目录[%1]清理").arg(CPathBuilder::getFtpUrl(m_oData.ip, m_oData.port, m_oData.m_fullPath)), 1);
-    using namespace FTP;
     CFtp oFtp;
     do
     {
@@ -61,7 +60,7 @@ void CFtpClear::run()
             //}
             const CFileInfo &fi = oFileList.at(i);
             //qDebug() << fi.time << "--" << QDateTime::currentDateTime().addMSecs(-qint64(m_oData.m_time) * 1000);
-            if (fi.type == FTP::FTP_FILE && fi.time < QDateTime::currentDateTime().addMSecs(-qint64(m_oData.m_time) * 1000))
+            if (fi.type == FTP_FILE && fi.time < QDateTime::currentDateTime().addMSecs(-qint64(m_oData.m_time) * 1000))
             {
                 if (0 != pFtp->remove(fi.path))
                 {
@@ -73,7 +72,7 @@ void CFtpClear::run()
 					QSLOG_DEBUG(QString::fromLocal8Bit("删除远程文件[%1]成功").arg(fi.name));
                 }
             }
-            if (fi.type == FTP::FTP_DIR && fi.time < QDateTime::currentDateTime().addMSecs(-qint64(m_oData.m_time) * 1000))
+            if (fi.type == FTP_DIR && fi.time < QDateTime::currentDateTime().addMSecs(-qint64(m_oData.m_time) * 1000))
             {
                 if (0 != pFtp->rmdir(fi.path))
                 {

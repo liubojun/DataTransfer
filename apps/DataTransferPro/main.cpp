@@ -18,8 +18,8 @@
 #include "ftpCollector.h"
 #include "sftpCollector.h"
 #include "subdirfilter.h"
-#include "LibCurlFtp.h"
-#include "LibCurlSFtp.h"
+//#include "LibCurlFtp.h"
+//#include "LibCurlSFtp.h"
 #include <QDebug>
 #include <QByteArray>
 

@@ -16,9 +16,10 @@
 #define sftpCollector_H_
 
 #include "CollectorBase.h"
+#include "LibCurlSFtp.h"
 
 
-class CurlFtp;
+
 class CDirRecord;
 
 class DLL_EXPORT_CLASS_DECL SFtpCollector : public CollectorBase
@@ -53,19 +54,17 @@ public:
     virtual void taskDone(bool bFlag, const FileInfo &file);
 
     // 相同返回true，不同返回false
-    bool compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransTask &tTask);
+	bool compareWithDest(SFtp &oCurlFtp, const CFileInfo &fi, TransTask &tTask);
 
     void setProcess(QProcess *in_pro);
 
 private slots:
-	void ftpDone(CDirRecord &io_record);
+void ftpDone(const QList<CFileInfo> &files, CDirRecord &io_record);
 
     void readOutput();
 
 private:
     QSharedPointer<QObject> m_pTimerObj;
-
-    FileInfoList m_fileList;
 
     bool m_bChildProcessRunning;	// 子进程运行标识
 

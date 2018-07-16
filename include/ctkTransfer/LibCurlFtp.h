@@ -13,8 +13,7 @@
 #include "../macro.h"
 #include "curlftp.h"
 
-namespace FTP
-{
+
 // FTP´«ÊäÄ£Ê½
     enum TransferMode
     {
@@ -149,5 +148,5 @@ namespace FTP
 
         QList<QString> m_urlBody;
     };
-}
+
 #endif
