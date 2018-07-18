@@ -5,6 +5,7 @@
 #include "ctkPublicFun.h"
 #include "ctkLog.h"
 #include "pathbuilder.h"
+#include "LibCurlFtp.h"
 #pragma warning(disable:4996)
 
 const QString g_suffix[4] = { "", ".jm1", ".jm2", ".jm3" };
@@ -184,9 +185,9 @@ DistributeFile::~DistributeFile()
 //    return bRes;
 //}
 
-bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSource, QSharedPointer<FtpBase> &pFtpDest, CurlFtp &oCurlFtp)
+bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSource, QSharedPointer<FtpBase> &pFtpDest)
 {
-    m_pCurlFtp = &oCurlFtp;
+    //m_pCurlFtp = &oCurlFtp;
     QDir qdir(m_downloadPath);
     if (!qdir.exists())
     {
@@ -223,53 +224,41 @@ bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSour
         qint64 size = f.size();
         QSLOG_DEBUG(QString("%1").arg(f.size()));
 
-        //if (0 != m_pFtp->downloadFile(url, NULL, &fileData))
         if (!f.copy(QString::fromLocal8Bit(fileData.filename)))
         {
             QString logInfo = QStringLiteral("从源目录下载[%1]失败。").arg(task.srcFileFullPath);
-            //m_pBase->emitLog(task.collectSet.dirName, logInfo);
-            //m_pBase->emitLog(logInfo, BAD);
             emit emitLog(logInfo, BAD);
             return false;
         }
     }
-    else if (1 == task.collectSet.collectType)	// ftp收集
-    {
-        string strIP = task.collectSet.ip.toStdString();
-        QString ftpUrl = QString("ftp://%1:%2%3").arg(strIP.c_str()).arg(task.collectSet.port).arg(task.srcFileFullPath);
-        strBroadMsgFile = ftpUrl;
-        //sprintf(ftpUrl, "ftp://%s:%d%s", strIP.c_str(), task.collectSet.port, task.srcFileFullPath.toLocal8Bit().data());
-        QString usrPwd = QString("%1:%2").arg(task.collectSet.loginUser).arg(task.collectSet.loginPass);
-        //sprintf(usrPwd, "%s:%s", task.collectSet.loginUser.toLocal8Bit().data(), task.collectSet.loginPass.toLocal8Bit().data());
-        m_pCurlFtp->setFtpConnectMode(task.collectSet.ftp_connectMode);
-        m_pCurlFtp->setFtpTransferMode(task.collectSet.ftp_transferMode);
-        if (0 != m_pCurlFtp->downloadFile(ftpUrl.toLocal8Bit().toStdString().c_str(), usrPwd.toLocal8Bit().toStdString().c_str(), &fileData))
-        {
-            QString logInfo = QStringLiteral("从FTP下载文件[%1]失败。").arg(task.fileName);
+	else
+	{
+		if (1 == task.collectSet.collectType)	// ftp收集
+		{
+			if (pFtpSource.isNull())
+			{
+				pFtpSource = QSharedPointer<FtpBase>(new CFtp());
+			}
+			
+		}
+		else // sftp 收集
+		{
+			if (pFtpSource.isNull())
+			{
+				pFtpSource = QSharedPointer<FtpBase>(new SFtp());
+			}
+		}
+		pFtpSource->setTransferMode(task.collectSet.ftp_connectMode == 0 ? Passive : Active);
+		pFtpSource->connectToHost(task.collectSet.ip, task.collectSet.port, task.collectSet.loginUser, task.collectSet.loginPass);
 
-            emit emitLog(logInfo, BAD);
-            return false;
-        }
-    }
-    else if (2 == task.collectSet.collectType)	// sftp收集
-    {
-        if (pFtpSource.isNull())
-        {
-            pFtpSource = QSharedPointer<FtpBase>(new SFtp());
-        }
-        pFtpSource->setTransferMode(task.collectSet.ftp_connectMode == 0 ? Passive : Active);
-        pFtpSource->connectToHost(task.collectSet.ip, task.collectSet.port, task.collectSet.loginUser, task.collectSet.loginPass);
-
-        if (CURLE_OK != pFtpSource->get(task.srcFileFullPath, tmpFilePath, task.collectSet.ftp_transferMode == 0 ? Binary : Ascii))
-        {
-            QString logInfo = QStringLiteral("从FTP下载文件[%1]失败。").arg(task.fileName);
-            emit emitLog(logInfo, BAD);
-            return false;
-        }
-
-    }
-
-
+		if (CURLE_OK != pFtpSource->get(task.srcFileFullPath, tmpFilePath, task.collectSet.ftp_transferMode == 0 ? Binary : Ascii))
+		{
+			QString logInfo = QStringLiteral("从FTP下载文件[%1]失败。").arg(task.fileName);
+			emit emitLog(logInfo, BAD);
+			return false;
+		}
+	}
+   
     bool bRes = false;
     const UserInfo &user = task.userInfo;
 
@@ -279,35 +268,65 @@ bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSour
     QString strDstFile;
     if (0 == user.sendType)		//目录分发
     {
-        bRes = sendToDir(fileData.filename, task);
-        strDstFile = task.dstFilePath + task.strDestFileName;
-    }
-    else if (1 == user.sendType)	//ftp分发
-    {
-        bRes = sendToFtp(fileData.filename, task);
-        strDstFile = QString("ftp://%1:%2%3%4").
-                     arg(task.userInfo.ip.toStdString().c_str()).
-                     arg(task.userInfo.port).
-                     arg(task.dstFilePath.toLocal8Bit().toStdString().c_str()).
-                     arg(task.strDestFileName);
-    }
-    else
-    {
-        if (pFtpDest.isNull())
-        {
-            pFtpDest = QSharedPointer<FtpBase>(new SFtp());
-        }
-        pFtpDest->setTransferMode(task.userInfo.ftpTransferMode == 0 ? Passive : Active);
-        pFtpDest->connectToHost(task.userInfo.ip, task.userInfo.port, task.userInfo.lgUser, task.userInfo.lgPass);
+        //bRes = sendToDir(fileData.filename, task);
+        //strDstFile = task.dstFilePath + task.strDestFileName;
 
-        if (CURLE_OK != pFtpDest->put(tmpFilePath, task.dstFilePath + task.strDestFileName, task.userInfo.sendSuffix, task.userInfo.ftpTransferType == 0 ? Binary : Ascii))
-        {
-            QString logInfo = QStringLiteral("文件[%1]上传到ftp失败。").arg(task.fileName);
-            emit emitLog(logInfo, BAD);
-            return false;
-        }
+		QString strDestFileFullPath(task.dstFilePath + task.strDestFileName);
+		QDir oDir(task.dstFilePath);
+		if (!oDir.exists())
+		{
+			if (!oDir.mkpath(task.dstFilePath))
+			{
+				QString logInfo = QStringLiteral("创建分发目录%1失败。").arg(task.dstFilePath);
+				emit emitLog(logInfo, BAD);
+				return false;
+			}
+		}
+		QFile sourcefile(tmpFilePath);
+		if (!sourcefile.copy(strDestFileFullPath + task.userInfo.sendSuffix))
+		{
+			QString logInfo = QStringLiteral("文件[%1]上传到%2失败。").arg(task.fileName).arg(task.dstFilePath);
+			emit emitLog(logInfo, BAD);
+			return false;
+		}
+		if (!task.userInfo.sendSuffix.trimmed().isEmpty())
+		{
+			QFile destFile(strDestFileFullPath + task.userInfo.sendSuffix);
+			if (!destFile.rename(strDestFileFullPath))
+			{
+				QString logInfo = QStringLiteral("文件[%1]重命名失败。").arg(task.fileName);
+				emit emitLog(logInfo, BAD);
+				return false;
+			}
+		}
     }
+	else
+	{
+		if (1 == user.sendType) // ftp
+		{
+			if (pFtpDest.isNull())
+			{
+				pFtpDest = QSharedPointer<FtpBase>(new CFtp());
+			}
+		}
+		else
+		{
+			if (pFtpDest.isNull()) // sftp
+			{
+				pFtpDest = QSharedPointer<FtpBase>(new SFtp());
+			}
+		}
 
+		pFtpDest->setTransferMode(task.userInfo.ftpTransferMode == 0 ? Passive : Active);
+		pFtpDest->connectToHost(task.userInfo.ip, task.userInfo.port, task.userInfo.lgUser, task.userInfo.lgPass);
+
+		if (CURLE_OK != pFtpDest->put(tmpFilePath, task.dstFilePath + task.strDestFileName, task.userInfo.sendSuffix, task.userInfo.ftpTransferType == 0 ? Binary : Ascii))
+		{
+			QString logInfo = QStringLiteral("文件[%1]上传到ftp失败。").arg(task.fileName);
+			emit emitLog(logInfo, BAD);
+			return false;
+		}
+	}
 
     QString strInfo = QStringLiteral("文件[%1]发送完成。").arg(task.fileName);
     emit emitLog(strInfo, GOOD);
@@ -394,105 +413,92 @@ QString DistributeFile::getHostFromFileName(const QString& r_strFullPathFileName
     return ret;
 }
 
-//bool DistributeFile::sendToDir(const char *fullPath, TransTask &taskInfo, int userIndex)
-bool DistributeFile::sendToDir(const char *fullPath, TransTask &taskInfo)
-{
 
-    if (fullPath == NULL)
-    {
-        return false;
-    }
-    //QSLOG_INFO(QString::fromLocal8Bit("send to dir : %1").arg(QString::fromLocal8Bit(fullPath)));
-
-    QString strSendPath = taskInfo.dstFilePath;//.at(userIndex);
-    QDir qDir;
-    if (!qDir.exists(strSendPath))
-    {
-        qDir.mkpath(strSendPath);
-    }
-    if (strSendPath.length() >= 1 && strSendPath.right(1) != "/")
-    {
-        strSendPath += "/";
-    }
-
-    // 目标文件路径
-    // QString strFullPath = strSendPath + taskInfo.fileName;
-    QString strFullPath = strSendPath + taskInfo.strDestFileName;
-    // 目标临时文件路径
-    QString strTmpName = strFullPath + taskInfo.userInfo.sendSuffix;//taskInfo.userInfo.at(userIndex).sendSuffix;
-
-    //////////////////////////////////////////////////////////////////////////
-    //string strUsr = userInfo.m_strSendUserName.toLocal8Bit().data();
-    //string strPwd = userInfo.m_strSendPasswd.toStdString();
-    if (strSendPath.length() >= 1 && strSendPath.left(1) != "/")
-    {
-        strSendPath = "/" + strSendPath;
-    }
-    //string strPath = strSendPath.toLocal8Bit().data();
-    //char url[512] = {0};
-    //char usrPwd[100] = {0};
-    //sprintf(url, "file://%s", strPath.c_str());
-    QString url = QString::fromLocal8Bit("file://%1").arg(strSendPath);
-    //sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
-
-    int bRet = -1;
-    // if (taskInfo.userInfo.at(userIndex).conput)	// 断点续传
-    if (taskInfo.userInfo.conput)
-    {
-        bRet = m_pCurlFtp->conputFileToDir(url.toLocal8Bit().toStdString().c_str(), NULL,
-                                           taskInfo.strDestFileName.toLocal8Bit().data(), fullPath,
-                                           // taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
-                                           taskInfo.userInfo.sendSuffix.toAscii().data());
-    }
-    else
-    {
-        bRet = m_pCurlFtp->uploadFileToDir(url.toLocal8Bit().toStdString().c_str(), NULL,
-                                           taskInfo.strDestFileName.toLocal8Bit().data(), fullPath,
-                                           // taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
-                                           taskInfo.userInfo.sendSuffix.toAscii().data());
-    }
-    if (bRet != 0)
-    {
-        QSLOG_ERROR(QStringLiteral("上传到目录失败。"));
-        //m_pManager->dealError(m_fileInfo, QStringLiteral("上传到目录失败。"));
-        return false;
-    }
-
-    bool res = false;
-    // 删除原来文件
-    //QSLOG_INFO("begin remove");
-    if (QFile::exists(strFullPath))
-    {
-        res = QFile::remove(strFullPath);
-    }
-    //QSLOG_INFO("remove success");
-    //QSLOG_INFO("begin open");
-    // 重命名
-    QFile w_file(strTmpName);
-    if (!w_file.open(QIODevice::ReadOnly))
-    {
-        QSLOG_ERROR("Fail to open device.");
-        return false;
-    }
-    //QSLOG_INFO("begin rename");
-    res = w_file.rename(strFullPath);
-    if (!res)
-    {
-        QSLOG_ERROR("rename fail");
-        return false;
-    }
-    //QSLOG_INFO("rename success");
-
-    // 发送key和iv
-    //if (taskInfo.userInfo.at(userIndex).compress || taskInfo.userInfo.at(userIndex).encrypt)
-    //{
-    //    strFullPath += ".key";
-    //    writeKeyIv(strFullPath, keyiv);
-    //}
-
-    //QSLOG_INFO("bool DistributeFile::sendToDir finish");
-    return true;
-}
+//bool DistributeFile::sendToDir(const char *fullPath, TransTask &taskInfo)
+//{
+//
+//    if (fullPath == NULL)
+//    {
+//        return false;
+//    }
+//
+//    QString strSendPath = taskInfo.dstFilePath;//.at(userIndex);
+//    QDir qDir;
+//    if (!qDir.exists(strSendPath))
+//    {
+//        qDir.mkpath(strSendPath);
+//    }
+//    if (strSendPath.length() >= 1 && strSendPath.right(1) != "/")
+//    {
+//        strSendPath += "/";
+//    }
+//
+//    // 目标文件路径
+//    QString strFullPath = strSendPath + taskInfo.strDestFileName;
+//    // 目标临时文件路径
+//    QString strTmpName = strFullPath + taskInfo.userInfo.sendSuffix;//taskInfo.userInfo.at(userIndex).sendSuffix;
+//
+//    if (strSendPath.length() >= 1 && strSendPath.left(1) != "/")
+//    {
+//        strSendPath = "/" + strSendPath;
+//    }
+//
+//    QString url = QString::fromLocal8Bit("file://%1").arg(strSendPath);
+//
+//    int bRet = -1;
+//
+//    if (taskInfo.userInfo.conput)
+//    {
+//        bRet = m_pCurlFtp->conputFileToDir(url.toLocal8Bit().toStdString().c_str(), NULL,
+//                                           taskInfo.strDestFileName.toLocal8Bit().data(), fullPath,
+//                                           // taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
+//                                           taskInfo.userInfo.sendSuffix.toAscii().data());
+//    }
+//    else
+//    {
+//        bRet = m_pCurlFtp->uploadFileToDir(url.toLocal8Bit().toStdString().c_str(), NULL,
+//                                           taskInfo.strDestFileName.toLocal8Bit().data(), fullPath,
+//                                           // taskInfo.userInfo.at(userIndex).sendSuffix.toAscii().data());
+//                                           taskInfo.userInfo.sendSuffix.toAscii().data());
+//    }
+//    if (bRet != 0)
+//    {
+//        QSLOG_ERROR(QStringLiteral("上传到目录失败。"));
+//        //m_pManager->dealError(m_fileInfo, QStringLiteral("上传到目录失败。"));
+//        return false;
+//    }
+//
+//    bool res = false;
+//    // 删除原来文件
+//    if (QFile::exists(strFullPath))
+//    {
+//        res = QFile::remove(strFullPath);
+//    }
+//    // 重命名
+//    QFile w_file(strTmpName);
+//    if (!w_file.open(QIODevice::ReadOnly))
+//    {
+//        QSLOG_ERROR("Fail to open device.");
+//        return false;
+//    }
+//
+//    res = w_file.rename(strFullPath);
+//    if (!res)
+//    {
+//        QSLOG_ERROR("rename fail");
+//        return false;
+//    }
+//
+//    // 发送key和iv
+//    //if (taskInfo.userInfo.at(userIndex).compress || taskInfo.userInfo.at(userIndex).encrypt)
+//    //{
+//    //    strFullPath += ".key";
+//    //    writeKeyIv(strFullPath, keyiv);
+//    //}
+//
+//    //QSLOG_INFO("bool DistributeFile::sendToDir finish");
+//    return true;
+//}
 
 
 //bool DistributeFile::writeKeyIv(const QString &fileName, KeyIv &keyiv)
@@ -521,81 +527,81 @@ bool DistributeFile::sendToDir(const char *fullPath, TransTask &taskInfo)
 //    return wFile.rename(fileName);
 //}
 
-// bool DistributeFile::sendToFtp(const char *fullPath, TransTask &task, int userIndex)
-bool DistributeFile::sendToFtp(const char *fullPath, TransTask &task)
-{
-    //string strIp =  task.userInfo.at(userIndex).ip.toStdString();
-    //int nPort = task.userInfo.at(userIndex).port;
-    //string strUsr = task.userInfo.at(userIndex).lgUser.toLocal8Bit().toStdString();
-    //string strPwd = task.userInfo.at(userIndex).lgPass.toLocal8Bit().toStdString();
-    //// 相对路径
-    //string strPath = task.dstFilePath.at(userIndex).toLocal8Bit().toStdString();
-    string strIp = task.userInfo.ip.toStdString();
-    int nPort = task.userInfo.port;
-    string strUsr = task.userInfo.lgUser.toLocal8Bit().toStdString();
-    string strPwd = task.userInfo.lgPass.toLocal8Bit().toStdString();
-    // 相对路径
-    string strPath = task.dstFilePath.toLocal8Bit().toStdString();
-    //char ftpUrl[512] = {0};
-    //char usrPwd[100] = {0};
-    QString ftpUrl = QString("ftp://%1:%2%3").arg(strIp.c_str()).arg(nPort).arg(strPath.c_str());
-    //sprintf(ftpUrl, "ftp://%s:%d%s", strIp.c_str(), nPort, strPath.c_str());
-    QString usrPwd = QString("%1:%2").arg(strUsr.c_str()).arg(strPwd.c_str());
-    //sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
-
-    int bRet = -1;
-    // if (task.userInfo.at(userIndex).conput)	// 断点续传
-    if (task.userInfo.conput)	// 断点续传
-    {
-        bRet = m_pCurlFtp->conputFileToFtp(ftpUrl.toLocal8Bit().toStdString().c_str(),
-                                           usrPwd.toLocal8Bit().toStdString().c_str()
-                                           , task.strDestFileName.toLocal8Bit().toStdString().c_str(),
-                                           // fullPath, task.userInfo.at(userIndex).sendSuffix.toStdString().c_str());
-                                           fullPath, task.userInfo.sendSuffix.toStdString().c_str());
-    }
-    else
-    {
-        bRet = m_pCurlFtp->uploadFileToFtp(ftpUrl.toLocal8Bit().toStdString().c_str(),
-                                           usrPwd.toLocal8Bit().toStdString().c_str(),
-                                           task.strDestFileName.toLocal8Bit().toStdString().c_str(),
-                                           // fullPath, task.userInfo.at(userIndex).sendSuffix.toStdString().c_str());
-                                           fullPath, task.userInfo.sendSuffix.toStdString().c_str(), task.userInfo.ftpTransferMode);
-    }
-    if (bRet != 0)
-    {
-        QString logInfo = QStringLiteral("文件[%1]上传到ftp失败。").arg(task.fileName);
-        //m_pBase->emitLog(task.collectSet.dirName, logInfo);
-        //m_pBase->emitLog(logInfo, BAD);
-        emit emitLog(logInfo, BAD);
-        return false;
-    }
-
-    // 发送key和iv
-    //if (task.userInfo.at(userIndex).compress || task.userInfo.at(userIndex).encrypt)
-    //{
-    //    string strKeyIv = task.fileName.toStdString() + ".key";
-    //    QByteArray baKey;
-    //    QDataStream out(&baKey, QIODevice::WriteOnly);
-    //    out << keyiv.bComp;
-    //    out << keyiv.bCrypt;
-    //    out << keyiv.key;
-    //    out << keyiv.iv;
-
-    //    // 从内存上传到FTP
-    //    MemoryData mkey;
-    //    mkey.size = baKey.size();
-    //    mkey.memdata = (char *)malloc(mkey.size + 1);
-    //    memcpy(mkey.memdata, baKey.data(), mkey.size);
-    //    mkey.memdata[mkey.size] = 0;
-    //    if (m_pFtp->uploadFile(ftpUrl, usrPwd, &mkey, strKeyIv, task.userInfo.at(userIndex).sendSuffix.toAscii().data()) != 0)
-    //    {
-    //        QSLOG_ERROR(QString("Fail to upload %1.").arg(QString::fromStdString(strKeyIv)));
-    //        //return false;
-    //    }
-    //}
-
-    return true;
-}
+//
+//bool DistributeFile::sendToFtp(const char *fullPath, TransTask &task)
+//{
+//    //string strIp =  task.userInfo.at(userIndex).ip.toStdString();
+//    //int nPort = task.userInfo.at(userIndex).port;
+//    //string strUsr = task.userInfo.at(userIndex).lgUser.toLocal8Bit().toStdString();
+//    //string strPwd = task.userInfo.at(userIndex).lgPass.toLocal8Bit().toStdString();
+//    //// 相对路径
+//    //string strPath = task.dstFilePath.at(userIndex).toLocal8Bit().toStdString();
+//    string strIp = task.userInfo.ip.toStdString();
+//    int nPort = task.userInfo.port;
+//    string strUsr = task.userInfo.lgUser.toLocal8Bit().toStdString();
+//    string strPwd = task.userInfo.lgPass.toLocal8Bit().toStdString();
+//    // 相对路径
+//    string strPath = task.dstFilePath.toLocal8Bit().toStdString();
+//    //char ftpUrl[512] = {0};
+//    //char usrPwd[100] = {0};
+//    QString ftpUrl = QString("ftp://%1:%2%3").arg(strIp.c_str()).arg(nPort).arg(strPath.c_str());
+//    //sprintf(ftpUrl, "ftp://%s:%d%s", strIp.c_str(), nPort, strPath.c_str());
+//    QString usrPwd = QString("%1:%2").arg(strUsr.c_str()).arg(strPwd.c_str());
+//    //sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
+//
+//    int bRet = -1;
+//    // if (task.userInfo.at(userIndex).conput)	// 断点续传
+//    if (task.userInfo.conput)	// 断点续传
+//    {
+//        bRet = m_pCurlFtp->conputFileToFtp(ftpUrl.toLocal8Bit().toStdString().c_str(),
+//                                           usrPwd.toLocal8Bit().toStdString().c_str()
+//                                           , task.strDestFileName.toLocal8Bit().toStdString().c_str(),
+//                                           // fullPath, task.userInfo.at(userIndex).sendSuffix.toStdString().c_str());
+//                                           fullPath, task.userInfo.sendSuffix.toStdString().c_str());
+//    }
+//    else
+//    {
+//        bRet = m_pCurlFtp->uploadFileToFtp(ftpUrl.toLocal8Bit().toStdString().c_str(),
+//                                           usrPwd.toLocal8Bit().toStdString().c_str(),
+//                                           task.strDestFileName.toLocal8Bit().toStdString().c_str(),
+//                                           // fullPath, task.userInfo.at(userIndex).sendSuffix.toStdString().c_str());
+//                                           fullPath, task.userInfo.sendSuffix.toStdString().c_str(), task.userInfo.ftpTransferMode);
+//    }
+//    if (bRet != 0)
+//    {
+//        QString logInfo = QStringLiteral("文件[%1]上传到ftp失败。").arg(task.fileName);
+//        //m_pBase->emitLog(task.collectSet.dirName, logInfo);
+//        //m_pBase->emitLog(logInfo, BAD);
+//        emit emitLog(logInfo, BAD);
+//        return false;
+//    }
+//
+//    // 发送key和iv
+//    //if (task.userInfo.at(userIndex).compress || task.userInfo.at(userIndex).encrypt)
+//    //{
+//    //    string strKeyIv = task.fileName.toStdString() + ".key";
+//    //    QByteArray baKey;
+//    //    QDataStream out(&baKey, QIODevice::WriteOnly);
+//    //    out << keyiv.bComp;
+//    //    out << keyiv.bCrypt;
+//    //    out << keyiv.key;
+//    //    out << keyiv.iv;
+//
+//    //    // 从内存上传到FTP
+//    //    MemoryData mkey;
+//    //    mkey.size = baKey.size();
+//    //    mkey.memdata = (char *)malloc(mkey.size + 1);
+//    //    memcpy(mkey.memdata, baKey.data(), mkey.size);
+//    //    mkey.memdata[mkey.size] = 0;
+//    //    if (m_pFtp->uploadFile(ftpUrl, usrPwd, &mkey, strKeyIv, task.userInfo.at(userIndex).sendSuffix.toAscii().data()) != 0)
+//    //    {
+//    //        QSLOG_ERROR(QString("Fail to upload %1.").arg(QString::fromStdString(strKeyIv)));
+//    //        //return false;
+//    //    }
+//    //}
+//
+//    return true;
+//}
 
 int DistributeFile::getCurlAddr()
 {

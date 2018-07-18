@@ -18,6 +18,7 @@
 #include "CollectorBase.h"
 #include "commontypedef.h"
 #include "curlftp.h"
+#include "LibCurlFtpBase.h"
 #ifdef WITH_QT5
 #include <QtConcurrent/QtConcurrent>
 #else
@@ -85,7 +86,7 @@ public:
     void getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, CDirRecord &oRecord);
 
     // 相同返回true，不同返回false
-    bool compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi, TransTask &tTask);
+	bool compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const QFileInfo &fi, TransTask &tTask);
 
     /**
      * @brief  数据传输检索新文件

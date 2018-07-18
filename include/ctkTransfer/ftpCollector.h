@@ -16,6 +16,7 @@
 #define ftpCollector_H_
 
 #include "CollectorBase.h"
+#include "LibCurlFtpBase.h"
 
 
 class CurlFtp;
@@ -53,7 +54,7 @@ public:
     virtual void taskDone(bool bFlag, const FileInfo &file);
 
     // 相同返回true，不同返回false
-    bool compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransTask &tTask);
+	bool compareWithDest(QSharedPointer<FtpBase> &pFtpTemp, const FileInfo &fi, TransTask &tTask);
 
     void setProcess(QProcess *in_pro);
 

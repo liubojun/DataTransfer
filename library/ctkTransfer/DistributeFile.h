@@ -28,7 +28,7 @@ public:
      * @param  TransTask &task：文件信息
      * @return bool：成功返回true
      */
-    bool transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSource, QSharedPointer<FtpBase> &pFtpDest, CurlFtp &oCurlFtp);
+    bool transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSource, QSharedPointer<FtpBase> &pFtpDest);
 
     int getCurlAddr();
     TransTask m_fileInfo;
@@ -46,8 +46,8 @@ protected:
      * @param  SendAcctInfo & userInfo：分发用户信息
      * @return bool：成功返回true
      */
-    bool sendToDir(const char *fullPath, TransTask &task);
-    bool sendToFtp(const char *fullPath, TransTask &userInfo);
+    //bool sendToDir(const char *fullPath, TransTask &task);
+    //bool sendToFtp(const char *fullPath, TransTask &userInfo);
     //bool sendToDir(const char *fullPath, TransTask &task, int userIndex);
     //bool sendToFtp(const char *fullPath, TransTask &userInfo, int userIndex);
 
@@ -68,7 +68,7 @@ protected:
     void taskFinish();
 
 private:
-    CurlFtp *m_pCurlFtp;
+    //CurlFtp *m_pCurlFtp;
     // QSharedPointer<CurlFtp>	m_pFtp;
     CollectorBase	*m_pBase;
     //IFileCrypt	*m_pFileCrypt;

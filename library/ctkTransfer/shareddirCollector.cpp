@@ -16,6 +16,8 @@
 #include "publicthread.h"
 #include "DistributeFile.h"
 #include "change_name.h"
+#include "LibCurlFtp.h"
+#include "LibCurlSFtp.h"
 
 
 bool _olderThen(const FileInfo &f1, const FileInfo &f2)
@@ -683,10 +685,10 @@ void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, 
 
     QDateTime qdtCollect = QDateTime::currentDateTime().addSecs(-m_collectSet.col_timerange*60);
 
-    CurlFtp m_ftp;
+    // CurlFtp m_ftp;
     QSharedPointer<FtpBase> pFtpSource;
     QSharedPointer<FtpBase> pFtpDest;
-
+	QSharedPointer<FtpBase> pFtpTemp;
     for (int i=0; i<qfileList.size(); ++i)
     {
         if (!m_bRun)
@@ -755,13 +757,13 @@ void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, 
                 if (filterFileName(qf.fileName()))
                 {
                     TransTask tTask;
-                    if (!compareWithDest(m_ftp, qf, tTask) && m_bRun)
+					if (!compareWithDest(pFtpTemp, qf, tTask) && m_bRun)
                     {
                         tTask.collectSet = m_collectSet;
                         //tTask.userInfo = m_userInfo.user;
                         // 发送文件
                         DistributeFile sendFile(this);
-                        if (!sendFile.transfer(tTask, pFtpSource, pFtpDest, m_ftp) && m_collectSet.recordLatestTime)
+                        if (!sendFile.transfer(tTask, pFtpSource, pFtpDest) && m_collectSet.recordLatestTime)
                         {
                             oRecord.updateSendFailure(qf.absolutePath(), qf.fileName());
                         }
@@ -782,7 +784,7 @@ void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, 
     }
 }
 
-bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi, TransTask &tTask)
+bool SharedDirCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const QFileInfo &fi, TransTask &tTask)
 {
     // libcurl不能传输大小为0的文件
     if (fi.size() <= 0)
@@ -875,53 +877,84 @@ bool SharedDirCollector::compareWithDest(CurlFtp &oCurlFtp, const QFileInfo &fi,
         // 分发到FTP
         else
         {
-            //QSLOG_DEBUG("SEND TO FTP");
-            //char ftpUrl[200] = {0};
-            //char ftpPath[512] = { 0 };
-            //char usrPwd[100] = {0};
-            string strIp = cUser.user.ip.toStdString();
-            int nPort = cUser.user.port;
-            //string strPath = dstFileFullPath.toLocal8Bit().data();
-            string strName = tTask.strDestFileName.toLocal8Bit().data();
-            string strUsr = cUser.user.lgUser.toLocal8Bit().data();
-            string strPwd = cUser.user.lgPass.toLocal8Bit().data();
-            QString ftpUrl = QString("ftp://%1:%2%3").arg(strIp.c_str()).arg(nPort).arg(dstFileFullPath);
-            //sprintf(ftpUrl, "ftp://%s:%d%s", strIp.c_str(), nPort, strPath.c_str());
-            QString usrPwd = QString("%1:%2").arg(strUsr.c_str()).arg(strPwd.c_str());
-            //sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
+			if (cUser.user.sendType == 1)
+			{
+				if (pCurlFtp.isNull())
+				{
+					pCurlFtp = QSharedPointer<FtpBase>(new CFtp());
+				}
+			}
+			else
+			{
+				if (pCurlFtp.isNull())
+				{
+					pCurlFtp = QSharedPointer<FtpBase>(new SFtp());
+				}
+			}
 
-            int iIndex = dstFileFullPath.lastIndexOf("/");
-            string strDestPath;
-            if (dstFileFullPath.length() > iIndex)
-            {
-                strDestPath = dstFileFullPath.mid(0, iIndex + 1).toLocal8Bit().toStdString();
-            }
-            else
-            {
-                QSLOG_ERROR("dstFileFullPath.length() is incorrect.");
-            }
-            //string strDestPath = dstFileFullPath.mid(0, iIndex + 1).toLocal8Bit().toStdString();
-            QString ftpPath = QString("ftp://%1:%2%3").arg(strIp.c_str()).arg(nPort).arg(strDestPath.c_str());
-            //sprintf(ftpPath, "ftp://%s:%d%s", strIp.c_str(), nPort, strDestPath.c_str());
-            // CurlFtp m_ftp;
-            double dSize = 0;
-            if (oCurlFtp.getFileSize(ftpUrl.toLocal8Bit().toStdString().c_str(),
-                                     usrPwd.toLocal8Bit().toStdString().c_str(), strName, dSize))
-            {
-                if (fi.size() != (long long)dSize)
-                {
-                    if (-1 == oCurlFtp.deleteFtpFile(ftpPath.toLocal8Bit().toStdString().c_str(),
-                                                     usrPwd.toLocal8Bit().toStdString().c_str(), strName))
-                    {
-                        continue;
-                    }
-                }
-                else
-                {
-                    continue;
-                }
-                //
-            }
+			pCurlFtp->connectToHost(cUser.user.ip, cUser.user.port, cUser.user.lgUser, cUser.user.lgPass);
+			pCurlFtp->setTransferMode(cUser.user.ftpTransferMode == 0 ? Passive : Active);
+
+			long long dSize = (long long)pCurlFtp->getFileSize(dstFileFullPath);
+			if (-1 != dSize)
+			{
+				if (fi.size() != dSize)
+				{
+					if (-1 == pCurlFtp->remove(dstFileFullPath))
+					{
+						continue;
+					}
+				}
+				else
+				{
+					continue;
+				}
+
+			}
+
+            //string strIp = cUser.user.ip.toStdString();
+            //int nPort = cUser.user.port;
+            ////string strPath = dstFileFullPath.toLocal8Bit().data();
+            //string strName = tTask.strDestFileName.toLocal8Bit().data();
+            //string strUsr = cUser.user.lgUser.toLocal8Bit().data();
+            //string strPwd = cUser.user.lgPass.toLocal8Bit().data();
+            //QString ftpUrl = QString("ftp://%1:%2%3").arg(strIp.c_str()).arg(nPort).arg(dstFileFullPath);
+            ////sprintf(ftpUrl, "ftp://%s:%d%s", strIp.c_str(), nPort, strPath.c_str());
+            //QString usrPwd = QString("%1:%2").arg(strUsr.c_str()).arg(strPwd.c_str());
+            ////sprintf(usrPwd, "%s:%s", strUsr.c_str(), strPwd.c_str());
+
+            //int iIndex = dstFileFullPath.lastIndexOf("/");
+            //string strDestPath;
+            //if (dstFileFullPath.length() > iIndex)
+            //{
+            //    strDestPath = dstFileFullPath.mid(0, iIndex + 1).toLocal8Bit().toStdString();
+            //}
+            //else
+            //{
+            //    QSLOG_ERROR("dstFileFullPath.length() is incorrect.");
+            //}
+            ////string strDestPath = dstFileFullPath.mid(0, iIndex + 1).toLocal8Bit().toStdString();
+            //QString ftpPath = QString("ftp://%1:%2%3").arg(strIp.c_str()).arg(nPort).arg(strDestPath.c_str());
+            ////sprintf(ftpPath, "ftp://%s:%d%s", strIp.c_str(), nPort, strDestPath.c_str());
+            //// CurlFtp m_ftp;
+            //double dSize = 0;
+            //if (oCurlFtp.getFileSize(ftpUrl.toLocal8Bit().toStdString().c_str(),
+            //                         usrPwd.toLocal8Bit().toStdString().c_str(), strName, dSize))
+            //{
+            //    if (fi.size() != (long long)dSize)
+            //    {
+            //        if (-1 == oCurlFtp.deleteFtpFile(ftpPath.toLocal8Bit().toStdString().c_str(),
+            //                                         usrPwd.toLocal8Bit().toStdString().c_str(), strName))
+            //        {
+            //            continue;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        continue;
+            //    }
+            //    //
+            //}
         }
 
         //tTask.userInfo.append(cUser.user);

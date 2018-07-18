@@ -89,7 +89,7 @@ void SFtpCollector::getNewFiles()
     SFtp oSFtp;
     oSFtp.setTransferMode(m_collectSet.ftp_connectMode == 0 ? Passive : Active);
     oSFtp.connectToHost(m_collectSet.ip, m_collectSet.port);
-    if (CURLcode::CURLE_OK != oSFtp.login(m_collectSet.loginUser, m_collectSet.loginPass))
+    if (CURLE_OK != oSFtp.login(m_collectSet.loginUser, m_collectSet.loginPass))
     {
         bConnect = false;
     }
@@ -300,7 +300,7 @@ void SFtpCollector::ftpDone(const QList<CFileInfo> &files, CDirRecord &io_record
     QSharedPointer<FtpBase> pFtpTemp;
     QSharedPointer<FtpBase> pFtpSource;
     QSharedPointer<FtpBase> pFtpDest;
-    CurlFtp	 oCurlFtp;
+    //CurlFtp	 oCurlFtp;
 
 
     for (int i = 0; i<files.size(); ++i)
@@ -314,7 +314,7 @@ void SFtpCollector::ftpDone(const QList<CFileInfo> &files, CDirRecord &io_record
             DistributeFile sendFile(this);
 
             // 解决问题：当启用了记录收集时间时，当分发失败时，第二次无法重新分发
-            if (!sendFile.transfer(task, pFtpSource, pFtpDest, oCurlFtp) && m_collectSet.recordLatestTime)
+            if (!sendFile.transfer(task, pFtpSource, pFtpDest) && m_collectSet.recordLatestTime)
             {
                 io_record.updateSendFailure(task.srcFileFullPath.mid(0, task.srcFileFullPath.lastIndexOf("/")+1), task.fileName);
             }
