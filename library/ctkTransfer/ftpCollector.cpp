@@ -231,7 +231,7 @@ void FtpCollector::getNewFiles(const CollectTask &in_oTask)
             m_fileList.clear();	//清空新文件列表
 
             m_pCftp->getNewFiles(m_fileList, oRecordSet);
-			ftpDone(oRecordSet);
+            ftpDone(oRecordSet);
             emit startGif(m_collectSet.dirID, false);
         }
         else
@@ -258,6 +258,8 @@ void FtpCollector::ftpDone(CDirRecord &io_record)
     QTime oTimer;
     oTimer.start();
 
+    SFtp sourceFtp;
+    SFtp destFtp;
     CurlFtp m_ftp;
     for (int i=0; i<m_fileList.size(); ++i)
     {
@@ -269,14 +271,14 @@ void FtpCollector::ftpDone(CDirRecord &io_record)
             // 发送文件
             DistributeFile sendFile(this);
 
-			// 解决问题：当启用了记录收集时间时，当分发失败时，第二次无法重新分发
-			if (!sendFile.transfer(task, m_ftp) && m_collectSet.recordLatestTime)
-			{
-				io_record.updateSendFailure(task.srcFileFullPath.mid(0, task.srcFileFullPath.lastIndexOf("/")+1), task.fileName);
-			}
+            // 解决问题：当启用了记录收集时间时，当分发失败时，第二次无法重新分发
+            if (!sendFile.transfer(task, sourceFtp, destFtp, m_ftp) && m_collectSet.recordLatestTime)
+            {
+                io_record.updateSendFailure(task.srcFileFullPath.mid(0, task.srcFileFullPath.lastIndexOf("/")+1), task.fileName);
+            }
         }
     }
-	m_bFinish = true;
+    m_bFinish = true;
     QSLOG_DEBUG(QString::fromLocal8Bit("本次分发共用时:%1秒").arg(oTimer.elapsed()/1000));
 }
 

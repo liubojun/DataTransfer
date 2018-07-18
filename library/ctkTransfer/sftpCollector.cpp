@@ -84,14 +84,14 @@ void SFtpCollector::getNewFiles()
     QSLOG_DEBUG(strLogInfo);
     bool bConnect = true;
 
-	// 先测试源路径是否正常
-	SFtp oSFtp;
-	oSFtp.setTransferMode(m_collectSet.ftp_connectMode == 0 ? Passive : Active);
-	oSFtp.connectToHost(m_collectSet.ip, m_collectSet.port);
-	if (CURLcode::CURLE_OK != oSFtp.login(m_collectSet.loginUser, m_collectSet.loginPass))
-	{
-		bConnect = false;
-	}
+    // 先测试源路径是否正常
+    SFtp oSFtp;
+    oSFtp.setTransferMode(m_collectSet.ftp_connectMode == 0 ? Passive : Active);
+    oSFtp.connectToHost(m_collectSet.ip, m_collectSet.port);
+    if (CURLcode::CURLE_OK != oSFtp.login(m_collectSet.loginUser, m_collectSet.loginPass))
+    {
+        bConnect = false;
+    }
     // 先测试源路径是否正常
     //bConnect = testFtpConnection(m_collectSet.ip, m_collectSet.port, m_collectSet.loginUser, m_collectSet.loginPass, m_collectSet.ftp_transferMode, m_collectSet.ftp_connectMode);
 
@@ -173,8 +173,8 @@ void SFtpCollector::getNewFiles(const CollectTask &in_oTask)
     {
         oRecordSet.loadLatestFileSize();
     }
-	CSubDirFilter m_oSubDirFilter;
-	m_oSubDirFilter.init();
+    CSubDirFilter m_oSubDirFilter;
+    m_oSubDirFilter.init();
 
     // E:/workspace/DataTransfer/DataTransfer_code_20170831/vs2013/apps/DataTransfer/%T-1H%t%y/%t%m/%td
     // modified by liubojun. 支持按照特定时间获取数据
@@ -194,15 +194,15 @@ void SFtpCollector::getNewFiles(const CollectTask &in_oTask)
                    .arg(m_collectSet.rltvPath));
 
         bool bConnect = true;
-		// 先测试源路径是否正常
-		SFtp oSFtp;
-		oSFtp.setTransferMode(m_collectSet.ftp_connectMode == 0 ? Passive : Active);
-		oSFtp.connectToHost(m_collectSet.ip, m_collectSet.port);
-		oSFtp.login(m_collectSet.loginUser, m_collectSet.loginPass);
-		if (CURLcode::CURLE_OK != oSFtp.cd(m_collectSet.rltvPath))
-		{
-			bConnect = false;
-		}
+        // 先测试源路径是否正常
+        SFtp oSFtp;
+        oSFtp.setTransferMode(m_collectSet.ftp_connectMode == 0 ? Passive : Active);
+        oSFtp.connectToHost(m_collectSet.ip, m_collectSet.port);
+        oSFtp.login(m_collectSet.loginUser, m_collectSet.loginPass);
+        if (CURLE_OK != oSFtp.cd(m_collectSet.rltvPath))
+        {
+            bConnect = false;
+        }
 
         if (!bConnect)
         {
@@ -218,58 +218,58 @@ void SFtpCollector::getNewFiles(const CollectTask &in_oTask)
             emit startGif(m_collectSet.dirID, true);
             m_bFinish = false;
 
-			// 存储所有的文件和目录
-			QList<CFileInfo> oFiles;
+            // 存储所有的文件和目录
+            QList<CFileInfo> oFiles;
 
-			// 存储所有的目录
-			QList<QString> oDirs;
-			oDirs.append(m_collectSet.rltvPath);
-			int level = 1;
-			while (!oDirs.isEmpty())
-			{
-				QString strCurDir = oDirs.takeFirst();
-				if (strCurDir.length() >= 1 && strCurDir.right(1) != "/")
-				{
-					strCurDir += "/";
-				}
+            // 存储所有的目录
+            QList<QString> oDirs;
+            oDirs.append(m_collectSet.rltvPath);
+            int level = 1;
+            while (!oDirs.isEmpty())
+            {
+                QString strCurDir = oDirs.takeFirst();
+                if (strCurDir.length() >= 1 && strCurDir.right(1) != "/")
+                {
+                    strCurDir += "/";
+                }
 
-				QList<CFileInfo> retFiles = oSFtp.list(strCurDir);
-				foreach(const CFileInfo &fi, retFiles)
-				{
-					if (fi.type == FTP_DIR && m_collectSet.subdirFlag)
-					{
-						// 在此处加入过滤条件，支持针对子目录的模糊匹配
-						if (!m_oSubDirFilter.match(m_collectSet.subDirTemplate, fi.name, level))
-						{
-							continue;
-						}
-						oDirs.append(fi.path);
-					}
-					else if (fi.type == FTP_FILE)
-					{
-						if (m_collectSet.recordLatestTime)
-						{
-							oRecordSet.updateLatestFileSize(strCurDir, fi.name, fi.time.toString("yyyyMMddhhmmss"), fi.size);
+                QList<CFileInfo> retFiles = oSFtp.list(strCurDir);
+                foreach(const CFileInfo &fi, retFiles)
+                {
+                    if (fi.type == FTP_DIR && m_collectSet.subdirFlag)
+                    {
+                        // 在此处加入过滤条件，支持针对子目录的模糊匹配
+                        if (!m_oSubDirFilter.match(m_collectSet.subDirTemplate, fi.name, level))
+                        {
+                            continue;
+                        }
+                        oDirs.append(fi.path);
+                    }
+                    else if (fi.type == FTP_FILE)
+                    {
+                        if (m_collectSet.recordLatestTime)
+                        {
+                            oRecordSet.updateLatestFileSize(strCurDir, fi.name, fi.time.toString("yyyyMMddhhmmss"), fi.size);
 
-							if (!oRecordSet.checkIsNewFile(strCurDir, fi.name, fi.time.toString("yyyyMMddhhmmss"), fi.size))
-							{
-								continue;
-							}
-						}
-						if (!filterFileName(fi.name))
-						{
-							continue;
-						}
-						oFiles.append(fi);
+                            if (!oRecordSet.checkIsNewFile(strCurDir, fi.name, fi.time.toString("yyyyMMddhhmmss"), fi.size))
+                            {
+                                continue;
+                            }
+                        }
+                        if (!filterFileName(fi.name))
+                        {
+                            continue;
+                        }
+                        oFiles.append(fi);
 
-					}
-				}
-				level++;
-			}
-			//qSort(oFiles.begin(), oFiles.end(), compareCFileInfo);
+                    }
+                }
+                level++;
+            }
+            //qSort(oFiles.begin(), oFiles.end(), compareCFileInfo);
 
 
-			ftpDone(oFiles, oRecordSet);
+            ftpDone(oFiles, oRecordSet);
             emit startGif(m_collectSet.dirID, false);
         }
         else
@@ -287,36 +287,37 @@ void SFtpCollector::getNewFiles(const CollectTask &in_oTask)
 
 void SFtpCollector::ftpDone(const QList<CFileInfo> &files, CDirRecord &io_record)
 {
-	QSLOG_DEBUG(QString::fromLocal8Bit("本次收集共获取到新文件:%1").arg(files.size()));
-	if (files.isEmpty() || !m_bRun)
-	{
-		return;
-	}
+    QSLOG_DEBUG(QString::fromLocal8Bit("本次收集共获取到新文件:%1").arg(files.size()));
+    if (files.isEmpty() || !m_bRun)
+    {
+        return;
+    }
 
     QTime oTimer;
     oTimer.start();
 
-	SFtp oSFtpSource;
-	SFtp oSFtpDestTemp;
-	SFtp oSFtpDestSend;
-	for (int i = 0; i<files.size(); ++i)
+    SFtp oSFtpSource;
+    SFtp oSFtpDestTemp;
+    SFtp oSFtpDestSend;
+    CurlFtp	 oCurlFtp;
+    for (int i = 0; i<files.size(); ++i)
     {
         TransTask task;
-		if (m_bRun && !compareWithDest(oSFtpDestTemp, files.at(i), task))
+        if (m_bRun && !compareWithDest(oSFtpDestTemp, files.at(i), task))
         {
             task.collectSet = m_collectSet;
             //task.userInfo = m_userInfo.user;
             // 发送文件
             DistributeFile sendFile(this);
 
-			// 解决问题：当启用了记录收集时间时，当分发失败时，第二次无法重新分发
-			if (!sendFile.transfer(task, oSFtpSource, oSFtpDestSend) && m_collectSet.recordLatestTime)
-			{
-				io_record.updateSendFailure(task.srcFileFullPath.mid(0, task.srcFileFullPath.lastIndexOf("/")+1), task.fileName);
-			}
+            // 解决问题：当启用了记录收集时间时，当分发失败时，第二次无法重新分发
+            if (!sendFile.transfer(task, oSFtpSource, oSFtpDestSend, oCurlFtp) && m_collectSet.recordLatestTime)
+            {
+                io_record.updateSendFailure(task.srcFileFullPath.mid(0, task.srcFileFullPath.lastIndexOf("/")+1), task.fileName);
+            }
         }
     }
-	m_bFinish = true;
+    m_bFinish = true;
     QSLOG_DEBUG(QString::fromLocal8Bit("本次分发共用时:%1秒").arg(oTimer.elapsed()/1000));
 }
 
@@ -350,8 +351,8 @@ bool SFtpCollector::compareWithDest(SFtp &oCurlFtp, const CFileInfo &fi, TransTa
     for (int i=0; i<m_tUser.lstUser.size(); ++i)
     {
         CollectUser &cUser = m_tUser.lstUser[i];
-		QString strFileFullPath = fi.path;
-		QString strFileName = fi.name;
+        QString strFileFullPath = fi.path;
+        QString strFileName = fi.name;
         // QString dstFileFullPath = getDestFilePath(strFileFullPath, strFileName, cUser, QDateTime::fromString(fi.strMdyTime.c_str(), "yyyyMMddhhmmss"));
 
         // modified by liubojun @20171029
@@ -364,7 +365,7 @@ bool SFtpCollector::compareWithDest(SFtp &oCurlFtp, const CFileInfo &fi, TransTa
         QDateTime oDt;
         if (1 == iTmBaseRule) // 基于收集目录时间
         {
-			oDt = CPathBuilder::getDateTimeFrom2Urls(m_tUser.colTaskInfo.rltvPath, fi.path.toLocal8Bit().toStdString().c_str());
+            oDt = CPathBuilder::getDateTimeFrom2Urls(m_tUser.colTaskInfo.rltvPath, fi.path.toLocal8Bit().toStdString().c_str());
         }
         else if (2 == iTmBaseRule) // 基于文件名时间
         {
@@ -393,9 +394,9 @@ bool SFtpCollector::compareWithDest(SFtp &oCurlFtp, const CFileInfo &fi, TransTa
             }
         }
         // 分发到FTP
-		else if (cUser.user.sendType == 1)
+        else if (cUser.user.sendType == 1)
         {
-          
+
             string strIp = cUser.user.ip.toStdString();
             int nPort = cUser.user.port;
             string strPath = dstFileFullPath.toLocal8Bit().data();
@@ -423,11 +424,11 @@ bool SFtpCollector::compareWithDest(SFtp &oCurlFtp, const CFileInfo &fi, TransTa
             //sprintf(ftpPath, "ftp://%s:%d%s", strIp.c_str(), nPort, strDestPath.c_str());
             // CurlFtp m_ftp;
             double dSize = 0;
-			if (dSize = oCurlFtp.getFileSize(fi.path))
+            if (dSize = oCurlFtp.getFileSize(fi.path))
             {
                 if (fi.size != (long long)dSize)
                 {
-					if (-1 == oCurlFtp.remove(fi.path))
+                    if (-1 == oCurlFtp.remove(fi.path))
                     {
                         continue;
                     }
@@ -438,36 +439,36 @@ bool SFtpCollector::compareWithDest(SFtp &oCurlFtp, const CFileInfo &fi, TransTa
                 }
             }
         }
-		else
-		{
-			oCurlFtp.connectToHost(cUser.user.ip, cUser.user.port, cUser.user.lgUser, cUser.user.lgPass);
-			oCurlFtp.setTransferMode(cUser.user.ftpTransferMode == 0 ? Passive : Active);
-			//if (CURLE_OK != oCurlFtp.login(cUser.user.lgUser, cUser.user.lgPass))
-			//{
-			//	continue;
-			//}
-			//else
-			{
-				long long dSize = (long long)oCurlFtp.getFileSize(dstFileFullPath);
-				if (-1 != dSize)
-				{
-					if (fi.size != dSize)
-					{
-						if (-1 == oCurlFtp.remove(fi.path))
-						{
-							continue;
-						}
-					}
-					else
-					{
-						continue;
-					}
+        else
+        {
+            oCurlFtp.connectToHost(cUser.user.ip, cUser.user.port, cUser.user.lgUser, cUser.user.lgPass);
+            oCurlFtp.setTransferMode(cUser.user.ftpTransferMode == 0 ? Passive : Active);
+            //if (CURLE_OK != oCurlFtp.login(cUser.user.lgUser, cUser.user.lgPass))
+            //{
+            //	continue;
+            //}
+            //else
+            {
+                long long dSize = (long long)oCurlFtp.getFileSize(dstFileFullPath);
+                if (-1 != dSize)
+                {
+                    if (fi.size != dSize)
+                    {
+                        if (-1 == oCurlFtp.remove(fi.path))
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
 
-				}
+                }
 
-			}
+            }
 
-		}
+        }
 
         tTask.userInfo = cUser.user;
         //tTask.userInfo.append(cUser.user);

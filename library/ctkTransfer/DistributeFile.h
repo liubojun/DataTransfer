@@ -16,19 +16,19 @@ public:
     DistributeFile(CollectorBase *pBase);
     virtual ~DistributeFile();
 
-	/**
-	 * @brief  文件分发
-	 * @param  TransTask &task：文件信息
-	 * @return bool：成功返回true
-	 */
-	bool transfer(TransTask &task, CurlFtp &oCurlFtp);
+    /**
+     * @brief  文件分发
+     * @param  TransTask &task：文件信息
+     * @return bool：成功返回true
+     */
+    //bool transfer(TransTask &task, CurlFtp &oCurlFtp);
 
-	/**
-	 * @brief  文件分发
-	 * @param  TransTask &task：文件信息
-	 * @return bool：成功返回true
-	 */
-	bool transfer(TransTask &task, SFtp &oSFtpSource, SFtp &oSFtpDest);
+    /**
+     * @brief  文件分发
+     * @param  TransTask &task：文件信息
+     * @return bool：成功返回true
+     */
+    bool transfer(TransTask &task, SFtp &oSFtpSource, SFtp &oSFtpDest, CurlFtp &oCurlFtp);
 
     int getCurlAddr();
     TransTask m_fileInfo;
