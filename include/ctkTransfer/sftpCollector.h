@@ -26,8 +26,8 @@ class DLL_EXPORT_CLASS_DECL SFtpCollector : public CollectorBase
 {
     Q_OBJECT
 public:
-	SFtpCollector(QWaitCondition &in_oCond, QMutex &in_oLocker, int &in_iLogsize);
-	~SFtpCollector();
+    SFtpCollector(QWaitCondition &in_oCond, QMutex &in_oLocker, int &in_iLogsize);
+    ~SFtpCollector();
 
     virtual int start();
     virtual int reStart();
@@ -54,12 +54,12 @@ public:
     virtual void taskDone(bool bFlag, const FileInfo &file);
 
     // 相同返回true，不同返回false
-	bool compareWithDest(SFtp &oCurlFtp, const CFileInfo &fi, TransTask &tTask);
+    bool compareWithDest(SFtp &oCurlFtp, const CFileInfo &fi, TransTask &tTask);
 
     void setProcess(QProcess *in_pro);
 
 private slots:
-void ftpDone(const QList<CFileInfo> &files, CDirRecord &io_record);
+    void ftpDone(const QList<CFileInfo> &files, CDirRecord &io_record);
 
     void readOutput();
 

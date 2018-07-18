@@ -303,7 +303,7 @@ void SFtpCollector::ftpDone(const QList<CFileInfo> &files, CDirRecord &io_record
     for (int i = 0; i<files.size(); ++i)
     {
         TransTask task;
-        if (m_bRun && !compareWithDest(oSFtpDestTemp, files.at(i), task))
+        if (m_bRun && !compareWithDest(oSFtpDestTemp,  files.at(i), task))
         {
             task.collectSet = m_collectSet;
             //task.userInfo = m_userInfo.user;
@@ -454,7 +454,7 @@ bool SFtpCollector::compareWithDest(SFtp &oCurlFtp, const CFileInfo &fi, TransTa
                 {
                     if (fi.size != dSize)
                     {
-                        if (-1 == oCurlFtp.remove(fi.path))
+                        if (-1 == oCurlFtp.remove(dstFileFullPath))
                         {
                             continue;
                         }

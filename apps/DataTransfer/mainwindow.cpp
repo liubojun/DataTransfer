@@ -243,7 +243,9 @@ bool MainWindow::addCollect(CollectTask &task, bool bDb /*= true*/)
     tUser.taskID = task.dirID;
     m_sqlite->QueryUserInfo(tUser);
 
-    int nIcon = task.collectType + tUser.lstUser.at(0).user.sendType * 2 + task.enable * 4;
+    int iSendType = tUser.lstUser.at(0).user.sendType >1 ? 1 : 0;
+    int iCollectType = task.collectType > 1 ? 1: 0;
+    int nIcon = iCollectType + iSendType * 2 + task.enable * 4;
     // 在左侧列表显示
     QListWidgetItem *pItem = new QListWidgetItem(COLLECTITEM);
     ui.listWidget->addItem(pItem);
@@ -570,9 +572,14 @@ void MainWindow::openSrcPath()
             urlPath = CPathBuilder::getFinalPathFromUrl(task.rltvPath).at(0);
             urlPath = QUrl::fromLocalFile(urlPath).toString();
         }
-        else
+        else if (task.collectType == 1)
         {
             urlPath = QString("ftp://%1:%2@%3:%4%5").arg(task.loginUser).arg(task.loginPass).arg(task.ip)
+                      .arg(task.port).arg(CPathBuilder::getFinalPathFromUrl(task.rltvPath).at(0));
+        }
+        else
+        {
+            urlPath = QString("sftp://%1:%2@%3:%4%5").arg(task.loginUser).arg(task.loginPass).arg(task.ip)
                       .arg(task.port).arg(CPathBuilder::getFinalPathFromUrl(task.rltvPath).at(0));
         }
 
@@ -650,9 +657,14 @@ void MainWindow::openDstPath()
         urlPath = lstPaths.at(0);
         urlPath = QUrl::fromLocalFile(urlPath).toString();
     }
-    else
+    else if (cUser.user.sendType == 1)
     {
         urlPath = QStringLiteral("ftp://%1:%2@%3:%4%5").arg(cUser.user.lgUser).arg(cUser.user.lgPass).arg(cUser.user.ip)
+                  .arg(cUser.user.port).arg(CPathBuilder::getFinalPathFromUrl(cUser.user.rootPath + cUser.rltvPath).at(0));
+    }
+    else
+    {
+        urlPath = QStringLiteral("sftp://%1:%2@%3:%4%5").arg(cUser.user.lgUser).arg(cUser.user.lgPass).arg(cUser.user.ip)
                   .arg(cUser.user.port).arg(CPathBuilder::getFinalPathFromUrl(cUser.user.rootPath + cUser.rltvPath).at(0));
     }
 
@@ -979,10 +991,10 @@ void MainWindow::onProperty()
                     task.compareContent != m_pCollectDlg->m_task.compareContent ||
                     task.subDirTemplate != m_pCollectDlg->m_task.subDirTemplate ||
                     task.fileTemplate != m_pCollectDlg->m_task.fileTemplate ||
-					task.ip != m_pCollectDlg->m_task.ip || 
-					task.port != m_pCollectDlg->m_task.port || 
-					task.loginUser != m_pCollectDlg->m_task.loginUser || 
-					task.loginPass != m_pCollectDlg->m_task.loginPass)
+                    task.ip != m_pCollectDlg->m_task.ip ||
+                    task.port != m_pCollectDlg->m_task.port ||
+                    task.loginUser != m_pCollectDlg->m_task.loginUser ||
+                    task.loginPass != m_pCollectDlg->m_task.loginPass)
             {
                 bRestart = true;
             }
@@ -993,8 +1005,9 @@ void MainWindow::onProperty()
             }
             task = m_pCollectDlg->m_task;
             // 设置列表图标状态
-            int nIcon = m_pCollectDlg->m_task.collectType + oSender.user.sendType * 2 + task.enable * 4;
-            // int nIcon = m_pCollectDlg->m_task.collectType + 0 + task.enable * 4;
+            int iSendType = oSender.user.sendType > 1 ? 1 : 0;
+            int iCollectType = m_pCollectDlg->m_task.collectType > 1 ? 1 : 0;
+            int nIcon = iCollectType + iSendType * 2 + task.enable * 4;
             MyItemWidget *pItemWidget = (MyItemWidget *)ui.listWidget->itemWidget(pItem);
             pItemWidget->SetIcon((ICONTYPE)nIcon);
             pItemWidget->SetName(task.dirName);
@@ -1087,7 +1100,9 @@ void MainWindow::setTaskIcon(const CollectTask &task, int sendWay, int normal)
     TaskUser tUser;
     tUser.taskID = task.dirID;
     m_sqlite->QueryUserInfo(tUser);
-    int nIcon = task.collectType + tUser.lstUser.at(0).user.sendType * 2 + task.enable * 4 + normal * 8;
+    int iSendType = tUser.lstUser.at(0).user.sendType > 1 ? 1 : 0;
+    int iCollectType = task.collectType + iSendType > 1 ? 1 : 0;
+    int nIcon = iCollectType + iSendType * 2 + task.enable * 4 + normal * 8;
     QMap<QListWidgetItem*, QString>::const_iterator it = m_ItemTask.begin();
     while (it != m_ItemTask.end())
     {
@@ -1215,9 +1230,14 @@ void MainWindow::onUserAction(QAction *act)
         urlPath = cUser.user.rootPath + cUser.rltvPath;
         urlPath = QUrl::fromLocalFile(urlPath).toString();
     }
-    else
+    else if (cUser.user.sendType == 1)
     {
         urlPath = QStringLiteral("ftp://%1:%2@%3:%4%5").arg(cUser.user.lgUser).arg(cUser.user.lgPass).arg(cUser.user.ip)
+                  .arg(cUser.user.port).arg(cUser.user.rootPath + cUser.rltvPath);
+    }
+    else
+    {
+        urlPath = QStringLiteral("sftp://%1:%2@%3:%4%5").arg(cUser.user.lgUser).arg(cUser.user.lgPass).arg(cUser.user.ip)
                   .arg(cUser.user.port).arg(cUser.user.rootPath + cUser.rltvPath);
     }
 
@@ -1230,7 +1250,6 @@ void MainWindow::onNewClearTaskCreated(const ClearTask &task)
     //tUser.taskID = task.dirID;
     //m_sqlite->QueryUserInfo(tUser);
 
-    //int nIcon = task.collectType + /*cUser.user.sendType * 2 +*/ task.enable * 4;
     // 在左侧列表显示
     QListWidgetItem *pItem = new QListWidgetItem(CLEARITEM);
     ui.listWidget->addItem(pItem);

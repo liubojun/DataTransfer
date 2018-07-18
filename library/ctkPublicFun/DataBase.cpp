@@ -61,50 +61,53 @@ DataBase::DataBase()
     //m_strTbSendUser = "T_SEND_USER";
 
     // 判断清理表是否存在，如果不存在则自动创建
-    checkTable("T_DIR_CLEAR", "CREATE TABLE T_DIR_CLEAR ("
-			   "[ID] VARCHAR2(20) NOT NULL, "
-               "[NAME] VHARCHAR(64) NOT NULL, "
-               "[TYPE] INT(1) NOT NULL DEFAULT (0), "
-               "[IP] VARCHAR2(50), "
+    checkTable("T_DIR_CLEAR", "CREATE TABLE[T_DIR_CLEAR]("
+               "[ID] VARCHAR2(20) NOT NULL,"
+               "[NAME] VHARCHAR(64) NOT NULL,"
+               "[TYPE] INT(1) NOT NULL DEFAULT(0),"
+               "[IP] VARCHAR2(50),"
                "[PORT] INT(5),"
-               "[USER] VARCHAR2(20), "
-               "[PASSWORD] VARCHAR2(20), "
-               "[TRANSFERMODE] INT(1) DEFAULT (0), "
-               "[DIR] VHARCHAR(256) NOT NULL, "
+               "[USER] VARCHAR2(20),"
+               "[PASSWORD] VARCHAR2(20),"
+               "[TRANSFERMODE] INT(1) DEFAULT(0),"
+               "[DIR] VHARCHAR(256) NOT NULL,"
                "[QUARTZ] VHARCHAR(64) NOT NULL,"
-               "[FILE] VHARCHAR(64) NOT NULL, "
-               "[UNIT] INT NOT NULL, "
-               "[VALUE] INT NOT NULL, "
-               "[ACTIVE] INT NOT NULL,  "
-               "CONSTRAINT [sqlite_autoindex_T_DIR_CLEAR] PRIMARY KEY ([ID]))");
+               "[FILE] VHARCHAR(64) NOT NULL,"
+               "[UNIT] INT NOT NULL,"
+               "[VALUE] INT NOT NULL,"
+               "[ACTIVE] INT NOT NULL,"
+               "CONSTRAINT[] PRIMARY KEY([ID]))");
 
-    checkTable("T_COL_USER", "CREATE TABLE [T_COL_USER] ("
-               "[DIRID] VARCHAR(20) NOT NULL, "
-               "[USERID] VARCHAR(20), "
+
+    checkTable("T_COL_USER",
+               "CREATE TABLE[T_COL_USER]("
+               "[DIRID] VARCHAR(20) NOT NULL,"
+               "[USERID] VARCHAR(20),"
                "[RLTVPATH] VARCHAR(100),"
                "[RENAME_RULE] VARCHAR(20),"
-               "CONSTRAINT [] PRIMARY KEY ([DIRID]))");
+               "CONSTRAINT[sqlite_autoindex_T_COL_USER_1] PRIMARY KEY([DIRID]) ON CONFLICT FAIL)"
+              );
 
     checkTable("T_DIR_COL", "CREATE TABLE [T_DIR_COL] ("
-               "[DIRID] VARCHAR(20) NOT NULL, "
-               "[DIRNAME] VARCHAR(20) NOT NULL, "
-               "[ENABLE] INT, "
-               "[COLLECTTYPE] INT, "
+               "[DIRID] VARCHAR(20) NOT NULL,"
+               "[DIRNAME] VARCHAR(20) NOT NULL,"
+               "[ENABLE] INT,"
+               "[COLLECTTYPE] INT,"
                "[FTPTRANSFERMODE] INT,"
                "[FTPCONNECTMODE] INT,"
-               "[RLTVPATH] VARCHAR(100), "
-               "[DISPATCH] VARCHAR(50), "
-               "[FILETEMPLATE] VARCHAR(50), "
-               "[SUBDIRTEMPLATE] VARCHAR2(20), "
-               "[SUBDIRCHECK] INT, "
-               "[MOVEFLAG] INT, "
-               "[COLTIMERANGE] INT, "
-               "[RECORDLATESTTIME] BOOL, "
-               "[COMPARE_CONTENT] BOOL DEFAULT 0"
-               "[LOGINUSER] VARCHAR(20), "
-               "[LOGINPASS] VARCHAR(20), "
-               "[IP] VARCHAR(20), "
-               "[PORT] INT, "
+               "[RLTVPATH] VARCHAR(100),"
+               "[DISPATCH] VARCHAR(50),"
+               "[FILETEMPLATE] VARCHAR(50),"
+               "[SUBDIRTEMPLATE] VARCHAR2(20),"
+               "[SUBDIRCHECK] INT,"
+               "[MOVEFLAG] INT,"
+               "[COLTIMERANGE] INT,"
+               "[RECORDLATESTTIME] BOOL,"
+               "[COMPARE_CONTENT] BOOL DEFAULT 0,"
+               "[LOGINUSER] VARCHAR(20),"
+               "[LOGINPASS] VARCHAR(20),"
+               "[IP] VARCHAR(20),"
+               "[PORT] INT,"
                "CONSTRAINT [sqlite_autoindex_T_DIR_COL_1] PRIMARY KEY ([DIRID]))");
 
     checkTable("T_SEND_USER", "CREATE TABLE [T_SEND_USER] ("
@@ -125,7 +128,7 @@ DataBase::DataBase()
                "[ENCRYPT] INT, "
                "[CONPUT] INT, "
                "[MAXTRYCOUNS] INT,"
-               "CONSTRAINT [] PRIMARY KEY ([USERID]))");
+               "CONSTRAINT [sqlite_autoindex_T_SEND_USER_1] PRIMARY KEY ([USERID]))");
 
     checkTable("T_GLOBALINFO", "CREATE TABLE [T_GLOBALINFO] ("
                "[PROGRAMID] INT,"
@@ -812,7 +815,7 @@ bool DataBase::queryClearTask(QList<ClearTask> &tasks)
         {
             ClearTask task;
             int index = 0;
-			task.taskId = query.value(index++).toString();
+            task.taskId = query.value(index++).toString();
             task.taskName = query.value(index++).toString();
             task.taskType = query.value(index++).toInt();
             task.ip = query.value(index++).toString();
@@ -855,7 +858,7 @@ bool DataBase::queryClearTask(ClearTask &task)
         if (query.next())
         {
             int index = 0;
-			task.taskId = query.value(index++).toString();
+            task.taskId = query.value(index++).toString();
             task.taskName = query.value(index++).toString();
             task.taskType = query.value(index++).toInt();
             task.ip = query.value(index++).toString();
@@ -982,7 +985,7 @@ bool DataBase::insertClearTask(const ClearTask &task)
         QString sql = QString("REPLACE INTO T_DIR_CLEAR(ID, NAME,TYPE,IP,PORT,USER,PASSWORD,TRANSFERMODE,DIR,QUARTZ,FILE,UNIT,VALUE,ACTIVE)"
                               "VALUES(:ID, :NAME,:TYPE,:IP,:PORT,:USER,:PASSWORD,:TRANSFERMODE,:DIR,:QUARTZ,:FILE,:UNIT,:VALUE,:ACTIVE)");
         query.prepare(sql);
-		query.bindValue(":ID", task.taskId);
+        query.bindValue(":ID", task.taskId);
         query.bindValue(":NAME", task.taskName);
         query.bindValue(":TYPE", task.taskType);
         query.bindValue(":IP", task.ip);

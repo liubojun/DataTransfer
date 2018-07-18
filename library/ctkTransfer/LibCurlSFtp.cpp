@@ -13,6 +13,7 @@ SFtp::SFtp()
     m_pCurlHandler = NULL;
     m_pCurlHandler = curl_easy_init();
     m_pSecCurlHandler = curl_easy_init();
+    m_pThridCurlHandler = curl_easy_init();
     enableDebugLevel(true);
 
 }
@@ -43,7 +44,11 @@ int SFtp::close()
         curl_easy_cleanup(m_pSecCurlHandler);
         m_pSecCurlHandler = NULL;
     }
-
+    if (NULL != m_pThridCurlHandler)
+    {
+        curl_easy_cleanup(m_pThridCurlHandler);
+        m_pThridCurlHandler = NULL;
+    }
     return 0;
 }
 
@@ -55,26 +60,34 @@ int SFtp::connectToHost(const QString &host, quint16 port /*= 21*/)
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
     m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_NOSIGNAL, 1L);
     m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pThridCurlHandler, CURLOPT_NOSIGNAL, 1L);
+    m_iRetCode = curl_easy_setopt(m_pThridCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
 
     return m_iRetCode;
 }
 
 int SFtp::connectToHost(const QString &host, quint16 port /*= 22*/, const QString &user /*= QString()*/, const QString &pwd /*= QString()*/,  int timeout /* = 30*/)
 {
-	QString url = makeUrl(host, port);
+    QString url = makeUrl(host, port);
 
-	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_NOSIGNAL, 1L);
-	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_NOSIGNAL, 1L);
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_NOSIGNAL, 1L);
+    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_NOSIGNAL, 1L);
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pThridCurlHandler, CURLOPT_NOSIGNAL, 1L);
+    m_iRetCode = curl_easy_setopt(m_pThridCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
 
-	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_USERNAME, user.toLocal8Bit().toStdString().c_str());
-	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_PASSWORD, pwd.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_USERNAME, user.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_PASSWORD, pwd.toLocal8Bit().toStdString().c_str());
 
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_USERNAME, user.toLocal8Bit().toStdString().c_str());
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_PASSWORD, pwd.toLocal8Bit().toStdString().c_str());
-	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_TIMEOUT, timeout);
-	return m_iRetCode;
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_USERNAME, user.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_PASSWORD, pwd.toLocal8Bit().toStdString().c_str());
+
+    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_TIMEOUT, timeout);
+
+    m_iRetCode = curl_easy_setopt(m_pThridCurlHandler, CURLOPT_USERNAME, user.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pThridCurlHandler, CURLOPT_PASSWORD, pwd.toLocal8Bit().toStdString().c_str());
+    return m_iRetCode;
 }
 
 QString SFtp::errorString()
@@ -106,31 +119,31 @@ int SFtp::enableDebugLevel(bool flag /*= true*/)
 int SFtp::get(const QString &sourceFile, const QString &downloadFile, TransferType type /*= Binary*/)
 {
     // 获知当前所在目录
-	QString filename, url;
-	if (sourceFile.startsWith("/"))
-	{
-		filename = sourceFile.split("/").last();
-		QString dir = sourceFile.mid(0, sourceFile.lastIndexOf("/"));
-		url = makeUrl(dir);
-	}
-	else
-	{
-		filename = sourceFile;
-		url = makeUrl("");
-	}
-	url = url + filename;
+    QString filename, url;
+    if (sourceFile.startsWith("/"))
+    {
+        filename = sourceFile.split("/").last();
+        QString dir = sourceFile.mid(0, sourceFile.lastIndexOf("/"));
+        url = makeUrl(dir);
+    }
+    else
+    {
+        filename = sourceFile;
+        url = makeUrl("");
+    }
+    url = url + filename;
     //QString url = makeUrl("");
     //url.append(file);
     struct FileData fileData;
-	// std::string localfilepath = (dir + "/" + filename).toLocal8Bit().toStdString();
+    // std::string localfilepath = (dir + "/" + filename).toLocal8Bit().toStdString();
     // fileData.filename = localfilepath.c_str();
-	std::string strfilename(downloadFile.toLocal8Bit().toStdString());
-	fileData.filename = strfilename.c_str();
-	QFile ofile(fileData.filename);
-	if (ofile.exists())
-	{
-		ofile.remove();
-	}
+    std::string strfilename(downloadFile.toLocal8Bit().toStdString());
+    fileData.filename = strfilename.c_str();
+    QFile ofile(fileData.filename);
+    if (ofile.exists())
+    {
+        ofile.remove();
+    }
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEFUNCTION, WriteInFileFun);
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEDATA, &fileData);
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
@@ -238,7 +251,7 @@ QList<CFileInfo> SFtp::listRecursion(const QString &dir)
     // 存储所有的目录
     QList<QString> oDirs;
     oDirs.append(dir);
-	int level = 1;
+    int level = 1;
     while (!oDirs.isEmpty())
     {
         QString strCurDir = oDirs.takeFirst();
@@ -261,7 +274,7 @@ QList<CFileInfo> SFtp::listRecursion(const QString &dir)
 
             }
         }
-		level++;
+        level++;
     }
 
     for (int i = oDirsFinal.size()-1; i >= 0; --i)
@@ -313,12 +326,12 @@ int SFtp::put(const QString & localFile, const QString & remoteFile, const QStri
 
 
 
-	QString cmd = QString("rename %1%2 %1").arg(remoteFile).arg(suffix);
+    QString cmd = QString("rename %1%2 %1").arg(remoteFile).arg(suffix);
     //QString cmdOrgName = "RNTO " + filename;
     QString strUrl = url + filename + suffix;
     //strUrl += filename + sendsuffix;
     struct curl_slist *headerlist = NULL;
-	headerlist = curl_slist_append(headerlist, cmd.toLocal8Bit().toStdString().c_str());
+    headerlist = curl_slist_append(headerlist, cmd.toLocal8Bit().toStdString().c_str());
     //headerlist = curl_slist_append(headerlist, cmdOrgName.toLocal8Bit().toStdString().c_str());
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_UPLOAD, 1);
     //////////////////////////////////////////////////////////////////////////
@@ -388,14 +401,14 @@ int SFtp::remove(const QString &file)
         url = makeUrl("");
     }
 
-    QString szCmd = QString("DELE %1").arg(filename);
+    QString szCmd = QString("rm %1").arg(file);
     //m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url);
     struct curl_slist *headerlist = NULL;
     headerlist = curl_slist_append(headerlist, szCmd.toLocal8Bit().toStdString().c_str());
-    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_POSTQUOTE, headerlist);
-    m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+    m_iRetCode = curl_easy_setopt(m_pThridCurlHandler, CURLOPT_POSTQUOTE, headerlist);
+    m_iRetCode = curl_easy_setopt(m_pThridCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
     prepare();
-    m_iRetCode = curl_easy_perform(m_pSecCurlHandler);
+    m_iRetCode = curl_easy_perform(m_pThridCurlHandler);
     curl_slist_free_all(headerlist);
     return m_iRetCode;
 }
@@ -415,7 +428,7 @@ int SFtp::rmdir(const QString &dir)
         dirname = dir;
         url = makeUrl("");
     }
-    QString szCmd = QString("RMD %1").arg(dirname);
+    QString szCmd = QString("rmdir %1").arg(dir);
     //m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url);
     struct curl_slist *headerlist = NULL;
     headerlist = curl_slist_append(headerlist, szCmd.toLocal8Bit().toStdString().c_str());
@@ -501,6 +514,9 @@ void SFtp::prepare()
 
     m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_WRITEDATA, (void *)&listInfo);
     m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
+
+    m_iRetCode = curl_easy_setopt(m_pThridCurlHandler, CURLOPT_WRITEDATA, (void *)&listInfo);
+    m_iRetCode = curl_easy_setopt(m_pThridCurlHandler, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
 }
 
 void SFtp::parseMlsdInfo(const QString &currentDir, const QString &info, QList<CFileInfo> &fileList)
