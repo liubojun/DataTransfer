@@ -28,7 +28,7 @@ public:
      * @param  TransTask &task：文件信息
      * @return bool：成功返回true
      */
-    bool transfer(TransTask &task, SFtp &oSFtpSource, SFtp &oSFtpDest, CurlFtp &oCurlFtp);
+    bool transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSource, QSharedPointer<FtpBase> &pFtpDest, CurlFtp &oCurlFtp);
 
     int getCurlAddr();
     TransTask m_fileInfo;

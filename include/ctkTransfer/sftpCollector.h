@@ -54,7 +54,7 @@ public:
     virtual void taskDone(bool bFlag, const FileInfo &file);
 
     // 相同返回true，不同返回false
-    bool compareWithDest(SFtp &oCurlFtp, const CFileInfo &fi, TransTask &tTask);
+    bool compareWithDest(QSharedPointer<FtpBase> &oCurlFtp, const CFileInfo &fi, TransTask &tTask);
 
     void setProcess(QProcess *in_pro);
 

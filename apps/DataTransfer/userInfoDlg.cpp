@@ -44,18 +44,18 @@ bool UserManageDlg::onApply()
 
     UserInfo user;
     user.userName = ui.lineEdit_username->text();
-	if (ui.filerbt->isChecked()) // file
-	{
-		user.sendType = 0;
-	}
-	else if (ui.ftprbt->isChecked()) // ftp
-	{
-		user.sendType = 1;
-	}
-	else // sftp
-	{
-		user.sendType = 2;
-	}
+    if (ui.filerbt->isChecked()) // file
+    {
+        user.sendType = 0;
+    }
+    else if (ui.ftprbt->isChecked()) // ftp
+    {
+        user.sendType = 1;
+    }
+    else // sftp
+    {
+        user.sendType = 2;
+    }
 
     user.sendSuffix = ui.lineEdit_sendSuffix->text();
     user.rootPath = ui.lineEdit_path->text();
@@ -249,16 +249,16 @@ void UserManageDlg::onSelectUser(int nRow)
             ui.filerbt->setChecked(true);
             onSelWay(true);
         }
-		else if (it->sendType == 1) // ftp
+        else if (it->sendType == 1) // ftp
         {
             ui.ftprbt->setChecked(true);
             onSelWay(false);
         }
-		else // sftp
-		{
-			ui.sftprbt->setChecked(true);
-			onSelWay(false);
-		}
+        else // sftp
+        {
+            ui.sftprbt->setChecked(true);
+            onSelWay(false);
+        }
         ui.lineEdit_sendSuffix->setText(it->sendSuffix);
         ui.lineEdit_path->setText(it->rootPath);
         ui.lineEdit_ip->setText(it->ip);
@@ -337,14 +337,21 @@ void UserManageDlg::onRemoteColTest()
 
 
     }
-	else if (ui.ftprbt->isChecked())
+    else
     {
-        CFtp oFtp;
-
+        QSharedPointer<FtpBase> pFtp;
+        if (ui.ftprbt->isChecked())
+        {
+            pFtp = QSharedPointer<FtpBase>(new CFtp());
+        }
+        else
+        {
+            pFtp = QSharedPointer<FtpBase>(new SFtp());
+        }
         // 使用主动，默认为被动
-        oFtp.setTransferMode(1 == ui.cbx_ftpTransferMode->currentIndex() ? Active : Passive);
-        oFtp.connectToHost(ui.lineEdit_ip->text(), ui.lineEdit_port->text().toInt());
-        int ret = oFtp.login(ui.lineEdit_user->text(), ui.lineEdit_pwd->text(), 5);
+        pFtp->setTransferMode(1 == ui.cbx_ftpTransferMode->currentIndex() ? Active : Passive);
+        pFtp->connectToHost(ui.lineEdit_ip->text(), ui.lineEdit_port->text().toInt());
+        int ret = pFtp->login(ui.lineEdit_user->text(), ui.lineEdit_pwd->text(), 5);
 
         if (CURLE_OK != ret)
         {
@@ -354,26 +361,8 @@ void UserManageDlg::onRemoteColTest()
         {
             emit testok(QString(ui.lineEdit_ip->text()));
         }
-
     }
-	else
-	{
-		SFtp oFtp;
 
-		// 使用主动，默认为被动
-		oFtp.setTransferMode(1 == ui.cbx_ftpTransferMode->currentIndex() ? Active : Passive);
-		oFtp.connectToHost(ui.lineEdit_ip->text(), ui.lineEdit_port->text().toInt());
-		int ret = oFtp.login(ui.lineEdit_user->text(), ui.lineEdit_pwd->text(), 5);
-
-		if (CURLE_OK != ret)
-		{
-			emit testfail(QString(ui.lineEdit_ip->text()));
-		}
-		else
-		{
-			emit testok(QString(ui.lineEdit_ip->text()));
-		}
-	}
 }
 
 void UserManageDlg::onTestOk(const QString &url)

@@ -13,6 +13,7 @@ SET(SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/record.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/LibCurlFtp.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/LibCurlSFtp.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/LibCurlFtpBase.cpp
 )
 
 # 工程头文件
@@ -24,6 +25,7 @@ SET(HDRS
    ${RadarProjectInclude}/ctkTransfer/shareddirCollector.h
    ${RadarProjectInclude}/ctkTransfer/LibCurlFtp.h
    ${RadarProjectInclude}/ctkTransfer/LibCurlSFtp.h
+   ${RadarProjectInclude}/ctkTransfer/LibCurlFtpBase.h
    ${CMAKE_CURRENT_SOURCE_DIR}/DistributeFile.h
    ${CMAKE_CURRENT_SOURCE_DIR}/record.h
    

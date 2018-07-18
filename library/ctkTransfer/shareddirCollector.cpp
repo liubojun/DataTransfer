@@ -684,8 +684,9 @@ void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, 
     QDateTime qdtCollect = QDateTime::currentDateTime().addSecs(-m_collectSet.col_timerange*60);
 
     CurlFtp m_ftp;
-    SFtp sourceFtp;
-    SFtp destFtp;
+    QSharedPointer<FtpBase> pFtpSource;
+    QSharedPointer<FtpBase> pFtpDest;
+
     for (int i=0; i<qfileList.size(); ++i)
     {
         if (!m_bRun)
@@ -760,7 +761,7 @@ void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, 
                         //tTask.userInfo = m_userInfo.user;
                         // 发送文件
                         DistributeFile sendFile(this);
-                        if (!sendFile.transfer(tTask, sourceFtp, destFtp, m_ftp) && m_collectSet.recordLatestTime)
+                        if (!sendFile.transfer(tTask, pFtpSource, pFtpDest, m_ftp) && m_collectSet.recordLatestTime)
                         {
                             oRecord.updateSendFailure(qf.absolutePath(), qf.fileName());
                         }

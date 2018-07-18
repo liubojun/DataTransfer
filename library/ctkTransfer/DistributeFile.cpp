@@ -184,7 +184,7 @@ DistributeFile::~DistributeFile()
 //    return bRes;
 //}
 
-bool DistributeFile::transfer(TransTask &task, SFtp &oSFtpSource, SFtp &oSFtpDest, CurlFtp &oCurlFtp)
+bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSource, QSharedPointer<FtpBase> &pFtpDest, CurlFtp &oCurlFtp)
 {
     m_pCurlFtp = &oCurlFtp;
     QDir qdir(m_downloadPath);
@@ -236,9 +236,6 @@ bool DistributeFile::transfer(TransTask &task, SFtp &oSFtpSource, SFtp &oSFtpDes
     else if (1 == task.collectSet.collectType)	// ftp收集
     {
         string strIP = task.collectSet.ip.toStdString();
-        //char ftpUrl[512] = {0};
-        //char usrPwd[100] = {0};
-        // modified by liubojun@20170928,与收集统一方式
         QString ftpUrl = QString("ftp://%1:%2%3").arg(strIP.c_str()).arg(task.collectSet.port).arg(task.srcFileFullPath);
         strBroadMsgFile = ftpUrl;
         //sprintf(ftpUrl, "ftp://%s:%d%s", strIP.c_str(), task.collectSet.port, task.srcFileFullPath.toLocal8Bit().data());
@@ -249,23 +246,21 @@ bool DistributeFile::transfer(TransTask &task, SFtp &oSFtpSource, SFtp &oSFtpDes
         if (0 != m_pCurlFtp->downloadFile(ftpUrl.toLocal8Bit().toStdString().c_str(), usrPwd.toLocal8Bit().toStdString().c_str(), &fileData))
         {
             QString logInfo = QStringLiteral("从FTP下载文件[%1]失败。").arg(task.fileName);
-            //m_pBase->emitLog(task.collectSet.dirName, logInfo);
-            //m_pBase->emitLog(logInfo, BAD);
+
             emit emitLog(logInfo, BAD);
             return false;
         }
     }
     else if (2 == task.collectSet.collectType)	// sftp收集
     {
-        oSFtpSource.setTransferMode(task.collectSet.ftp_connectMode == 0 ? Passive : Active);
-        oSFtpSource.connectToHost(task.collectSet.ip, task.collectSet.port, task.collectSet.loginUser, task.collectSet.loginPass);
-        //if (CURLE_OK != oSFtpSource.login(task.collectSet.loginUser, task.collectSet.loginPass))
-        //{
-        //	QString logInfo = QStringLiteral("连接ftp服务器%1失败,原因:%2").arg(task.collectSet.ip).arg(oSFtpSource.errorString());
-        //	emit emitLog(logInfo, BAD);
-        //	return false;
-        //}
-        if (CURLE_OK != oSFtpSource.get(task.srcFileFullPath, tmpFilePath, task.collectSet.ftp_transferMode == 0 ? Binary : Ascii))
+        if (pFtpSource.isNull())
+        {
+            pFtpSource = QSharedPointer<FtpBase>(new SFtp());
+        }
+        pFtpSource->setTransferMode(task.collectSet.ftp_connectMode == 0 ? Passive : Active);
+        pFtpSource->connectToHost(task.collectSet.ip, task.collectSet.port, task.collectSet.loginUser, task.collectSet.loginPass);
+
+        if (CURLE_OK != pFtpSource->get(task.srcFileFullPath, tmpFilePath, task.collectSet.ftp_transferMode == 0 ? Binary : Ascii))
         {
             QString logInfo = QStringLiteral("从FTP下载文件[%1]失败。").arg(task.fileName);
             emit emitLog(logInfo, BAD);
@@ -298,15 +293,14 @@ bool DistributeFile::transfer(TransTask &task, SFtp &oSFtpSource, SFtp &oSFtpDes
     }
     else
     {
-        oSFtpDest.setTransferMode(task.userInfo.ftpTransferMode == 0 ? Passive : Active);
-        oSFtpDest.connectToHost(task.userInfo.ip, task.userInfo.port, task.userInfo.lgUser, task.userInfo.lgPass);
-        //if (CURLE_OK != oSFtpDest.login(task.userInfo.lgUser, task.userInfo.lgPass))
-        //{
-        //	QString logInfo = QStringLiteral("连接ftp服务器%1失败,原因:%2").arg(task.userInfo.ip).arg(oSFtpDest.errorString());
-        //	emit emitLog(logInfo, BAD);
-        //	return false;
-        //}
-        if (CURLE_OK != oSFtpDest.put(tmpFilePath, task.dstFilePath + task.strDestFileName, task.userInfo.sendSuffix, task.userInfo.ftpTransferType == 0 ? Binary : Ascii))
+        if (pFtpDest.isNull())
+        {
+            pFtpDest = QSharedPointer<FtpBase>(new SFtp());
+        }
+        pFtpDest->setTransferMode(task.userInfo.ftpTransferMode == 0 ? Passive : Active);
+        pFtpDest->connectToHost(task.userInfo.ip, task.userInfo.port, task.userInfo.lgUser, task.userInfo.lgPass);
+
+        if (CURLE_OK != pFtpDest->put(tmpFilePath, task.dstFilePath + task.strDestFileName, task.userInfo.sendSuffix, task.userInfo.ftpTransferType == 0 ? Binary : Ascii))
         {
             QString logInfo = QStringLiteral("文件[%1]上传到ftp失败。").arg(task.fileName);
             emit emitLog(logInfo, BAD);
@@ -314,18 +308,12 @@ bool DistributeFile::transfer(TransTask &task, SFtp &oSFtpSource, SFtp &oSFtpDes
         }
     }
 
-    if (bRes)
-    {
-        QString strInfo = QStringLiteral("文件[%1]发送完成。").arg(task.fileName);
-        emit emitLog(strInfo, GOOD);
-        emit emitBroadCast(strBroadMsgFile, strDstFile);
 
-    }
-
-
+    QString strInfo = QStringLiteral("文件[%1]发送完成。").arg(task.fileName);
+    emit emitLog(strInfo, GOOD);
+    emit emitBroadCast(strBroadMsgFile, strDstFile);
 
     QSLOG_DEBUG(QString("finish task: %1.").arg(task.srcFileFullPath));
-    //return bRes;
     return true;
 }
 

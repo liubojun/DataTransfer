@@ -243,8 +243,8 @@ bool MainWindow::addCollect(CollectTask &task, bool bDb /*= true*/)
     tUser.taskID = task.dirID;
     m_sqlite->QueryUserInfo(tUser);
 
-    int iSendType = tUser.lstUser.at(0).user.sendType >1 ? 1 : 0;
-    int iCollectType = task.collectType > 1 ? 1: 0;
+    int iSendType = tUser.lstUser.at(0).user.sendType >= 1 ? 1 : 0;
+    int iCollectType = task.collectType >= 1 ? 1: 0;
     int nIcon = iCollectType + iSendType * 2 + task.enable * 4;
     // 在左侧列表显示
     QListWidgetItem *pItem = new QListWidgetItem(COLLECTITEM);
@@ -1005,8 +1005,8 @@ void MainWindow::onProperty()
             }
             task = m_pCollectDlg->m_task;
             // 设置列表图标状态
-            int iSendType = oSender.user.sendType > 1 ? 1 : 0;
-            int iCollectType = m_pCollectDlg->m_task.collectType > 1 ? 1 : 0;
+            int iSendType = oSender.user.sendType >= 1 ? 1 : 0;
+            int iCollectType = m_pCollectDlg->m_task.collectType >= 1 ? 1 : 0;
             int nIcon = iCollectType + iSendType * 2 + task.enable * 4;
             MyItemWidget *pItemWidget = (MyItemWidget *)ui.listWidget->itemWidget(pItem);
             pItemWidget->SetIcon((ICONTYPE)nIcon);
@@ -1100,8 +1100,8 @@ void MainWindow::setTaskIcon(const CollectTask &task, int sendWay, int normal)
     TaskUser tUser;
     tUser.taskID = task.dirID;
     m_sqlite->QueryUserInfo(tUser);
-    int iSendType = tUser.lstUser.at(0).user.sendType > 1 ? 1 : 0;
-    int iCollectType = task.collectType + iSendType > 1 ? 1 : 0;
+    int iSendType = tUser.lstUser.at(0).user.sendType >= 1 ? 1 : 0;
+    int iCollectType = task.collectType + iSendType >= 1 ? 1 : 0;
     int nIcon = iCollectType + iSendType * 2 + task.enable * 4 + normal * 8;
     QMap<QListWidgetItem*, QString>::const_iterator it = m_ItemTask.begin();
     while (it != m_ItemTask.end())

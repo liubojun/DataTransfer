@@ -258,8 +258,8 @@ void FtpCollector::ftpDone(CDirRecord &io_record)
     QTime oTimer;
     oTimer.start();
 
-    SFtp sourceFtp;
-    SFtp destFtp;
+    QSharedPointer<FtpBase> pFtpSource;
+    QSharedPointer<FtpBase> pFtpDest;
     CurlFtp m_ftp;
     for (int i=0; i<m_fileList.size(); ++i)
     {
@@ -272,7 +272,7 @@ void FtpCollector::ftpDone(CDirRecord &io_record)
             DistributeFile sendFile(this);
 
             // 解决问题：当启用了记录收集时间时，当分发失败时，第二次无法重新分发
-            if (!sendFile.transfer(task, sourceFtp, destFtp, m_ftp) && m_collectSet.recordLatestTime)
+            if (!sendFile.transfer(task, pFtpSource, pFtpDest, m_ftp) && m_collectSet.recordLatestTime)
             {
                 io_record.updateSendFailure(task.srcFileFullPath.mid(0, task.srcFileFullPath.lastIndexOf("/")+1), task.fileName);
             }
@@ -309,7 +309,7 @@ bool FtpCollector::compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransT
         return true;
     }
 
-    for (int i=0; i<m_tUser.lstUser.size(); ++i)
+    for (int i = 0; i < m_tUser.lstUser.size(); ++i)
     {
         CollectUser &cUser = m_tUser.lstUser[i];
         QString strFileFullPath = QString::fromLocal8Bit(fi.strFilePath.c_str());
@@ -402,15 +402,15 @@ bool FtpCollector::compareWithDest(CurlFtp &oCurlFtp, const FileInfo &fi, TransT
                 }
                 //
             }
+
         }
 
         tTask.userInfo = cUser.user;
-        //tTask.userInfo.append(cUser.user);
-        //tTask.dstFilePath.append(dstFilePath);
+
         tTask.dstFilePath = dstFilePath;
     }
 
-    // return tTask.userInfo.empty();
+// return tTask.userInfo.empty();
     return tTask.userInfo.userID.isEmpty();
 }
 
