@@ -1,6 +1,7 @@
 ﻿#include "userInfoDlg.h"
 #include "pathbuilder.h"
 #include "LibCurlFtp.h"
+#include "LibCurlSFtp.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
@@ -17,7 +18,7 @@ UserManageDlg::UserManageDlg(QDialog *parent /*= NULL*/)
 
     InitUI();
 
-    connect(ui.radioButton, SIGNAL(toggled(bool)), this, SLOT(onSelWay(bool)));
+    connect(ui.filerbt, SIGNAL(toggled(bool)), this, SLOT(onSelWay(bool)));
     connect(ui.btnBrowse, SIGNAL(clicked()), this, SLOT(onBrowse()));
     connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(onAdd()));
     connect(ui.btnApply, SIGNAL(clicked()), this, SLOT(onApply()));
@@ -43,7 +44,19 @@ bool UserManageDlg::onApply()
 
     UserInfo user;
     user.userName = ui.lineEdit_username->text();
-    user.sendType = ui.radioButton->isChecked() ? 0 : 1;
+	if (ui.filerbt->isChecked()) // file
+	{
+		user.sendType = 0;
+	}
+	else if (ui.ftprbt->isChecked()) // ftp
+	{
+		user.sendType = 1;
+	}
+	else // sftp
+	{
+		user.sendType = 2;
+	}
+
     user.sendSuffix = ui.lineEdit_sendSuffix->text();
     user.rootPath = ui.lineEdit_path->text();
     user.timebaserule = ui.cb_timebaserule->currentIndex();
@@ -100,7 +113,7 @@ void UserManageDlg::onAdd()
 {
     // 清空内容
     ui.lineEdit_username->clear();
-    ui.radioButton->setChecked(true);
+    ui.filerbt->setChecked(true);
     ui.lineEdit_path->clear();
     ui.checkBox_3->setChecked(true);
     ui.listWidget->setCurrentRow(-1);
@@ -231,16 +244,21 @@ void UserManageDlg::onSelectUser(int nRow)
     if (it != m_ItemUser.end())
     {
         ui.lineEdit_username->setText(it->userName);
-        if (it->sendType == 0)
+        if (it->sendType == 0) // file
         {
-            ui.radioButton->setChecked(true);
+            ui.filerbt->setChecked(true);
             onSelWay(true);
         }
-        else
+		else if (it->sendType == 1) // ftp
         {
-            ui.radioButton_2->setChecked(true);
+            ui.ftprbt->setChecked(true);
             onSelWay(false);
         }
+		else // sftp
+		{
+			ui.sftprbt->setChecked(true);
+			onSelWay(false);
+		}
         ui.lineEdit_sendSuffix->setText(it->sendSuffix);
         ui.lineEdit_path->setText(it->rootPath);
         ui.lineEdit_ip->setText(it->ip);
@@ -259,7 +277,7 @@ void UserManageDlg::onSelectUser(int nRow)
     else
     {
         ui.lineEdit_username->clear();
-        ui.radioButton->setChecked(true);
+        ui.filerbt->setChecked(true);
         onSelWay(true);
         ui.lineEdit_path->clear();
         ui.lineEdit_ip->clear();
@@ -297,7 +315,7 @@ void UserManageDlg::onTest()
 
 void UserManageDlg::onRemoteColTest()
 {
-    if (ui.radioButton->isChecked())
+    if (ui.filerbt->isChecked())
     {
         QStringList retUrls = CPathBuilder::getFinalPathFromUrl(ui.lineEdit_path->text());
         foreach(QString strUrl, retUrls)
@@ -319,7 +337,7 @@ void UserManageDlg::onRemoteColTest()
 
 
     }
-    else
+	else if (ui.ftprbt->isChecked())
     {
         CFtp oFtp;
 
@@ -338,6 +356,24 @@ void UserManageDlg::onRemoteColTest()
         }
 
     }
+	else
+	{
+		SFtp oFtp;
+
+		// 使用主动，默认为被动
+		oFtp.setTransferMode(1 == ui.cbx_ftpTransferMode->currentIndex() ? Active : Passive);
+		oFtp.connectToHost(ui.lineEdit_ip->text(), ui.lineEdit_port->text().toInt());
+		int ret = oFtp.login(ui.lineEdit_user->text(), ui.lineEdit_pwd->text(), 5);
+
+		if (CURLE_OK != ret)
+		{
+			emit testfail(QString(ui.lineEdit_ip->text()));
+		}
+		else
+		{
+			emit testok(QString(ui.lineEdit_ip->text()));
+		}
+	}
 }
 
 void UserManageDlg::onTestOk(const QString &url)

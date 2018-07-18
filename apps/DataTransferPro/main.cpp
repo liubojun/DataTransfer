@@ -53,10 +53,19 @@ int main(int argc, char **argv)
 	//oFtp.cd("/home/serv");
 	//oFtp.list();
 
-	//SFTP::SFtp osFtp;
-	//osFtp.enableDebugLevel(true);
-	//osFtp.connectToHost("218.94.36.211", 10051);
-	//osFtp.login("nankong", "123456");
+	/*SFtp osFtp;
+	osFtp.enableDebugLevel(true);
+	osFtp.connectToHost("218.94.36.211", 10051);
+	osFtp.setTransferMode(Active);
+	osFtp.login("jslj", "jslj");
+	if (CURLE_OK != osFtp.get("/home/jslj/temp/bin/findg", "E:/findg"))
+	{
+
+	}
+	if (CURLE_OK != osFtp.get("/home/jslj/temp/bin/rassplit", "E:/rassplit"))
+	{
+
+	}*/
 	//osFtp.cd("/home/nankong");
 	//osFtp.list();
 	////osFtp.put("F:/TEST/DataTransfer_20170928.rar", "/home/nankong/DataTransfer_20170928.rar", ".tmp");

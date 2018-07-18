@@ -757,8 +757,8 @@ void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, 
                         tTask.collectSet = m_collectSet;
                         //tTask.userInfo = m_userInfo.user;
                         // 发送文件
-                        DistributeFile sendFile(this, m_ftp);
-                        if (!sendFile.transfer(tTask) && m_collectSet.recordLatestTime)
+                        DistributeFile sendFile(this);
+						if (!sendFile.transfer(tTask, m_ftp) && m_collectSet.recordLatestTime)
                         {
                             oRecord.updateSendFailure(qf.absolutePath(), qf.fileName());
                         }

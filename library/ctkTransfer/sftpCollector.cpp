@@ -296,23 +296,24 @@ void SFtpCollector::ftpDone(const QList<CFileInfo> &files, CDirRecord &io_record
     QTime oTimer;
     oTimer.start();
 
-   // CurlFtp m_ftp;
-	SFtp oSFtp;
+	SFtp oSFtpSource;
+	SFtp oSFtpDestTemp;
+	SFtp oSFtpDestSend;
 	for (int i = 0; i<files.size(); ++i)
     {
         TransTask task;
-		if (m_bRun && !compareWithDest(oSFtp, files.at(i), task))
+		if (m_bRun && !compareWithDest(oSFtpDestTemp, files.at(i), task))
         {
             task.collectSet = m_collectSet;
             //task.userInfo = m_userInfo.user;
             // 发送文件
-   //         DistributeFile sendFile(this, m_ftp);
+            DistributeFile sendFile(this);
 
-			//// 解决问题：当启用了记录收集时间时，当分发失败时，第二次无法重新分发
-			//if (!sendFile.transfer(task) && m_collectSet.recordLatestTime)
-			//{
-			//	io_record.updateSendFailure(task.srcFileFullPath.mid(0, task.srcFileFullPath.lastIndexOf("/")+1), task.fileName);
-			//}
+			// 解决问题：当启用了记录收集时间时，当分发失败时，第二次无法重新分发
+			if (!sendFile.transfer(task, oSFtpSource, oSFtpDestSend) && m_collectSet.recordLatestTime)
+			{
+				io_record.updateSendFailure(task.srcFileFullPath.mid(0, task.srcFileFullPath.lastIndexOf("/")+1), task.fileName);
+			}
         }
     }
 	m_bFinish = true;
@@ -392,11 +393,9 @@ bool SFtpCollector::compareWithDest(SFtp &oCurlFtp, const CFileInfo &fi, TransTa
             }
         }
         // 分发到FTP
-        else
+		else if (cUser.user.sendType == 1)
         {
-            //char ftpUrl[512] = {0};
-            //char ftpPath[512] = { 0 };
-            //char usrPwd[100] = {0};
+          
             string strIp = cUser.user.ip.toStdString();
             int nPort = cUser.user.port;
             string strPath = dstFileFullPath.toLocal8Bit().data();
@@ -437,9 +436,38 @@ bool SFtpCollector::compareWithDest(SFtp &oCurlFtp, const CFileInfo &fi, TransTa
                 {
                     continue;
                 }
-                //
             }
         }
+		else
+		{
+			oCurlFtp.connectToHost(cUser.user.ip, cUser.user.port, cUser.user.lgUser, cUser.user.lgPass);
+			oCurlFtp.setTransferMode(cUser.user.ftpTransferMode == 0 ? Passive : Active);
+			//if (CURLE_OK != oCurlFtp.login(cUser.user.lgUser, cUser.user.lgPass))
+			//{
+			//	continue;
+			//}
+			//else
+			{
+				long long dSize = (long long)oCurlFtp.getFileSize(dstFileFullPath);
+				if (-1 != dSize)
+				{
+					if (fi.size != dSize)
+					{
+						if (-1 == oCurlFtp.remove(fi.path))
+						{
+							continue;
+						}
+					}
+					else
+					{
+						continue;
+					}
+
+				}
+
+			}
+
+		}
 
         tTask.userInfo = cUser.user;
         //tTask.userInfo.append(cUser.user);

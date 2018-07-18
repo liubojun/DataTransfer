@@ -59,6 +59,24 @@ int SFtp::connectToHost(const QString &host, quint16 port /*= 21*/)
     return m_iRetCode;
 }
 
+int SFtp::connectToHost(const QString &host, quint16 port /*= 22*/, const QString &user /*= QString()*/, const QString &pwd /*= QString()*/,  int timeout /* = 30*/)
+{
+	QString url = makeUrl(host, port);
+
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_NOSIGNAL, 1L);
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_NOSIGNAL, 1L);
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
+
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_USERNAME, user.toLocal8Bit().toStdString().c_str());
+	m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_PASSWORD, pwd.toLocal8Bit().toStdString().c_str());
+
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_USERNAME, user.toLocal8Bit().toStdString().c_str());
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_PASSWORD, pwd.toLocal8Bit().toStdString().c_str());
+	m_iRetCode = curl_easy_setopt(m_pSecCurlHandler, CURLOPT_TIMEOUT, timeout);
+	return m_iRetCode;
+}
+
 QString SFtp::errorString()
 {
     if (CURLE_OK != m_iRetCode)
@@ -85,14 +103,34 @@ int SFtp::enableDebugLevel(bool flag /*= true*/)
 }
 
 
-int SFtp::get(const QString &file, const QString &dir, TransferType type /*= Binary*/)
+int SFtp::get(const QString &sourceFile, const QString &downloadFile, TransferType type /*= Binary*/)
 {
     // 获知当前所在目录
-    QString url = makeUrl("");
-    url.append(file);
+	QString filename, url;
+	if (sourceFile.startsWith("/"))
+	{
+		filename = sourceFile.split("/").last();
+		QString dir = sourceFile.mid(0, sourceFile.lastIndexOf("/"));
+		url = makeUrl(dir);
+	}
+	else
+	{
+		filename = sourceFile;
+		url = makeUrl("");
+	}
+	url = url + filename;
+    //QString url = makeUrl("");
+    //url.append(file);
     struct FileData fileData;
-    std::string localfilepath = (dir + "/" + file).toLocal8Bit().toStdString();
-    fileData.filename = localfilepath.c_str();
+	// std::string localfilepath = (dir + "/" + filename).toLocal8Bit().toStdString();
+    // fileData.filename = localfilepath.c_str();
+	std::string strfilename(downloadFile.toLocal8Bit().toStdString());
+	fileData.filename = strfilename.c_str();
+	QFile ofile(fileData.filename);
+	if (ofile.exists())
+	{
+		ofile.remove();
+	}
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEFUNCTION, WriteInFileFun);
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEDATA, &fileData);
     m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
@@ -275,7 +313,7 @@ int SFtp::put(const QString & localFile, const QString & remoteFile, const QStri
 
 
 
-	QString cmd = "rename " + filename + suffix + " " + filename;
+	QString cmd = QString("rename %1%2 %1").arg(remoteFile).arg(suffix);
     //QString cmdOrgName = "RNTO " + filename;
     QString strUrl = url + filename + suffix;
     //strUrl += filename + sendsuffix;

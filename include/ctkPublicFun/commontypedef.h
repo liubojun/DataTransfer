@@ -392,7 +392,7 @@ struct UserInfo
 {
     QString		userID;
     QString		userName;
-    int			sendType;			///< 分发方式：0-FILE，1-FTP
+    int			sendType;			///< 分发方式：0-FILE，1-FTP, 2-SFTP
     int			ftpTransferType;	// 只有当sendType为1时生效，ftp传输类型 0-binary，1-ascii
     int			ftpTransferMode;	// 只有当sendType为1时生效，ftp传输模式 0-被动，1-主动
     QString     sendSuffix;			// 传输过程中的临时文件后缀名

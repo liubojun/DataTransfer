@@ -267,10 +267,10 @@ void FtpCollector::ftpDone(CDirRecord &io_record)
             task.collectSet = m_collectSet;
             //task.userInfo = m_userInfo.user;
             // 发送文件
-            DistributeFile sendFile(this, m_ftp);
+            DistributeFile sendFile(this);
 
 			// 解决问题：当启用了记录收集时间时，当分发失败时，第二次无法重新分发
-			if (!sendFile.transfer(task) && m_collectSet.recordLatestTime)
+			if (!sendFile.transfer(task, m_ftp) && m_collectSet.recordLatestTime)
 			{
 				io_record.updateSendFailure(task.srcFileFullPath.mid(0, task.srcFileFullPath.lastIndexOf("/")+1), task.fileName);
 			}

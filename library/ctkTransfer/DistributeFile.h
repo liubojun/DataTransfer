@@ -6,13 +6,14 @@
 #include "curlftp.h"
 #include "commontypedef.h"
 #include "CollectorBase.h"
+#include "LibCurlSFtp.h"
 
 
 class DistributeFile : public QObject
 {
     Q_OBJECT
 public:
-    DistributeFile(CollectorBase *pBase, CurlFtp &oCurlFtp);
+    DistributeFile(CollectorBase *pBase);
     virtual ~DistributeFile();
 
 	/**
@@ -20,7 +21,14 @@ public:
 	 * @param  TransTask &task：文件信息
 	 * @return bool：成功返回true
 	 */
-    bool transfer(TransTask &task);
+	bool transfer(TransTask &task, CurlFtp &oCurlFtp);
+
+	/**
+	 * @brief  文件分发
+	 * @param  TransTask &task：文件信息
+	 * @return bool：成功返回true
+	 */
+	bool transfer(TransTask &task, SFtp &oSFtpSource, SFtp &oSFtpDest);
 
     int getCurlAddr();
     TransTask m_fileInfo;
@@ -60,7 +68,7 @@ protected:
     void taskFinish();
 
 private:
-    CurlFtp &m_oCurlFtp;
+    CurlFtp *m_pCurlFtp;
     // QSharedPointer<CurlFtp>	m_pFtp;
     CollectorBase	*m_pBase;
     //IFileCrypt	*m_pFileCrypt;

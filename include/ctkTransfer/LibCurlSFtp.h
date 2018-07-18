@@ -68,6 +68,9 @@
         // 连接到ftp服务器
         int connectToHost(const QString &host, quint16 port = 22);
 
+		// 连接到ftp服务器
+		int connectToHost(const QString &host, quint16 port, const QString &user, const QString &pwd, int timeout = 30);
+
         // 返回上一次错误结果
         QString errorString();
 
@@ -75,7 +78,7 @@
         int enableDebugLevel(bool flag = true);
 
         // 从ftp下载文件
-		int get(const QString &file, const QString &dir, TransferType type = Binary);
+		int get(const QString &sourceFile, const QString &downloadFile, TransferType type = Binary);
 
         // 从ftp下载文件(支持文件不落地，直接走内存)
 		int get(const QString &file, QIODevice *dev, TransferType type = Binary);
