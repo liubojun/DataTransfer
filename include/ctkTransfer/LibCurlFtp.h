@@ -22,18 +22,6 @@ public:
 
     virtual ~CFtp();
 
-    // 从ftp下载文件
-    virtual int get(const QString &file, const QString &dir, TransferType type = Binary);
-
-    // 从ftp下载文件(支持文件不落地，直接走内存)
-    virtual int get(const QString &file, QIODevice *dev, TransferType type = Binary);
-
-    // 获取文件目录列表
-    //virtual QList<CFileInfo> list(const QString &dir = QString());
-
-    // 获取文件目录列表（递归遍历子目录）
-    //virtual QList<CFileInfo> listRecursion(const QString &dir = QString());
-
     // 创建目录
     virtual int mkdir(const QString &dir);
 

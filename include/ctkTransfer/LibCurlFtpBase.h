@@ -69,10 +69,10 @@ public:
     int enableDebugLevel(bool flag = true);
 
     // 从ftp下载文件
-    virtual int get(const QString &file, const QString &dir, TransferType type = Binary) = 0;
+    int get(const QString &file, const QString &dir, TransferType type = Binary);
 
     // 从ftp下载文件(支持文件不落地，直接走内存)
-    virtual int get(const QString &file, QIODevice *dev, TransferType type = Binary) = 0;
+    int get(const QString &file, QIODevice *dev, TransferType type = Binary);
 
     // 获取ftp文件大小
     double getFileSize(const QString &file);

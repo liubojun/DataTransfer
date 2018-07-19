@@ -20,62 +20,6 @@ CFtp::~CFtp()
 
 }
 
-
-
-int CFtp::get(const QString &file, const QString &dir, TransferType type /*= Binary*/)
-{
-    // 获知当前所在目录
-    QString url = makeUrl2("");
-    url.append(file);
-    struct FileData fileData;
-    std::string localfilepath = (dir + "/" + file).toLocal8Bit().toStdString();
-    fileData.filename = localfilepath.c_str();
-    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEFUNCTION, WriteInFileFun);
-    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEDATA, &fileData);
-    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
-    if (Ascii == type)
-    {
-        m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_TRANSFERTEXT, 1L);
-    }
-    else
-    {
-        m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_TRANSFERTEXT, 0);
-    }
-    m_iRetCode = curl_easy_perform(m_pCurlHandler);
-    // 关闭文件
-    if (fileData.stream)
-    {
-        fclose(fileData.stream);
-    }
-    return m_iRetCode;
-}
-
-
-int CFtp::get(const QString &file, QIODevice *dev, TransferType type /*= Binary*/)
-{
-    // 获知当前所在目录
-    QString url = makeUrl2("");
-    url.append(file);
-
-    MemoryData oMemData;
-    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEFUNCTION, WriteInMemoryFun);
-    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_WRITEDATA, &oMemData);
-    m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_URL, url.toLocal8Bit().toStdString().c_str());
-    if (Ascii == type)
-    {
-        m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_TRANSFERTEXT, 1L);
-    }
-    else
-    {
-        m_iRetCode = curl_easy_setopt(m_pCurlHandler, CURLOPT_TRANSFERTEXT, 0);
-    }
-    m_iRetCode = curl_easy_perform(m_pCurlHandler);
-
-    QDataStream stream(dev);
-    stream.writeBytes(oMemData.memdata, oMemData.size);
-    return m_iRetCode;
-}
-
 int CFtp::mkdir(const QString &dir)
 {
     return 0;

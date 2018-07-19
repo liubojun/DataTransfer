@@ -297,7 +297,7 @@ void SFtpCollector::ftpDone(const QList<CFileInfo> &files, CDirRecord &io_record
     QTime oTimer;
     oTimer.start();
 
-    QSharedPointer<FtpBase> pFtpTemp;
+    //QSharedPointer<FtpBase> pFtpTemp;
     QSharedPointer<FtpBase> pFtpSource;
     QSharedPointer<FtpBase> pFtpDest;
     //CurlFtp	 oCurlFtp;
@@ -306,7 +306,7 @@ void SFtpCollector::ftpDone(const QList<CFileInfo> &files, CDirRecord &io_record
     for (int i = 0; i<files.size(); ++i)
     {
         TransTask task;
-        if (m_bRun && !compareWithDest(pFtpTemp, files.at(i), task))
+        if (m_bRun && !compareWithDest(pFtpDest, files.at(i), task))
         {
             task.collectSet = m_collectSet;
             //task.userInfo = m_userInfo.user;

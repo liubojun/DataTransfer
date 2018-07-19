@@ -22,13 +22,6 @@ public:
 
     virtual ~SFtp();
 
-    // 从ftp下载文件
-    virtual int get(const QString &sourceFile, const QString &downloadFile, TransferType type = Binary);
-
-    // 从ftp下载文件(支持文件不落地，直接走内存)
-    virtual int get(const QString &file, QIODevice *dev, TransferType type = Binary);
-
-
     // 创建目录
     virtual int mkdir(const QString &dir);
 
