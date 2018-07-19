@@ -352,9 +352,17 @@ bool FtpCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const File
         if (cUser.user.sendType == 0)
         {
             QFile file(dstFileFullPath);
-            if (file.exists() && fi.nFileSize == file.size())
+            if (file.exists())
             {
-                continue;
+                if (fi.nFileSize == file.size())
+                {
+                    continue;
+                }
+                else
+                {
+                    file.remove();
+                }
+
             }
         }
         // 分发到FTP

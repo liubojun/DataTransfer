@@ -284,22 +284,50 @@ bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSour
             }
         }
         QFile sourcefile(tmpFilePath);
-        if (!sourcefile.copy(strDestFileFullPath + task.userInfo.sendSuffix))
+        QFile destfile(strDestFileFullPath + task.userInfo.sendSuffix);
+        bool bNeedRename = false;
+        bool bNeedCopy = false;
+        if (destfile.exists())
         {
-            QString logInfo = QStringLiteral("文件[%1]上传到%2失败。").arg(task.fileName).arg(task.dstFilePath);
+            if (destfile.size() != sourcefile.size())
+            {
+                destfile.remove();
+                bNeedCopy = true;
+            }
+            else
+            {
+                bNeedRename = true;
+            }
+
+        }
+        else
+        {
+            bNeedRename = true;
+            bNeedCopy = true;
+        }
+
+        if (bNeedCopy && !sourcefile.copy(strDestFileFullPath + task.userInfo.sendSuffix))
+        {
+            QString logInfo = QStringLiteral("文件[%1]上传到%2失败").arg(task.fileName).arg(task.dstFilePath);
+
+            QSLOG_ERROR(logInfo + ",reason:" + sourcefile.errorString());
             emit emitLog(logInfo, BAD);
             return false;
         }
-        if (!task.userInfo.sendSuffix.trimmed().isEmpty())
+
+        if (bNeedRename && !task.userInfo.sendSuffix.trimmed().isEmpty())
         {
             QFile destFile(strDestFileFullPath + task.userInfo.sendSuffix);
             if (!destFile.rename(strDestFileFullPath))
             {
                 QString logInfo = QStringLiteral("文件[%1]重命名失败。").arg(task.fileName);
                 emit emitLog(logInfo, BAD);
+                QSLOG_ERROR(logInfo + ",reason:" + sourcefile.errorString());
                 return false;
             }
         }
+
+
     }
     else
     {

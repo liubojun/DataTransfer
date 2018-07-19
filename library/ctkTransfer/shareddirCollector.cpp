@@ -835,10 +835,10 @@ bool SharedDirCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, cons
         if (cUser.user.sendType == 0)
         {
             QFileInfo file(dstFileFullPath);
-            if (0 == cUser.user.compress)
+
+            if (file.exists())
             {
-                //qDebug() << fi.size() << file.size();
-                if (file.exists() && fi.size() == file.size())
+                if (fi.size() == file.size())
                 {
                     QSLOG_DEBUG(QString("dest file exist and size is the same with the source ,file content is not the same"
                                         "source file: %1, use content comare : %2").arg(fi.fileName()).arg(m_collectSet.compareContent));
@@ -863,15 +863,14 @@ bool SharedDirCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, cons
                         continue;
                     }
                 }
+                else
+                {
+                    QFile oFile(dstFileFullPath);
+                    oFile.remove();
+                }
 
             }
-            else
-            {
-                if (file.exists())
-                {
-                    continue;
-                }
-            }
+
 
         }
         // 分发到FTP

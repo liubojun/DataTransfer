@@ -391,10 +391,19 @@ bool SFtpCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const CFi
         if (cUser.user.sendType == 0)
         {
             QFile file(dstFileFullPath);
-            if (file.exists() && fi.size == file.size())
+            if (file.exists())
             {
-                continue;
+
+                if (fi.size == file.size())
+                {
+                    continue;
+                }
+                else
+                {
+                    file.remove();
+                }
             }
+
         }
         else
         {
