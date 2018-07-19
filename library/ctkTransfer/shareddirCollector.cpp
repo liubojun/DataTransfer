@@ -688,7 +688,7 @@ void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, 
     // CurlFtp m_ftp;
     QSharedPointer<FtpBase> pFtpSource;
     QSharedPointer<FtpBase> pFtpDest;
-	QSharedPointer<FtpBase> pFtpTemp;
+    //QSharedPointer<FtpBase> pFtpTemp;
     for (int i=0; i<qfileList.size(); ++i)
     {
         if (!m_bRun)
@@ -757,7 +757,7 @@ void SharedDirCollector::getSynclessFiles(DIRLEVEL in_processDir, bool bSubdir, 
                 if (filterFileName(qf.fileName()))
                 {
                     TransTask tTask;
-					if (!compareWithDest(pFtpTemp, qf, tTask) && m_bRun)
+                    if (!compareWithDest(pFtpDest, qf, tTask) && m_bRun)
                     {
                         tTask.collectSet = m_collectSet;
                         //tTask.userInfo = m_userInfo.user;
@@ -877,40 +877,40 @@ bool SharedDirCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, cons
         // 分发到FTP
         else
         {
-			if (cUser.user.sendType == 1)
-			{
-				if (pCurlFtp.isNull())
-				{
-					pCurlFtp = QSharedPointer<FtpBase>(new CFtp());
-				}
-			}
-			else
-			{
-				if (pCurlFtp.isNull())
-				{
-					pCurlFtp = QSharedPointer<FtpBase>(new SFtp());
-				}
-			}
+            if (cUser.user.sendType == 1)
+            {
+                if (pCurlFtp.isNull())
+                {
+                    pCurlFtp = QSharedPointer<FtpBase>(new CFtp());
+                }
+            }
+            else
+            {
+                if (pCurlFtp.isNull())
+                {
+                    pCurlFtp = QSharedPointer<FtpBase>(new SFtp());
+                }
+            }
 
-			pCurlFtp->connectToHost(cUser.user.ip, cUser.user.port, cUser.user.lgUser, cUser.user.lgPass);
-			pCurlFtp->setTransferMode(cUser.user.ftpTransferMode == 0 ? Passive : Active);
+            pCurlFtp->connectToHost(cUser.user.ip, cUser.user.port, cUser.user.lgUser, cUser.user.lgPass);
+            pCurlFtp->setTransferMode(cUser.user.ftpTransferMode == 0 ? Passive : Active);
 
-			long long dSize = (long long)pCurlFtp->getFileSize(dstFileFullPath);
-			if (-1 != dSize)
-			{
-				if (fi.size() != dSize)
-				{
-					if (-1 == pCurlFtp->remove(dstFileFullPath))
-					{
-						continue;
-					}
-				}
-				else
-				{
-					continue;
-				}
+            long long dSize = (long long)pCurlFtp->getFileSize(dstFileFullPath);
+            if (-1 != dSize)
+            {
+                if (fi.size() != dSize)
+                {
+                    if (-1 == pCurlFtp->remove(dstFileFullPath))
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    continue;
+                }
 
-			}
+            }
 
             //string strIp = cUser.user.ip.toStdString();
             //int nPort = cUser.user.port;
