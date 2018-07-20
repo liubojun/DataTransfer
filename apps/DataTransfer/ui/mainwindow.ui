@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>数据传输系统</string>
+   <string>数据传输系统(1.1.0)</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QListWidget" name="listWidget">
