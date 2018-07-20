@@ -31,9 +31,10 @@ DistributeFile::DistributeFile(CollectorBase *pBase)
     //m_pFileCrypt = pBase->m_pFileCrypt;
 
     // m_downloadPath = qApp->applicationDirPath() + "/work/download/" + QString::number(getCurlAddr());
-    m_downloadPath = qApp->applicationDirPath() + "/work/download/" + QUuid::createUuid().toString();
+    //m_downloadPath = qApp->applicationDirPath() + "/work/download/" + QUuid::createUuid().toString();
+    //m_downloadPath = qApp->applicationDirPath() + "/work/download/" + pBase->m_collectSet.dirName;
     // m_downloadPath = qApp->applicationDirPath() + "/work/download/";
-    taskFinish();
+    //taskFinish();
 }
 
 DistributeFile::~DistributeFile()
@@ -189,6 +190,7 @@ bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSour
 {
     //m_pCurlFtp = &oCurlFtp;
     QSLOG_DEBUG(QString::fromLocal8Bit("===开始传输文件:%1===").arg(task.srcFileFullPath));
+    m_downloadPath = qApp->applicationDirPath() + "/work/download/" + m_pBase->m_collectSet.dirName;
     QDir qdir(m_downloadPath);
     if (!qdir.exists())
     {
@@ -263,7 +265,7 @@ bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSour
     bool bRes = false;
     const UserInfo &user = task.userInfo;
 
-    QSLOG_DEBUG(QString::fromLocal8Bit("文件:%1分发到[%2]").arg(fileData.filename).arg(user.userName));
+    QSLOG_DEBUG(QString::fromLocal8Bit("文件:%1分发到[%2]").arg(QString::fromLocal8Bit(fileData.filename)).arg(user.userName));
     // 3.分发数据
 
     QString strDstFile;
