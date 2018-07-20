@@ -2,6 +2,7 @@
 #include "ctkLog.h"
 #include <QMetaType>
 #include <QDesktopServices>
+#include <QMessageBox>
 #include <QTimer>
 #include <QUrl>
 //--测试
@@ -1333,5 +1334,8 @@ void MainWindow::onBroadcastTest()
 
 void MainWindow::onHelp()
 {
-
-}
+    QMessageBox::about(this, QString::fromLocal8Bit("数据传输工具"), QString::fromLocal8Bit("数据传输工具\n"
+                       "版本：1.1.0\n"
+                       "copyright: 雷达系统事业部系统工程中心\n"
+                       "E-mail: liubojun@glarun.com"));
+};
