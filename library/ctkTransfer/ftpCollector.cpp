@@ -313,7 +313,7 @@ bool FtpCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const File
     }
 
     //for (int i = 0; i < m_tUser.lstUser.size(); ++i)
-    {
+    do{
         CollectUser &cUser = m_tUser.sendUser;
         QString strFileFullPath = QString::fromLocal8Bit(fi.strFilePath.c_str());
         QString strFileName = QString::fromLocal8Bit(fi.strFileName.c_str());
@@ -356,7 +356,7 @@ bool FtpCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const File
             {
                 if (fi.nFileSize == file.size())
                 {
-                    //continue;
+					break;
                 }
                 else
                 {
@@ -393,12 +393,12 @@ bool FtpCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const File
                 {
                     if (-1 == pCurlFtp->remove(dstFileFullPath))
                     {
-                        //continue;
+						break;
                     }
                 }
                 else
                 {
-                    //continue;
+                    break;
                 }
 
             }
@@ -446,12 +446,12 @@ bool FtpCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const File
             //    //
             //}
 
-        }
+		}
 
         tTask.userInfo = cUser.user;
 
         tTask.dstFilePath = dstFilePath;
-    }
+	}while (0);
 
 // return tTask.userInfo.empty();
     return tTask.userInfo.userID.isEmpty();

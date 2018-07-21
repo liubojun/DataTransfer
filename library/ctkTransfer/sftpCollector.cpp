@@ -83,6 +83,8 @@ void SFtpCollector::getNewFiles()
     QString strLogInfo(QStringLiteral("开始收集任务 %1[%2]").arg(m_collectSet.dirName).arg(m_collectSet.rltvPath));
     emit print(strLogInfo);
     QSLOG_DEBUG(strLogInfo);
+	m_nLineState = 0;
+	emit taskState(m_collectSet, 0, m_nLineState);
     bool bConnect = true;
 
     // 先测试源路径是否正常
@@ -105,8 +107,7 @@ void SFtpCollector::getNewFiles()
     }
 
     // 如果连接是正常的话
-    m_nLineState = 0;
-    emit taskState(m_collectSet, 0, m_nLineState);
+
 
     emit startGif(m_collectSet.dirID, true);
 
@@ -352,7 +353,8 @@ bool SFtpCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const CFi
     }
 
     //for (int i=0; i<m_tUser.lstUser.size(); ++i)
-    {
+    do
+	{
         CollectUser &cUser = m_tUser.sendUser;
         QString strFileFullPath = fi.path;
         QString strFileName = fi.name;
@@ -396,7 +398,7 @@ bool SFtpCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const CFi
 
                 if (fi.size == file.size())
                 {
-                    //continue;
+					break;
                 }
                 else
                 {
@@ -432,12 +434,12 @@ bool SFtpCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const CFi
                 {
                     if (-1 == pCurlFtp->remove(dstFileFullPath))
                     {
-                        //continue;
+						break;
                     }
                 }
                 else
                 {
-                    //continue;
+                    break;
                 }
 
             }
@@ -448,7 +450,7 @@ bool SFtpCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const CFi
         //tTask.userInfo.append(cUser.user);
         //tTask.dstFilePath.append(dstFilePath);
         tTask.dstFilePath = dstFilePath;
-    }
+	} while (0);
 
     // return tTask.userInfo.empty();
     return tTask.userInfo.userID.isEmpty();

@@ -794,7 +794,7 @@ bool SharedDirCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, cons
     //QSLOG_DEBUG("compare with dest");
 
     //for (int i=0; i<m_tUser.lstUser.size(); ++i)
-    {
+    do{
         CollectUser &cUser = m_tUser.sendUser;
         // QString dstFileFullPath = getDestFilePath(fi.filePath(), fi.fileName(), cUser, fi.lastModified());
 
@@ -854,13 +854,13 @@ bool SharedDirCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, cons
 
                         if (file_source.readAll() == file_dest.readAll())
                         {
-                            //continue;
+							break;
                         }
 
                     }
                     else
                     {
-                        //continue;
+						break;
                     }
                 }
                 else
@@ -901,12 +901,12 @@ bool SharedDirCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, cons
                 {
                     if (-1 == pCurlFtp->remove(dstFileFullPath))
                     {
-                        //continue;
+						break;
                     }
                 }
                 else
                 {
-                    //continue;
+					break;
                 }
 
             }
@@ -954,13 +954,13 @@ bool SharedDirCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, cons
             //    }
             //    //
             //}
-        }
+		}
 
         //tTask.userInfo.append(cUser.user);
         //tTask.dstFilePath.append(dstFilePath);
         tTask.userInfo = (cUser.user);
         tTask.dstFilePath = (dstFilePath);
-    }
+	}while (0);
 
     // return tTask.userInfo.empty();
     return tTask.userInfo.userID.isEmpty();
