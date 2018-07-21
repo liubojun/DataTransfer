@@ -85,6 +85,8 @@ DataBase::DataBase()
                "[USERID] VARCHAR(20),"
                "[RLTVPATH] VARCHAR(100),"
                "[RENAME_RULE] VARCHAR(20),"
+			   "[TIMERULE] INT(1),"
+			   "[KEEPDIR] BOOL,"
                "CONSTRAINT[sqlite_autoindex_T_COL_USER_1] PRIMARY KEY([DIRID]) ON CONFLICT FAIL)"
               );
 
@@ -118,16 +120,11 @@ DataBase::DataBase()
                "[FTPTRANSFERMODE] INT(1) NOT NULL DEFAULT 0, "
                "[SENDSUFFIX] VARCHAR(20) NOT NULL, "
                "[RLTVPATH] VARCHAR(100), "
-               "[TIMEBASEDRULE] INT(1) DEFAULT (0), "
                "[LOGINUSER] VARCHAR(20), "
                "[LOGINPASS] VARCHAR(20), "
                "[IP] VARCHAR(20), "
                "[PORT] INT, "
-               "[KEEPDIR] INT,"
-               "[COMPRESS] INT,"
-               "[ENCRYPT] INT, "
                "[CONPUT] INT, "
-               "[MAXTRYCOUNS] INT,"
                "CONSTRAINT [sqlite_autoindex_T_SEND_USER_1] PRIMARY KEY ([USERID]))");
 
     checkTable("T_GLOBALINFO", "CREATE TABLE [T_GLOBALINFO] ("

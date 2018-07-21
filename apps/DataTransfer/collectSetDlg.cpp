@@ -56,7 +56,7 @@ void CollectSetDlg::InitUI()
         ui.lineEdit_3->setText(timeR);
         ui.lineEdit_4->setText(".*");
 
-		ui.comboBox_timerule->setCurrentIndex(0);
+		ui.comboBox_timerule->setCurrentIndex(2);
     }
 	ui.label_result->setText("");
     //ui.checkBox_6->setVisible(false);
@@ -405,15 +405,6 @@ void CollectSetDlg::showTask(const CollectTask &task)
     ui.recordLatestTime->setChecked(task.recordLatestTime);
 
     m_task.dirID = task.dirID;
-    // 临时屏蔽
-//     m_selUser.dirID = task.dirID;
-//     DataBase::getInstance()->QueryUserInfo(m_selUser);
-//     QTableWidgetItem *pItem = new QTableWidgetItem(QStringLiteral("分发用户："));
-//     ui.tableWidget->setItem(0, 0, pItem);
-//     pItem = new QTableWidgetItem(m_selUser.user.userName);
-//     ui.tableWidget->setItem(0, 1, pItem);
-//     pItem = new QTableWidgetItem(m_selUser.rltvPath);
-//     ui.tableWidget->setItem(0, 2, pItem);
 
     CollectUser sendUser = getSendUserInfoFromDirID(task.dirID);
     ui.comboBox_sendUser->setCurrentText(sendUser.user.userName);
@@ -422,17 +413,6 @@ void CollectSetDlg::showTask(const CollectTask &task)
 	ui.comboBox_timerule->setCurrentIndex(sendUser.iTimeRule);
 	ui.checkBox_keepSource->setChecked(sendUser.bKeepDir);
     ui.compare_content->setChecked(task.compareContent);
-    //for (int i=0; i<tUser.lstUser.size(); ++i)
-    //{
-    //    const CollectUser &cUser = tUser.lstUser.at(i);
-    //    QListWidgetItem *pItem = new QListWidgetItem();
-    //    ui.listWidget->addItem(pItem);
-
-    //    UserItem *pUser = new UserItem(ui.listWidget, cUser.user.userID, cUser.user.userName, cUser.rltvPath);
-    //    connect(pUser, SIGNAL(onDelete(const QString &)), this, SLOT(onSendUserDel(const QString &)));
-    //    ui.listWidget->setItemWidget(pItem, pUser);
-    //    pItem->setSizeHint(QSize(pUser->rect().width(), pUser->rect().height()));
-    //}
 
     ui.cbx_subdirfilter->setCurrentText(task.subDirTemplate);
 }

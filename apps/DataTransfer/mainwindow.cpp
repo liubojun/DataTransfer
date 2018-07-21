@@ -299,10 +299,10 @@ void MainWindow::onCopyCollectSet()
 			return;
 		}
 		task.dirName = QString::fromLocal8Bit("%1(副本)").arg(task.dirName);
-		task.dirID = QUuid::createUuid().toString(); // 重新生成新的Guid
 
 		m_pCollectDlg = QSharedPointer<CollectSetDlg>(new CollectSetDlg(1));
 		m_pCollectDlg->showTask(task);
+		task.dirID = QUuid::createUuid().toString(); // 重新生成新的Guid
 		QString strOldSenderUser = m_pCollectDlg->getSendUserNameFromDirID(task.dirID);
 		if (QDialog::Accepted == m_pCollectDlg->exec())
 		{
