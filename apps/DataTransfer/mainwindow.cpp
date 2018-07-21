@@ -63,6 +63,7 @@ void MainWindow::InitUI()
     m_pDeletAct = new QAction(QIcon(":/delete.png"), QStringLiteral("删除"), this);
     m_pEditAct = new QAction(QIcon(":/property.png"), QStringLiteral("属性"), this);
     m_pAddAct = new QAction(QIcon(":/add.png"), QStringLiteral("新增"), this);
+	m_pCopyAct = new QAction(QIcon(":/add.png"), QStringLiteral("复制"), this);
     m_pUserInfoAct = new QAction(QIcon(":/allUser.png"), QStringLiteral("分发用户"), this);
 
     m_pClearAct = new QAction(QIcon(":/clear.png"), QStringLiteral("清屏"), this);
@@ -82,6 +83,8 @@ void MainWindow::InitUI()
     ui.toolBar->addAction(m_pEditAct);
     ui.toolBar->addSeparator();
     ui.toolBar->addAction(m_pAddAct);
+	ui.toolBar->addAction(m_pCopyAct);
+	
     ui.toolBar->addSeparator();
     ui.toolBar->addAction(m_pUserInfoAct);
     ui.toolBar->addSeparator();
@@ -100,6 +103,7 @@ void MainWindow::InitUI()
 
     // 绑定信号槽
     connect(m_pAddAct, SIGNAL(triggered()), this, SLOT(addCollectSet()));
+	connect(m_pCopyAct, SIGNAL(triggered()), this, SLOT(onCopyCollectSet()));
     connect(m_pUserInfoAct, SIGNAL(triggered()), this, SLOT(manageUser()));
     connect(m_pOpenSrcAct, SIGNAL(triggered()), this, SLOT(openSrcPath()));
     connect(m_pOpenDstAct, SIGNAL(triggered()), this, SLOT(openDstPath()));
@@ -244,7 +248,7 @@ bool MainWindow::addCollect(CollectTask &task, bool bDb /*= true*/)
     tUser.taskID = task.dirID;
     m_sqlite->QueryUserInfo(tUser);
 
-    int iSendType = tUser.lstUser.at(0).user.sendType >= 1 ? 1 : 0;
+    int iSendType = tUser.sendUser.user.sendType >= 1 ? 1 : 0;
     int iCollectType = task.collectType >= 1 ? 1: 0;
     int nIcon = iCollectType + iSendType * 2 + task.enable * 4;
     // 在左侧列表显示
@@ -274,6 +278,99 @@ bool MainWindow::addCollect(CollectTask &task, bool bDb /*= true*/)
 
     return true;
 }
+
+
+void MainWindow::onCopyCollectSet()
+{
+	QListWidgetItem *pItem = NULL;
+	getCurTaskID(pItem);
+	if (pItem == NULL)
+	{
+		return;
+	}
+
+	// 如果是收集任务
+	if (pItem->text() == COLLECTITEM)
+	{
+		CollectTask task;
+		task.dirID = m_ItemTask[pItem];	// 先拷贝原有UUid
+		if (!m_sqlite->QueryCollectTask(task))
+		{
+			return;
+		}
+		task.dirName = QString::fromLocal8Bit("%1(副本)").arg(task.dirName);
+		task.dirID = QUuid::createUuid().toString(); // 重新生成新的Guid
+
+		m_pCollectDlg = QSharedPointer<CollectSetDlg>(new CollectSetDlg(1));
+		m_pCollectDlg->showTask(task);
+		QString strOldSenderUser = m_pCollectDlg->getSendUserNameFromDirID(task.dirID);
+		if (QDialog::Accepted == m_pCollectDlg->exec())
+		{
+			addCollect(m_pCollectDlg->m_task);
+
+			//CollectUser oSender = m_pCollectDlg->getSendUserInfoFromDirID(task.dirID);
+			//
+			//task = m_pCollectDlg->m_task;
+			//// 设置列表图标状态
+			//int iSendType = oSender.user.sendType >= 1 ? 1 : 0;
+			//int iCollectType = m_pCollectDlg->m_task.collectType >= 1 ? 1 : 0;
+			//int nIcon = iCollectType + iSendType * 2 + task.enable * 4;
+			//MyItemWidget *pItemWidget = (MyItemWidget *)ui.listWidget->itemWidget(pItem);
+			//pItemWidget->SetIcon((ICONTYPE)nIcon);
+			//pItemWidget->SetName(task.dirName);
+
+			//if (0 == task.collectType)
+			//{
+			//	task.rltvPath = task.rltvPath.replace("\\", "/");
+			//}
+			//// 记录到数据库
+			//m_sqlite->InsertCollectTask(task);
+			//// 修改收集设置
+			//m_pCollect->addSyncTransfer(task);
+		}
+	}
+	else
+	{
+		// 是清理任务
+		//ClearTask task;
+		//task.taskName = m_ItemTask[pItem];
+		//if (!m_sqlite->queryClearTask(task))
+		//{
+		//	return;
+		//}
+		//task.taskName = QUuid::createUuid().toString(); // 重新生成新的Guid
+
+		//m_pClearDlg = QSharedPointer<DataClearDlg>(new DataClearDlg(task.taskName));
+		//if (QDialog::Accepted == m_pClearDlg->exec())
+		//{
+		//	
+		//	task = m_pClearDlg->m_task;
+
+		//	ClearItemWidget *pItemWidget = (ClearItemWidget *)ui.listWidget->itemWidget(pItem);
+		//	pItemWidget->setName(task.taskName);
+		//	// 记录到数据库
+		//	m_sqlite->insertClearTask(task);
+		//	//// 修改收集设置
+		//	//m_pCollect->mdfySyncTransfer(task);
+		//	BaseDatas data;
+		//	data.m_taskName = task.taskName;
+		//	data.m_DDrule = task.quartzRule;
+		//	data.m_fullPath = task.taskDir;
+		//	data.m_regex.append(task.matchRule);
+		//	data.m_time = task.computeSecond();
+		//	data.m_style = "0";	// 按照时间规则进行清理
+		//	data.taskType = task.taskType;
+		//	data.ip = task.ip;
+		//	data.port = task.port;
+		//	data.user = task.user;
+		//	data.password = task.password;
+		//	data.transfermode = task.transfermode;
+		//	m_pDataClear->stop(data);
+		//	m_pDataClear->start(data);
+		//}
+	}
+}
+
 
 bool MainWindow::addClear(const ClearTask &task, bool bDb)
 {
@@ -649,7 +746,7 @@ void MainWindow::openDstPath()
         return;
     }
 
-    cUser = oTaskUser.lstUser.at(0);
+    cUser = oTaskUser.sendUser;
 
     QString urlPath;
     if (cUser.user.sendType == 0)
@@ -981,7 +1078,8 @@ void MainWindow::onProperty()
         {
             bool bRestart = false;
             CollectUser oSender = m_pCollectDlg->getSendUserInfoFromDirID(task.dirID);
-            if (task.collectType != m_pCollectDlg->m_task.collectType ||
+			if (task.dirName != m_pCollectDlg->m_task.dirName ||
+				task.collectType != m_pCollectDlg->m_task.collectType ||
                     task.dispatch != m_pCollectDlg->m_task.dispatch ||
                     task.rltvPath != m_pCollectDlg->m_task.rltvPath ||
                     task.col_timerange != m_pCollectDlg->m_task.col_timerange ||
@@ -1101,7 +1199,7 @@ void MainWindow::setTaskIcon(const CollectTask &task, int sendWay, int normal)
     TaskUser tUser;
     tUser.taskID = task.dirID;
     m_sqlite->QueryUserInfo(tUser);
-    int iSendType = tUser.lstUser.at(0).user.sendType >= 1 ? 1 : 0;
+    int iSendType = tUser.sendUser.user.sendType >= 1 ? 1 : 0;
     int iCollectType = task.collectType + iSendType >= 1 ? 1 : 0;
     int nIcon = iCollectType + iSendType * 2 + task.enable * 4 + normal * 8;
     QMap<QListWidgetItem*, QString>::const_iterator it = m_ItemTask.begin();
@@ -1335,7 +1433,7 @@ void MainWindow::onBroadcastTest()
 void MainWindow::onHelp()
 {
     QMessageBox::about(this, QString::fromLocal8Bit("数据传输工具"), QString::fromLocal8Bit("数据传输工具\n"
-                       "版本：1.1.0\n"
+                       "版本：2.0.0\n"
                        "copyright: 雷达系统事业部系统工程中心\n"
                        "E-mail: liubojun@glarun.com"));
 };

@@ -294,7 +294,7 @@ bool DataBase::QueryCollectTask(CollectTask &task)
 
 bool DataBase::QueryUserInfo(TaskUser &user)
 {
-    user.lstUser.clear();
+    //user.lstUser.clear();
     MyDataBase t_oDb;
 
     try
@@ -305,7 +305,7 @@ bool DataBase::QueryUserInfo(TaskUser &user)
         }
         QSqlQuery &query(t_oDb.sqlquery());
         // 先查收集用户表
-        QString sql = QString("SELECT USERID, RLTVPATH, RENAME_RULE FROM T_COL_USER WHERE DIRID = '%1'").arg(user.taskID);
+        QString sql = QString("SELECT USERID, RLTVPATH, RENAME_RULE, TIMERULE, KEEPDIR FROM T_COL_USER WHERE DIRID = '%1'").arg(user.taskID);
 
         bool res = query.exec(sql);
         if (!res)
@@ -316,23 +316,25 @@ bool DataBase::QueryUserInfo(TaskUser &user)
 
         while (query.next())
         {
-            CollectUser cUser;
-            cUser.user.userID = query.value(0).toString();
-            cUser.rltvPath = query.value(1).toString();
-            cUser.rename_rule = query.value(2).toString();
-            user.lstUser.append(cUser);
+            //CollectUser cUser;
+			user.sendUser.user.userID = query.value(0).toString();
+			user.sendUser.rltvPath = query.value(1).toString();
+			user.sendUser.rename_rule = query.value(2).toString();
+			user.sendUser.iTimeRule = query.value(3).toInt();
+			user.sendUser.bKeepDir = query.value(3).toBool();
+            //user.lstUser.append(cUser);
         }
 
         // 再查分发用户表
-        for (int i=0; i<user.lstUser.size(); ++i)
+        //for (int i=0; i<user.lstUser.size(); ++i)
         {
-            UserInfo &uInfo = user.lstUser[i].user;
-            sql = QString("SELECT USERID, USERNAME, SENDTYPE, FTPTRANSFERTYPE, FTPTRANSFERMODE, SENDSUFFIX, RLTVPATH, TIMEBASEDRULE, LOGINUSER, LOGINPASS, IP, PORT, KEEPDIR, COMPRESS, ENCRYPT, CONPUT, MAXTRYCOUNS FROM T_SEND_USER WHERE USERID = '%1'").arg(uInfo.userID);
+			UserInfo &uInfo = user.sendUser.user;
+            sql = QString("SELECT USERID, USERNAME, SENDTYPE, FTPTRANSFERTYPE, FTPTRANSFERMODE, SENDSUFFIX, RLTVPATH,  LOGINUSER, LOGINPASS, IP, PORT,    CONPUT FROM T_SEND_USER WHERE USERID = '%1'").arg(uInfo.userID);
             res = query.exec(sql);
             if (!res)
             {
                 QSLOG_ERROR("Error: " + query.lastError().text());
-                continue;
+                //continue;
             }
 
             if (query.next())
@@ -345,16 +347,16 @@ bool DataBase::QueryUserInfo(TaskUser &user)
                 uInfo.ftpTransferMode = query.value(index++).toInt();
                 uInfo.sendSuffix = query.value(index++).toString();
                 uInfo.rootPath = query.value(index++).toString();
-                uInfo.timebaserule = query.value(index++).toInt();
+                //uInfo.timebaserule = query.value(index++).toInt();
                 uInfo.lgUser = query.value(index++).toString();
                 uInfo.lgPass = query.value(index++).toString();
                 uInfo.ip = query.value(index++).toString();
                 uInfo.port = query.value(index++).toInt();
-                uInfo.keepDir = query.value(index++).toInt();
-                uInfo.compress = query.value(index++).toInt();
-                uInfo.encrypt = query.value(index++).toInt();
+                //uInfo.keepDir = query.value(index++).toInt();
+                //uInfo.compress = query.value(index++).toInt();
+                //uInfo.encrypt = query.value(index++).toInt();
                 uInfo.conput = query.value(index++).toInt();
-                uInfo.tryCount = query.value(index++).toInt();
+                //uInfo.tryCount = query.value(index++).toInt();
             }
         }
 
@@ -380,7 +382,7 @@ bool DataBase::QueryUserInfo(QList<UserInfo> &lstUser)
         }
         QSqlQuery &query(t_oDb.sqlquery());
         // 先查收集用户表
-        QString sql = QString("SELECT USERID, USERNAME, SENDTYPE, FTPTRANSFERTYPE, FTPTRANSFERMODE, SENDSUFFIX, RLTVPATH, TIMEBASEDRULE, LOGINUSER, LOGINPASS, IP, PORT, KEEPDIR, COMPRESS, ENCRYPT, CONPUT, MAXTRYCOUNS FROM T_SEND_USER");
+        QString sql = QString("SELECT USERID, USERNAME, SENDTYPE, FTPTRANSFERTYPE, FTPTRANSFERMODE, SENDSUFFIX, RLTVPATH,  LOGINUSER, LOGINPASS, IP, PORT,CONPUT FROM T_SEND_USER");
         bool res = query.exec(sql);
         if (res)
         {
@@ -395,16 +397,16 @@ bool DataBase::QueryUserInfo(QList<UserInfo> &lstUser)
                 user.ftpTransferMode = query.value(index++).toInt();
                 user.sendSuffix = query.value(index++).toString();
                 user.rootPath = query.value(index++).toString();
-                user.timebaserule = query.value(index++).toInt();
+                //user.timebaserule = query.value(index++).toInt();
                 user.lgUser = query.value(index++).toString();
                 user.lgPass = query.value(index++).toString();
                 user.ip = query.value(index++).toString();
                 user.port = query.value(index++).toInt();
-                user.keepDir = query.value(index++).toInt();
-                user.compress = query.value(index++).toInt();
-                user.encrypt = query.value(index++).toInt();
+                //user.keepDir = query.value(index++).toInt();
+                //user.compress = query.value(index++).toInt();
+                //user.encrypt = query.value(index++).toInt();
                 user.conput = query.value(index++).toInt();
-                user.tryCount = query.value(index++).toInt();
+                //user.tryCount = query.value(index++).toInt();
                 lstUser.push_back(user);
             }
             return true;
@@ -429,8 +431,8 @@ bool DataBase::InsertUserInfo(const UserInfo &user)
         }
         QSqlQuery &query(t_oDb.sqlquery());
         // 先查收集用户表
-        QString sql = QString("REPLACE INTO T_SEND_USER(USERID, USERNAME, SENDTYPE, FTPTRANSFERTYPE, FTPTRANSFERMODE, SENDSUFFIX, RLTVPATH, TIMEBASEDRULE, LOGINUSER, LOGINPASS, IP, PORT, KEEPDIR, COMPRESS, ENCRYPT, CONPUT, MAXTRYCOUNS)"
-                              "VALUES(:USERID, :USERNAME, :SENDTYPE, :FTPTRANSFERTYPE, :FTPTRANSFERMODE, :SENDSUFFIX, :RLTVPATH, :TIMEBASEDRULE, :LOGINUSER, :LOGINPASS, :IP, :PORT, :KEEPDIR, :COMPRESS, :ENCRYPT, :CONPUT, :MAXTRYCOUNS)");
+        QString sql = QString("REPLACE INTO T_SEND_USER(USERID, USERNAME, SENDTYPE, FTPTRANSFERTYPE, FTPTRANSFERMODE, SENDSUFFIX, RLTVPATH,  LOGINUSER, LOGINPASS, IP, PORT, CONPUT)"
+                              "VALUES(:USERID, :USERNAME, :SENDTYPE, :FTPTRANSFERTYPE, :FTPTRANSFERMODE, :SENDSUFFIX, :RLTVPATH, :LOGINUSER, :LOGINPASS, :IP, :PORT, :CONPUT)");
         query.prepare(sql);
         query.bindValue(":USERID", user.userID);
         query.bindValue(":USERNAME", user.userName);
@@ -439,16 +441,16 @@ bool DataBase::InsertUserInfo(const UserInfo &user)
         query.bindValue(":FTPTRANSFERMODE", user.ftpTransferMode);
         query.bindValue(":SENDSUFFIX", user.sendSuffix);
         query.bindValue(":RLTVPATH", user.rootPath);
-        query.bindValue(":TIMEBASEDRULE", user.timebaserule);
+        //query.bindValue(":TIMEBASEDRULE", user.timebaserule);
         query.bindValue(":LOGINUSER", user.lgUser);
         query.bindValue(":LOGINPASS", user.lgPass);
         query.bindValue(":IP", user.ip);
         query.bindValue(":PORT", user.port);
-        query.bindValue(":KEEPDIR", user.keepDir);
-        query.bindValue(":COMPRESS", user.compress);
-        query.bindValue(":ENCRYPT", user.encrypt);
+        //query.bindValue(":KEEPDIR", user.keepDir);
+        //query.bindValue(":COMPRESS", user.compress);
+        //query.bindValue(":ENCRYPT", user.encrypt);
         query.bindValue(":CONPUT", user.conput);
-        query.bindValue(":MAXTRYCOUNS", user.tryCount);
+        //query.bindValue(":MAXTRYCOUNS", user.tryCount);
         bool res = query.exec();
         if (!res)
         {
@@ -518,15 +520,17 @@ bool DataBase::InsertCollectUser(const TaskUser &user)
         }
         QSqlQuery &query(t_oDb.sqlquery());
         //QString sql;
-        for (int i=0; i<user.lstUser.size(); i++)
+        //for (int i=0; i<user.lstUser.size(); i++)
         {
-            QString sql = QString("REPLACE INTO T_COL_USER (DIRID, USERID, RLTVPATH, RENAME_RULE) "
-                                  "VALUES(:DIRID, :USERID, :RLTVPATH, :RENAME_RULE)");
+            QString sql = QString("REPLACE INTO T_COL_USER (DIRID, USERID, RLTVPATH, RENAME_RULE, TIMERULE, KEEPDIR) "
+                                  "VALUES(:DIRID, :USERID, :RLTVPATH, :RENAME_RULE, :TIMERULE, :KEEPDIR)");
             query.prepare(sql);
             query.bindValue(":DIRID", user.taskID);
-            query.bindValue(":USERID", user.lstUser.at(i).user.userID);
-            query.bindValue(":RLTVPATH", user.lstUser.at(i).rltvPath);
-            query.bindValue(":RENAME_RULE", user.lstUser.at(i).rename_rule);
+            query.bindValue(":USERID", user.sendUser.user.userID);
+			query.bindValue(":RLTVPATH", user.sendUser.rltvPath);
+			query.bindValue(":RENAME_RULE", user.sendUser.rename_rule);
+			query.bindValue(":TIMERULE", user.sendUser.iTimeRule);
+			query.bindValue(":KEEPDIR", user.sendUser.bKeepDir);
             if (!query.exec())
             {
                 QSLOG_ERROR(QString("Err: %1").arg(query.lastError().text()));

@@ -319,6 +319,11 @@ bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSour
 
         if (bNeedRename && !task.userInfo.sendSuffix.trimmed().isEmpty())
         {
+			QFile destFileFinal(strDestFileFullPath);
+			if (destFileFinal.exists())
+			{
+				destFileFinal.remove();
+			}
             QFile destFile(strDestFileFullPath + task.userInfo.sendSuffix);
             if (!destFile.rename(strDestFileFullPath))
             {

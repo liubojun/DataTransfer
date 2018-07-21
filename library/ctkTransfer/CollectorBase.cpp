@@ -186,8 +186,9 @@ QString CollectorBase::getDestFilePath(const QString &srcFileFullPath, const QSt
     {
         destPath = "/";
     }
-    if (!cUser.user.keepDir)	// 不保持原目录结构
+	if (!cUser.bKeepDir)	// 不保持原目录结构
     {
+		
         //return destPath;
     }
     else			// 保持原目录结构

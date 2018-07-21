@@ -397,21 +397,21 @@ struct UserInfo
     int			ftpTransferMode;	// 只有当sendType为1时生效，ftp传输模式 0-被动，1-主动
     QString     sendSuffix;			// 传输过程中的临时文件后缀名
     QString		rootPath;
-    int			timebaserule;		///< 时间变量基于的时间规则：0无，1-基于收集目录时间，2-基于文件名时间，3-基于系统时间
+    //int			timebaserule;		///< 时间变量基于的时间规则：0无，1-基于收集目录时间，2-基于文件名时间，3-基于系统时间
     QString		lgUser;
     QString		lgPass;
     QString		ip;
     int			port;
-    int			keepDir;
-    int			compress;
-    int			encrypt;
+    //int			keepDir;
+    //int			compress;
+    //int			encrypt;
     int			conput;
-    int			tryCount;
+    //int			tryCount;
 
     UserInfo ()
     {
         conput = 0;
-        tryCount = 3;
+        //tryCount = 3;
     }
 };
 
@@ -420,6 +420,8 @@ struct CollectUser
     QString		rltvPath;
     UserInfo	user;
     QString     rename_rule;	// 换名规则
+	int iTimeRule;	//时间规则
+	bool bKeepDir;	// 保持源目录
 };
 
 Q_DECLARE_METATYPE(CollectUser)
@@ -455,7 +457,8 @@ struct TaskUser
 {
     QString				taskID;
     CollectTask			colTaskInfo;
-    QList<CollectUser>	lstUser;
+    // QList<CollectUser>	lstUser;
+	CollectUser			sendUser;
 };
 
 

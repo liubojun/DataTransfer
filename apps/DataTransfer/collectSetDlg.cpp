@@ -55,8 +55,10 @@ void CollectSetDlg::InitUI()
         QString timeR = QString::number(sRand) + " * * * * *";
         ui.lineEdit_3->setText(timeR);
         ui.lineEdit_4->setText(".*");
-    }
 
+		ui.comboBox_timerule->setCurrentIndex(0);
+    }
+	ui.label_result->setText("");
     //ui.checkBox_6->setVisible(false);
     connect(ui.btnApply, SIGNAL(clicked()), this, SLOT(onApply()));
     connect(ui.btnCancel, SIGNAL(clicked()), this, SLOT(onCancel()));
@@ -64,7 +66,8 @@ void CollectSetDlg::InitUI()
     connect(ui.radFile, SIGNAL(toggled(bool)), this, SLOT(onSelFile(bool)));
     //connect(ui.btnSelUser, SIGNAL(clicked()), this, SLOT(selUser()));
     connect(ui.btn_test, SIGNAL(clicked()), this, SLOT(onRegExpTest()));
-    connect(ui.btn_test_2, SIGNAL(clicked()), this, SLOT(onWaitForTest()));
+	connect(ui.btn_testSource, SIGNAL(clicked()), this, SLOT(onWaitForTestSource()));
+	connect(ui.btn_testDest, SIGNAL(clicked()), this, SLOT(onWaitForTestDest()));
     //connect(ui.btn_test_2, SIGNAL(clicked()), this, SLOT(onRemoteColTest()));
     connect(this, SIGNAL(testok(const QString &)), this, SLOT(onTestOk(const QString &)));
     connect(this, SIGNAL(testfail(const QString &)), this, SLOT(onTestFail(const QString &)));
@@ -235,7 +238,10 @@ bool CollectSetDlg::onApply()
 
     CollectUser oSendUser = getSendUserInfoFromName(ui.comboBox_sendUser->currentText());
     oSendUser.rename_rule = ui.comboBox_rename->currentText();
-    m_selUser.lstUser.append(oSendUser);
+	oSendUser.bKeepDir = ui.checkBox_keepSource->isChecked();
+	oSendUser.rltvPath = ui.lineEdit_rtvpath->text();
+	oSendUser.iTimeRule = ui.comboBox_timerule->currentIndex();
+	m_selUser.sendUser = oSendUser;
 
     cSet.subDirTemplate = ui.cbx_subdirfilter->currentText();
 
@@ -412,7 +418,9 @@ void CollectSetDlg::showTask(const CollectTask &task)
     CollectUser sendUser = getSendUserInfoFromDirID(task.dirID);
     ui.comboBox_sendUser->setCurrentText(sendUser.user.userName);
     ui.comboBox_rename->setCurrentText(sendUser.rename_rule);
-
+	ui.lineEdit_rtvpath->setText(sendUser.rltvPath);
+	ui.comboBox_timerule->setCurrentIndex(sendUser.iTimeRule);
+	ui.checkBox_keepSource->setChecked(sendUser.bKeepDir);
     ui.compare_content->setChecked(task.compareContent);
     //for (int i=0; i<tUser.lstUser.size(); ++i)
     //{
@@ -485,10 +493,11 @@ CollectUser CollectSetDlg::getSendUserInfoFromDirID(const QString &CollectDirId)
         return retUser;
     }
 
-    if (user.lstUser.size() > 0)
-    {
-        retUser = user.lstUser[0];
-    }
+    //if (user.lstUser.size() > 0)
+    //{
+    //    retUser = user.lstUser[0];
+    //}
+	retUser = user.sendUser;
 
     return retUser;
 }
@@ -533,10 +542,6 @@ CollectUser CollectSetDlg::getSendUserInfoFromDirID(const QString &CollectDirId)
 
 void CollectSetDlg::onRemoteColTest()
 {
-
-    // 文件目录收集
-    //qDebug() << ui.radFile->isChecked() << ui.radFtp->isChecked();
-
     if (ui.radFile->isChecked())
     {
         QStringList retUrls = CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text());
@@ -603,6 +608,72 @@ void CollectSetDlg::onRemoteColTest()
     }
 }
 
+void CollectSetDlg::onRemoteDestTest()
+{
+	// 查询分发用户的基本信息
+	CollectUser oSendUser = getSendUserInfoFromName(ui.comboBox_sendUser->currentText());
+
+	// 0-FILE，1-FTP, 2-SFTP
+	if (0 == oSendUser.user.sendType)
+	{
+		QStringList retUrls = CPathBuilder::getFinalPathFromUrl(oSendUser.user.rootPath + "/" + ui.lineEdit_rtvpath->text());
+		//QStringList retUrls = CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text());
+		foreach(QString strUrl, retUrls)
+		{
+			QUrl url = QUrl::fromLocalFile(strUrl);
+			if (url.isLocalFile())
+			{
+				QDir qdir(strUrl);
+				if (qdir.exists())
+				{
+					emit testok(strUrl);
+				}
+				else
+				{
+					emit testfail(strUrl);
+				}
+			}
+		}
+
+
+	}
+	else
+	{
+		QSharedPointer<FtpBase> pFtpBase;
+		//char url[256] = { 0 };
+		if (1 == oSendUser.user.sendType)
+		{
+			pFtpBase = QSharedPointer<FtpBase>(new CFtp());
+
+		}
+		else
+		{
+			pFtpBase = QSharedPointer<FtpBase>(new SFtp());
+		}
+		QStringList retUrls = CPathBuilder::getFinalPathFromUrl(oSendUser.user.rootPath + "/" + ui.lineEdit_rtvpath->text());
+		foreach(QString strUrl, retUrls)
+		{
+
+			// 使用主动，默认为被动
+			if (1 == ui.comboBox_passive->currentIndex())
+			{
+				pFtpBase->setTransferMode(Active);
+			}
+			QString url = QString("ftp://%1:%2").arg(oSendUser.user.ip).arg(oSendUser.user.port);
+			//sprintf(url, "ftp://%s:%d", oSendUser.user.ip.toStdString().c_str(), oSendUser.user.port);
+			pFtpBase->connectToHost(oSendUser.user.ip, oSendUser.user.port);
+			if (CURLE_OK != pFtpBase->login(oSendUser.user.lgUser, oSendUser.user.lgPass))
+			{
+				emit testfail(url);
+			}
+			else
+			{
+				emit testok(url);
+			}
+		}
+	}
+}
+
 void CollectSetDlg::onTestOk(const QString &url)
 {
     QPalette pal;
@@ -626,13 +697,22 @@ void CollectSetDlg::onTestResultTimeout()
     ui.label_result->setText("");
 }
 
-void CollectSetDlg::onWaitForTest()
+void CollectSetDlg::onWaitForTestSource()
 {
     QPalette pal;
     pal.setColor(QPalette::WindowText, Qt::black);
     ui.label_result->setPalette(pal);
-    ui.label_result->setText(QStringLiteral("正在测试网络连接，请稍后..."));
+    ui.label_result->setText(QStringLiteral("正在测试收集目录网络连接，请稍后..."));
     QTimer::singleShot(300, this, SLOT(onRemoteColTest()));
+}
+
+void CollectSetDlg::onWaitForTestDest()
+{
+	QPalette pal;
+	pal.setColor(QPalette::WindowText, Qt::black);
+	ui.label_result->setPalette(pal);
+	ui.label_result->setText(QStringLiteral("正在测试分发目录网络连接，请稍后..."));
+	QTimer::singleShot(300, this, SLOT(onRemoteDestTest()));
 }
 
 QString CollectSetDlg::getSendUserNameFromDirID(const QString &CollectDirId)
@@ -680,3 +760,5 @@ void CollectSetDlg::onSubDirFilterEdit()
     CSubDirTemplateUi oSubDir;
     oSubDir.exec();
 }
+
+

@@ -40,6 +40,9 @@ private slots:
     // 测试收集目录是否正常
     void onRemoteColTest();
 
+	// 测试分发目录是否正常
+	void onRemoteDestTest();
+
     // 测试收集路径成功
     void onTestOk(const QString &url);
 
@@ -49,8 +52,11 @@ private slots:
     // 测试结果超时
     void onTestResultTimeout();
 
-    // 检测网络状况
-    void onWaitForTest();
+    // 检测源目录网络状况
+	void onWaitForTestSource();
+
+	// 检测目标目录网络状况
+	void onWaitForTestDest();
 
     // 编辑换名规则
     void onRenameRuleEdit();

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>539</width>
-    <height>523</height>
+    <width>652</width>
+    <height>726</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -601,7 +601,79 @@
          <widget class="QComboBox" name="comboBox_sendUser"/>
         </item>
         <item>
-         <spacer name="horizontalSpacer_10">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>相对路径</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_rtvpath"/>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_16">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_13">
+        <item>
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>时间规则</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_timerule">
+          <item>
+           <property name="text">
+            <string>无</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>基于收集目录时间</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>基于文件名时间</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>基于系统时间</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBox_keepSource">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>保持原目录结构</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_17">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -632,18 +704,25 @@
     </spacer>
    </item>
    <item>
+    <widget class="QLabel" name="label_result">
+     <property name="text">
+      <string>test</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_7">
      <item>
-      <widget class="QPushButton" name="btn_test_2">
+      <widget class="QPushButton" name="btn_testSource">
        <property name="text">
-        <string>测试</string>
+        <string>测试源目录</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_result">
+      <widget class="QPushButton" name="btn_testDest">
        <property name="text">
-        <string/>
+        <string>测试目标目录</string>
        </property>
       </widget>
      </item>

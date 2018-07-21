@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>677</width>
-    <height>408</height>
+    <width>832</width>
+    <height>443</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -268,68 +268,6 @@
              <string>浏览</string>
             </property>
            </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <item>
-           <widget class="QLabel" name="label_10">
-            <property name="text">
-             <string>时间规则：</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="cb_timebaserule">
-            <item>
-             <property name="text">
-              <string>无</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>基于收集目录时间</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>基于文件名时间</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>基于系统时间</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="checkBox">
-            <property name="text">
-             <string>压缩</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="checkBox_3">
-            <property name="text">
-             <string>保持原目录结构</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_7">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </item>

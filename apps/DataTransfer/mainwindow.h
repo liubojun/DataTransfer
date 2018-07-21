@@ -85,12 +85,15 @@ signals:
     void enable(const QString &, bool);
 
 private slots:
+	// 添加收集任务
     void addCollectSet();
+
+	// 复制收集任务
+	void onCopyCollectSet();
+
     void manageUser();
 
     bool addCollect(CollectTask &task, bool bDb = true);
-
-
 
     bool addClear(const ClearTask &task, bool bDb = true);
 
@@ -186,6 +189,7 @@ private:
     QAction *m_pDeletAct;
     QAction *m_pEditAct;
     QAction *m_pAddAct;
+	QAction *m_pCopyAct;
     QAction *m_pTrayAct;
     QAction *m_pSet;					// 系统设置
     QAction *m_pBroadCastTest;			// 广播测试

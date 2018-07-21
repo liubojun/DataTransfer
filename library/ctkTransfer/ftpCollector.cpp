@@ -312,15 +312,15 @@ bool FtpCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const File
         return true;
     }
 
-    for (int i = 0; i < m_tUser.lstUser.size(); ++i)
+    //for (int i = 0; i < m_tUser.lstUser.size(); ++i)
     {
-        CollectUser &cUser = m_tUser.lstUser[i];
+        CollectUser &cUser = m_tUser.sendUser;
         QString strFileFullPath = QString::fromLocal8Bit(fi.strFilePath.c_str());
         QString strFileName = QString::fromLocal8Bit(fi.strFileName.c_str());
         // QString dstFileFullPath = getDestFilePath(strFileFullPath, strFileName, cUser, QDateTime::fromString(fi.strMdyTime.c_str(), "yyyyMMddhhmmss"));
 
         // modified by liubojun @20171029
-        int iTmBaseRule = cUser.user.timebaserule;
+        int iTmBaseRule = cUser.iTimeRule;
 
         QString dstFileFullPath;
 
@@ -356,7 +356,7 @@ bool FtpCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const File
             {
                 if (fi.nFileSize == file.size())
                 {
-                    continue;
+                    //continue;
                 }
                 else
                 {
@@ -393,12 +393,12 @@ bool FtpCollector::compareWithDest(QSharedPointer<FtpBase> &pCurlFtp, const File
                 {
                     if (-1 == pCurlFtp->remove(dstFileFullPath))
                     {
-                        continue;
+                        //continue;
                     }
                 }
                 else
                 {
-                    continue;
+                    //continue;
                 }
 
             }

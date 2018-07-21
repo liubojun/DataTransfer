@@ -59,14 +59,14 @@ bool UserManageDlg::onApply()
 
     user.sendSuffix = ui.lineEdit_sendSuffix->text();
     user.rootPath = ui.lineEdit_path->text();
-    user.timebaserule = ui.cb_timebaserule->currentIndex();
+    //user.timebaserule = ui.cb_timebaserule->currentIndex();
     user.ip = ui.lineEdit_ip->text();
     user.port = ui.lineEdit_port->text().toInt();
     user.lgUser = ui.lineEdit_user->text();
     user.lgPass = ui.lineEdit_pwd->text();
-    user.compress = ui.checkBox->isChecked() ? 1 : 0;
+    //user.compress = ui.checkBox->isChecked() ? 1 : 0;
     //user.encrypt = ui.checkBox_2->isChecked() ? 1 : 0;
-    user.keepDir = ui.checkBox_3->isChecked() ? 1 : 0;
+    //user.keepDir = ui.checkBox_3->isChecked() ? 1 : 0;
     user.ftpTransferType = ui.cbx_ftpTransferType->currentIndex();
     user.ftpTransferMode = ui.cbx_ftpTransferMode->currentIndex();
 
@@ -115,7 +115,7 @@ void UserManageDlg::onAdd()
     ui.lineEdit_username->clear();
     ui.filerbt->setChecked(true);
     ui.lineEdit_path->clear();
-    ui.checkBox_3->setChecked(true);
+    //ui.checkBox_3->setChecked(true);
     ui.listWidget->setCurrentRow(-1);
     ui.lineEdit_sendSuffix->setText(".tmp");
     m_nFlag = 1;
@@ -265,10 +265,10 @@ void UserManageDlg::onSelectUser(int nRow)
         ui.lineEdit_port->setText(QString::number(it->port));
         ui.lineEdit_user->setText(it->lgUser);
         ui.lineEdit_pwd->setText(it->lgPass);
-        ui.checkBox->setChecked(it->compress);
-        ui.cb_timebaserule->setCurrentIndex(it->timebaserule);
+        //ui.checkBox->setChecked(it->compress);
+        //ui.cb_timebaserule->setCurrentIndex(it->timebaserule);
         // ui.checkBox_2->setChecked(it->encrypt);
-        ui.checkBox_3->setChecked(it->keepDir);
+        //ui.checkBox_3->setChecked(it->keepDir);
         ui.cbx_ftpTransferType->setCurrentIndex(it->ftpTransferType);
         ui.cbx_ftpTransferMode->setCurrentIndex(it->ftpTransferMode);
 
@@ -284,9 +284,9 @@ void UserManageDlg::onSelectUser(int nRow)
         ui.lineEdit_port->clear();
         ui.lineEdit_user->clear();
         ui.lineEdit_pwd->clear();
-        ui.checkBox->setChecked(false);
+        //ui.checkBox->setChecked(false);
         //  ui.checkBox_2->setChecked(false);
-        ui.checkBox_3->setChecked(true);
+        //ui.checkBox_3->setChecked(true);
     }
 }
 
