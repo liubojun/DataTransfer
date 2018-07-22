@@ -16,6 +16,8 @@ public:
     // 显示收集信息
     void showTask(const CollectTask &task);
 
+	void resetDirId(const QString &dirId);
+
     // 根据收集目录ID获取分发用户名
     QString getSendUserNameFromDirID(const QString &CollectDirId);
 

@@ -18,15 +18,6 @@ QMutex DataBase::m_oMutex;
 
 #define MAGIC_NUM 20180124
 
-//QString g_tbDirCol[] = {"DIRID", "DIRNAME", "ENABLE", "COLLECTTYPE", "FTPTRANSFERMODE", "FTPCONNECTMODE", "RLTVPATH", "DISPATCH",
-//                        "FILETEMPLATE", "SUBDIRCHECK", "MOVEFLAG", "COLTIMERANGE", "RECORDLATESTTIME", "COMPARE_CONTENT", "LOGINUSER", "LOGINPASS",
-//                        "IP", "PORT"
-//};
-//QString g_tbColUser[] = {"DIRID", "USERID", "RLTVPATH"};
-//QString g_tbSendUser[] = {"USERID", "USERNAME", "SENDTYPE", "SENDSUFFIX", "RLTVPATH", "LOGINUSER", "LOGINPASS",
-//                          "IP", "PORT", "KEEPDIR", "COMPRESS", "ENCRYPT", "CONPUT", "MAXTRYCOUNS"
-//                         };
-
 DataBase * DataBase::getInstance()
 {
     if (s_db == NULL)
@@ -81,13 +72,13 @@ DataBase::DataBase()
 
     checkTable("T_COL_USER",
                "CREATE TABLE[T_COL_USER]("
-               "[DIRID] VARCHAR(20) NOT NULL,"
+			   "[CONNECTID] VARCHAR2(40) NOT NULL, "
                "[USERID] VARCHAR(20),"
                "[RLTVPATH] VARCHAR(100),"
                "[RENAME_RULE] VARCHAR(20),"
 			   "[TIMERULE] INT(1),"
 			   "[KEEPDIR] BOOL,"
-               "CONSTRAINT[sqlite_autoindex_T_COL_USER_1] PRIMARY KEY([DIRID]) ON CONFLICT FAIL)"
+               "CONSTRAINT[sqlite_autoindex_T_COL_USER_1] PRIMARY KEY([CONNECTID]) ON CONFLICT FAIL)"
               );
 
     checkTable("T_DIR_COL", "CREATE TABLE [T_DIR_COL] ("
@@ -110,6 +101,7 @@ DataBase::DataBase()
                "[LOGINPASS] VARCHAR(20),"
                "[IP] VARCHAR(20),"
                "[PORT] INT,"
+			   "[CONNECTID] VARCHAR2(40),"
                "CONSTRAINT [sqlite_autoindex_T_DIR_COL_1] PRIMARY KEY ([DIRID]))");
 
     checkTable("T_SEND_USER", "CREATE TABLE [T_SEND_USER] ("
@@ -196,7 +188,7 @@ void DataBase::QueryCollectTask(QList<CollectTask> &colTasks)
         QSqlQuery &query(t_oDb.sqlquery());
         QString sql = "SELECT DIRID, DIRNAME, ENABLE, COLLECTTYPE, FTPTRANSFERMODE, FTPCONNECTMODE, RLTVPATH, DISPATCH,"
                       "FILETEMPLATE, SUBDIRCHECK, MOVEFLAG, COLTIMERANGE, RECORDLATESTTIME, COMPARE_CONTENT, LOGINUSER, LOGINPASS,"
-                      "IP, PORT FROM T_DIR_COL ORDER BY DIRNAME";
+                      "IP, PORT, CONNECTID FROM T_DIR_COL ORDER BY DIRNAME";
         bool res = query.exec(sql);
         if (!res)
         {
@@ -226,7 +218,7 @@ void DataBase::QueryCollectTask(QList<CollectTask> &colTasks)
             cTask.loginPass = query.value(index++).toString();
             cTask.ip = query.value(index++).toString();
             cTask.port = query.value(index++).toInt();
-
+			cTask.connectId = query.value(index++).toString();
             colTasks.append(cTask);
         }
 
@@ -250,7 +242,7 @@ bool DataBase::QueryCollectTask(CollectTask &task)
         QSqlQuery &query(t_oDb.sqlquery());
         QString sql = QString("SELECT DIRID, DIRNAME, ENABLE, COLLECTTYPE, FTPTRANSFERMODE, FTPCONNECTMODE, RLTVPATH, DISPATCH,"
                               "FILETEMPLATE, SUBDIRTEMPLATE, SUBDIRCHECK, MOVEFLAG, COLTIMERANGE, RECORDLATESTTIME, COMPARE_CONTENT, LOGINUSER, LOGINPASS,"
-                              "IP, PORT from T_DIR_COL where DIRID = '%1'").arg(task.dirID);
+                              "IP, PORT, CONNECTID from T_DIR_COL where DIRID = '%1'").arg(task.dirID);
         bool res = query.exec(sql);
         if (!res)
         {
@@ -279,6 +271,7 @@ bool DataBase::QueryCollectTask(CollectTask &task)
             task.loginPass = query.value(index++).toString();
             task.ip = query.value(index++).toString();
             task.port = query.value(index++).toInt();
+			task.connectId = query.value(index++).toString();
             return true;
         }
     }
@@ -302,7 +295,7 @@ bool DataBase::QueryUserInfo(TaskUser &user)
         }
         QSqlQuery &query(t_oDb.sqlquery());
         // 先查收集用户表
-        QString sql = QString("SELECT USERID, RLTVPATH, RENAME_RULE, TIMERULE, KEEPDIR FROM T_COL_USER WHERE DIRID = '%1'").arg(user.taskID);
+		QString sql = QString("SELECT T1.USERID, T1.RLTVPATH, T1.RENAME_RULE, T1.TIMERULE, T1.KEEPDIR FROM T_COL_USER T1, T_DIR_COL T2 WHERE T1.CONNECTID = T2.CONNECTID AND T2.DIRID = '%1'").arg(user.taskID);
 
         bool res = query.exec(sql);
         if (!res)
@@ -326,7 +319,7 @@ bool DataBase::QueryUserInfo(TaskUser &user)
         //for (int i=0; i<user.lstUser.size(); ++i)
         {
 			UserInfo &uInfo = user.sendUser.user;
-            sql = QString("SELECT USERID, USERNAME, SENDTYPE, FTPTRANSFERTYPE, FTPTRANSFERMODE, SENDSUFFIX, RLTVPATH,  LOGINUSER, LOGINPASS, IP, PORT,    CONPUT FROM T_SEND_USER WHERE USERID = '%1'").arg(uInfo.userID);
+            sql = QString("SELECT USERID, USERNAME, SENDTYPE, FTPTRANSFERTYPE, FTPTRANSFERMODE, SENDSUFFIX, RLTVPATH,  LOGINUSER, LOGINPASS, IP, PORT, CONPUT FROM T_SEND_USER WHERE USERID = '%1'").arg(uInfo.userID);
             res = query.exec(sql);
             if (!res)
             {
@@ -519,10 +512,10 @@ bool DataBase::InsertCollectUser(const TaskUser &user)
         //QString sql;
         //for (int i=0; i<user.lstUser.size(); i++)
         {
-            QString sql = QString("REPLACE INTO T_COL_USER (DIRID, USERID, RLTVPATH, RENAME_RULE, TIMERULE, KEEPDIR) "
-                                  "VALUES(:DIRID, :USERID, :RLTVPATH, :RENAME_RULE, :TIMERULE, :KEEPDIR)");
+            QString sql = QString("REPLACE INTO T_COL_USER (CONNECTID, USERID, RLTVPATH, RENAME_RULE, TIMERULE, KEEPDIR) "
+                                  "VALUES(:CONNECTID, :USERID, :RLTVPATH, :RENAME_RULE, :TIMERULE, :KEEPDIR)");
             query.prepare(sql);
-            query.bindValue(":DIRID", user.taskID);
+            query.bindValue(":CONNECTID", user.connectId);
             query.bindValue(":USERID", user.sendUser.user.userID);
 			query.bindValue(":RLTVPATH", user.sendUser.rltvPath);
 			query.bindValue(":RENAME_RULE", user.sendUser.rename_rule);
@@ -590,10 +583,10 @@ bool DataBase::InsertCollectTask(const CollectTask &task)
         QSqlQuery &query(t_oDb.sqlquery());
         QString sql = QString("REPLACE INTO T_DIR_COL(DIRID, DIRNAME, ENABLE, COLLECTTYPE, FTPTRANSFERMODE, FTPCONNECTMODE, RLTVPATH, DISPATCH,"
                               "FILETEMPLATE, SUBDIRTEMPLATE, SUBDIRCHECK, MOVEFLAG, COLTIMERANGE, RECORDLATESTTIME, COMPARE_CONTENT, LOGINUSER, LOGINPASS,"
-                              "IP, PORT)"
+                              "IP, PORT, CONNECTID)"
                               "VALUES(:DIRID, :DIRNAME, :ENABLE, :COLLECTTYPE, :FTPTRANSFERMODE, :FTPCONNECTMODE, :RLTVPATH, :DISPATCH,"
                               ":FILETEMPLATE, :SUBDIRTEMPLATE ,:SUBDIRCHECK, :MOVEFLAG, :COLTIMERANGE, :RECORDLATESTTIME, :COMPARE_CONTENT, :LOGINUSER, :LOGINPASS,"
-                              ":IP, :PORT)");
+                              ":IP, :PORT, :CONNECTID)");
         query.prepare(sql);
         query.bindValue(":DIRID", task.dirID);
         query.bindValue(":DIRNAME", task.dirName);
@@ -614,6 +607,7 @@ bool DataBase::InsertCollectTask(const CollectTask &task)
         query.bindValue(":LOGINPASS", task.loginPass);
         query.bindValue(":IP", task.ip);
         query.bindValue(":PORT", task.port);
+		query.bindValue(":CONNECTID", task.connectId);
 
         bool res = query.exec();
         if (!res)
@@ -645,13 +639,25 @@ bool DataBase::DeltCollectTask(const QString &dirID)
         QSqlQuery &query(t_oDb.sqlquery());
         QString sql;
         bool res;
+
+		sql = QString("SELECT CONNECTID FROM T_DIR_COL WHERE DIRID = '%1'").arg(dirID);
+		res = query.exec(sql);
+		QString strConnectId;
+		if (res)
+		{
+			if (query.next())
+			{
+				strConnectId = query.value(0).toString();
+			}	
+		}
+
         // 先删除收集任务表
-        sql = QString("delete from T_DIR_COL where DIRID = '%1'").arg(dirID);
+		sql = QString("delete from T_DIR_COL where DIRID = '%1'").arg(dirID);
         res = query.exec(sql);
         if (res)
         {
             // 再删除收集用户表
-            sql = QString("delete from T_COL_USER where DIRID = '%3'").arg(dirID);
+			sql = QString("delete from T_COL_USER where CONNECTID = '%3'").arg(strConnectId);
             res = query.exec(sql);
             if (res)
             {

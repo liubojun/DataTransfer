@@ -284,7 +284,8 @@ bool CollectorBase::readSet()
         QSLOG_ERROR("Fail to QueryCollectTask.");
         return false;
     }
-    m_tUser.taskID = m_collectSet.dirID;
+	m_tUser.taskID = m_collectSet.dirID;
+    m_tUser.connectId = m_collectSet.connectId;
     m_tUser.colTaskInfo = m_collectSet;
     // 读取分发用户设置
     if (!DataBase::getInstance()->QueryUserInfo(m_tUser))

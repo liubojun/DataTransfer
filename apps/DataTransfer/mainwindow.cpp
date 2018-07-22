@@ -266,11 +266,6 @@ bool MainWindow::addCollect(CollectTask &task, bool bDb /*= true*/)
         //qDebug() << oUrl.path();
     }
 
-    // 添加到数据库
-    if (bDb && !DataBase::getInstance()->InsertCollectTask(task))
-    {
-        return false;
-    }
     // 记录到内存
     m_ItemTask[pItem] = task.dirID;
     // 启动收集
@@ -303,30 +298,12 @@ void MainWindow::onCopyCollectSet()
 		m_pCollectDlg = QSharedPointer<CollectSetDlg>(new CollectSetDlg(1));
 		m_pCollectDlg->showTask(task);
 		task.dirID = QUuid::createUuid().toString(); // 重新生成新的Guid
+		m_pCollectDlg->resetDirId(task.dirID);
 		QString strOldSenderUser = m_pCollectDlg->getSendUserNameFromDirID(task.dirID);
 		if (QDialog::Accepted == m_pCollectDlg->exec())
 		{
+			m_pCollectDlg->m_task.dirID = task.dirID;
 			addCollect(m_pCollectDlg->m_task);
-
-			//CollectUser oSender = m_pCollectDlg->getSendUserInfoFromDirID(task.dirID);
-			//
-			//task = m_pCollectDlg->m_task;
-			//// 设置列表图标状态
-			//int iSendType = oSender.user.sendType >= 1 ? 1 : 0;
-			//int iCollectType = m_pCollectDlg->m_task.collectType >= 1 ? 1 : 0;
-			//int nIcon = iCollectType + iSendType * 2 + task.enable * 4;
-			//MyItemWidget *pItemWidget = (MyItemWidget *)ui.listWidget->itemWidget(pItem);
-			//pItemWidget->SetIcon((ICONTYPE)nIcon);
-			//pItemWidget->SetName(task.dirName);
-
-			//if (0 == task.collectType)
-			//{
-			//	task.rltvPath = task.rltvPath.replace("\\", "/");
-			//}
-			//// 记录到数据库
-			//m_sqlite->InsertCollectTask(task);
-			//// 修改收集设置
-			//m_pCollect->addSyncTransfer(task);
 		}
 	}
 	else

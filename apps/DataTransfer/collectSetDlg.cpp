@@ -10,6 +10,7 @@
 #include <curl/curl.h>
 #include <QDebug>
 #include <QThread>
+#include <QCryptographicHash> 
 #include "QsLog/ctkLog.h"
 #include "renameDlg.h"
 #include "change_name.h"
@@ -111,27 +112,8 @@ void CollectSetDlg::InitUI()
 
 void CollectSetDlg::selUser()
 {
-//     if (m_flag == 0)
-//     {
-//         m_pSelUserDlg = QSharedPointer<SelUserDlg>(new SelUserDlg());
-//     }
-//     else
-//     {
-//         m_pSelUserDlg = QSharedPointer<SelUserDlg>(new SelUserDlg(m_flag, m_selUser));
-//     }
     m_pSelUserDlg = QSharedPointer<SelUserDlg>(new SelUserDlg());
 
-    //if (QDialog::Accepted == m_pSelUserDlg->exec())
-    //{
-    //    // m_selUser.lstUser.append(m_pSelUserDlg->m_selUser);
-
-    //    QListWidgetItem *pItem = new QListWidgetItem();
-    //    ui.listWidget->addItem(pItem);
-    //    UserItem *pUser = new UserItem(ui.listWidget, m_pSelUserDlg->m_selUser.user.userID, m_pSelUserDlg->m_selUser.user.userName, m_pSelUserDlg->m_selUser.rltvPath);
-    //    connect(pUser, SIGNAL(onDelete(const QString &)), this, SLOT(onSendUserDel(const QString &)));
-    //    ui.listWidget->setItemWidget(pItem, pUser);
-    //    pItem->setSizeHint(QSize(pUser->rect().width(), pUser->rect().height()));
-    //}
 }
 
 bool CollectSetDlg::onApply()
@@ -217,24 +199,10 @@ bool CollectSetDlg::onApply()
         return false;
     }
 
-    //int size = ui.listWidget->count();
-    //if (size <= 0)
-    //{
-    //    box.setText(QStringLiteral("未配置分发用户！"));
-    //    box.exec();
-    //    return false;
-    //}
     if (m_flag == 0)	// 新增
     {
         cSet.dirID = QUuid::createUuid().toString();
     }
-    //else				// 修改
-    //{
-    //    cSet.dirID = m_selUser.dirID;
-    //}
-    //m_selUser.lstUser.clear();
-
-    //UserItem *pUserItem = (UserItem *) ui.listWidget->itemWidget(ui.listWidget->item(0));
 
     CollectUser oSendUser = getSendUserInfoFromName(ui.comboBox_sendUser->currentText());
     oSendUser.rename_rule = ui.comboBox_rename->currentText();
@@ -247,11 +215,14 @@ bool CollectSetDlg::onApply()
 
     //// 临时屏蔽
     //// 更新收集用户表
-    m_selUser.taskID = cSet.dirID;
-    DataBase::getInstance()->InsertCollectUser(m_selUser);
-    // 查询用户信息
-    //DataBase::getInstance()->QueryUserInfo(m_selUser);
 
+	QString strMixValue = cSet.dirID + oSendUser.user.userID + oSendUser.rltvPath;
+	QByteArray oResult = QCryptographicHash::hash(strMixValue.toAscii(), QCryptographicHash::Md5);
+	m_selUser.connectId = oResult.toHex();
+	//m_selUser.connectId = QCryptographicHash::hash(strMixValue., QCryptographicHash::Md5).toStdString().c_str();
+	cSet.connectId = m_selUser.connectId;
+    DataBase::getInstance()->InsertCollectUser(m_selUser);
+	DataBase::getInstance()->InsertCollectTask(cSet);
     accept();
     emit commit(cSet);
 
@@ -348,9 +319,6 @@ void CollectSetDlg::showTask(const CollectTask &task)
     ui.lineEdit_6->setText(task.loginPass);
     ui.checkBox_2->setChecked(task.subdirFlag);
 //    ui.checkBox_6->setChecked(task.moveFlag);
-
-
-
 
     // 0:所有，1:30分钟，2：1小时，3：2小时，4：3小时，5：6小时，6：12小时，7：1天，8：2天，9：3天
     int index = 0;
@@ -739,6 +707,11 @@ void CollectSetDlg::onSubDirFilterEdit()
 {
     CSubDirTemplateUi oSubDir;
     oSubDir.exec();
+}
+
+void CollectSetDlg::resetDirId(const QString &dirId)
+{
+	m_task.dirID = dirId;
 }
 
 
