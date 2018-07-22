@@ -53,17 +53,14 @@ void MainWindow::InitUI()
     ui.toolBar->setIconSize(QSize(55, 55));
     m_pOpenSrcAct = new QAction(QIcon(":/openSrc.png"), QStringLiteral("打开源"), this);
     m_pOpenDstAct = new QAction(QIcon(":/openDst.png"), QStringLiteral("打开目标"), this);
-    //m_menuOpenDst = new QMenu(this);
-    //m_tbtnOpenDst = new QToolButton(this);
-    //m_tbtnOpenDst->setIcon(QIcon(":/openDst.png"));
-    //m_tbtnOpenDst->setMenu(m_menuOpenDst);
-    //m_tbtnOpenDst->setPopupMode(QToolButton::MenuButtonPopup);
     m_pExecuteNowAct = new QAction(QIcon(":/doNow.png"), QStringLiteral("立刻执行"), this);
     m_pEnableAct = new QAction(QIcon(":/stop.png"), QStringLiteral("停止"), this);
+
+    m_pAddAct = new QAction(QIcon(":/add.png"), QStringLiteral("新增"), this);
+    m_pCopyAct = new QAction(QStringLiteral("复制"), this);
     m_pDeletAct = new QAction(QIcon(":/delete.png"), QStringLiteral("删除"), this);
     m_pEditAct = new QAction(QIcon(":/property.png"), QStringLiteral("属性"), this);
-    m_pAddAct = new QAction(QIcon(":/add.png"), QStringLiteral("新增"), this);
-    m_pCopyAct = new QAction(QIcon(":/add.png"), QStringLiteral("复制"), this);
+
     m_pUserInfoAct = new QAction(QIcon(":/allUser.png"), QStringLiteral("分发用户"), this);
 
     m_pClearAct = new QAction(QIcon(":/clear.png"), QStringLiteral("清屏"), this);
@@ -76,14 +73,14 @@ void MainWindow::InitUI()
 
     ui.toolBar->addAction(m_pOpenSrcAct);
     ui.toolBar->addAction(m_pOpenDstAct);
-    //ui.toolBar->addWidget(m_tbtnOpenDst);
     ui.toolBar->addAction(m_pExecuteNowAct);
     ui.toolBar->addAction(m_pEnableAct);
-    ui.toolBar->addAction(m_pDeletAct);
-    ui.toolBar->addAction(m_pEditAct);
     ui.toolBar->addSeparator();
+
     ui.toolBar->addAction(m_pAddAct);
     ui.toolBar->addAction(m_pCopyAct);
+    ui.toolBar->addAction(m_pDeletAct);
+    ui.toolBar->addAction(m_pEditAct);
 
     ui.toolBar->addSeparator();
     ui.toolBar->addAction(m_pUserInfoAct);
