@@ -16,7 +16,7 @@ public:
     // 显示收集信息
     void showTask(const CollectTask &task);
 
-	void resetDirId(const QString &dirId);
+    void resetDirId(const QString &dirId);
 
     // 根据收集目录ID获取分发用户名
     QString getSendUserNameFromDirID(const QString &CollectDirId);
@@ -42,8 +42,8 @@ private slots:
     // 测试收集目录是否正常
     void onRemoteColTest();
 
-	// 测试分发目录是否正常
-	void onRemoteDestTest();
+    // 测试分发目录是否正常
+    void onRemoteDestTest();
 
     // 测试收集路径成功
     void onTestOk(const QString &url);
@@ -55,10 +55,10 @@ private slots:
     void onTestResultTimeout();
 
     // 检测源目录网络状况
-	void onWaitForTestSource();
+    void onWaitForTestSource();
 
-	// 检测目标目录网络状况
-	void onWaitForTestDest();
+    // 检测目标目录网络状况
+    void onWaitForTestDest();
 
     // 编辑换名规则
     void onRenameRuleEdit();
@@ -71,6 +71,15 @@ private slots:
 
     // 编辑子目录过滤弹窗
     void onSubDirFilterEdit();
+
+    // 自动生成常用目录1
+    void onBtnDir1();
+
+    // 自动生成常用目录2
+    void onBtnDir2();
+
+    // 自动生成常用目录3
+    void onBtnDir3();
 
 signals:
     void commit(CollectTask &task);

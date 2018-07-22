@@ -10,7 +10,7 @@
 #include <curl/curl.h>
 #include <QDebug>
 #include <QThread>
-#include <QCryptographicHash> 
+#include <QCryptographicHash>
 #include "QsLog/ctkLog.h"
 #include "renameDlg.h"
 #include "change_name.h"
@@ -57,9 +57,9 @@ void CollectSetDlg::InitUI()
         ui.lineEdit_3->setText(timeR);
         ui.lineEdit_4->setText(".*");
 
-		ui.comboBox_timerule->setCurrentIndex(2);
+        ui.comboBox_timerule->setCurrentIndex(2);
     }
-	ui.label_result->setText("");
+    ui.label_result->setText("");
     //ui.checkBox_6->setVisible(false);
     connect(ui.btnApply, SIGNAL(clicked()), this, SLOT(onApply()));
     connect(ui.btnCancel, SIGNAL(clicked()), this, SLOT(onCancel()));
@@ -67,8 +67,11 @@ void CollectSetDlg::InitUI()
     connect(ui.radFile, SIGNAL(toggled(bool)), this, SLOT(onSelFile(bool)));
     //connect(ui.btnSelUser, SIGNAL(clicked()), this, SLOT(selUser()));
     connect(ui.btn_test, SIGNAL(clicked()), this, SLOT(onRegExpTest()));
-	connect(ui.btn_testSource, SIGNAL(clicked()), this, SLOT(onWaitForTestSource()));
-	connect(ui.btn_testDest, SIGNAL(clicked()), this, SLOT(onWaitForTestDest()));
+    connect(ui.btn_testSource, SIGNAL(clicked()), this, SLOT(onWaitForTestSource()));
+    connect(ui.btn_testDest, SIGNAL(clicked()), this, SLOT(onWaitForTestDest()));
+    connect(ui.btn_dir1, SIGNAL(clicked()), this, SLOT(onBtnDir1()));
+    connect(ui.btn_dir2, SIGNAL(clicked()), this, SLOT(onBtnDir2()));
+    connect(ui.btn_dir3, SIGNAL(clicked()), this, SLOT(onBtnDir3()));
     //connect(ui.btn_test_2, SIGNAL(clicked()), this, SLOT(onRemoteColTest()));
     connect(this, SIGNAL(testok(const QString &)), this, SLOT(onTestOk(const QString &)));
     connect(this, SIGNAL(testfail(const QString &)), this, SLOT(onTestFail(const QString &)));
@@ -199,6 +202,18 @@ bool CollectSetDlg::onApply()
         return false;
     }
 
+    // 分发相对目录规则检查
+    if (ui.lineEdit_rtvpath->text().indexOf("%t") != -1)
+    {
+        if (ui.comboBox_timerule->currentIndex() == 0 || ui.lineEdit_4->text().indexOf("(") == -1 || ui.lineEdit_4->text().indexOf(")") == -1)
+        {
+            QMessageBox box(QMessageBox::Critical, QStringLiteral("提示"), "");
+            box.setText(QStringLiteral("请检查文件名模板或时间规则设置！"));
+            box.exec();
+            return false;
+        }
+    }
+
     if (m_flag == 0)	// 新增
     {
         cSet.dirID = QUuid::createUuid().toString();
@@ -206,23 +221,23 @@ bool CollectSetDlg::onApply()
 
     CollectUser oSendUser = getSendUserInfoFromName(ui.comboBox_sendUser->currentText());
     oSendUser.rename_rule = ui.comboBox_rename->currentText();
-	oSendUser.bKeepDir = ui.checkBox_keepSource->isChecked();
-	oSendUser.rltvPath = ui.lineEdit_rtvpath->text();
-	oSendUser.iTimeRule = ui.comboBox_timerule->currentIndex();
-	m_selUser.sendUser = oSendUser;
+    oSendUser.bKeepDir = ui.checkBox_keepSource->isChecked();
+    oSendUser.rltvPath = ui.lineEdit_rtvpath->text();
+    oSendUser.iTimeRule = ui.comboBox_timerule->currentIndex();
+    m_selUser.sendUser = oSendUser;
 
     cSet.subDirTemplate = ui.cbx_subdirfilter->currentText();
 
     //// 临时屏蔽
     //// 更新收集用户表
 
-	QString strMixValue = cSet.dirID + oSendUser.user.userID + oSendUser.rltvPath;
-	QByteArray oResult = QCryptographicHash::hash(strMixValue.toAscii(), QCryptographicHash::Md5);
-	m_selUser.connectId = oResult.toHex();
-	//m_selUser.connectId = QCryptographicHash::hash(strMixValue., QCryptographicHash::Md5).toStdString().c_str();
-	cSet.connectId = m_selUser.connectId;
+    QString strMixValue = cSet.dirID + oSendUser.user.userID + oSendUser.rltvPath;
+    QByteArray oResult = QCryptographicHash::hash(strMixValue.toAscii(), QCryptographicHash::Md5);
+    m_selUser.connectId = oResult.toHex();
+    //m_selUser.connectId = QCryptographicHash::hash(strMixValue., QCryptographicHash::Md5).toStdString().c_str();
+    cSet.connectId = m_selUser.connectId;
     DataBase::getInstance()->InsertCollectUser(m_selUser);
-	DataBase::getInstance()->InsertCollectTask(cSet);
+    DataBase::getInstance()->InsertCollectTask(cSet);
     accept();
     emit commit(cSet);
 
@@ -377,9 +392,9 @@ void CollectSetDlg::showTask(const CollectTask &task)
     CollectUser sendUser = getSendUserInfoFromDirID(task.dirID);
     ui.comboBox_sendUser->setCurrentText(sendUser.user.userName);
     ui.comboBox_rename->setCurrentText(sendUser.rename_rule);
-	ui.lineEdit_rtvpath->setText(sendUser.rltvPath);
-	ui.comboBox_timerule->setCurrentIndex(sendUser.iTimeRule);
-	ui.checkBox_keepSource->setChecked(sendUser.bKeepDir);
+    ui.lineEdit_rtvpath->setText(sendUser.rltvPath);
+    ui.comboBox_timerule->setCurrentIndex(sendUser.iTimeRule);
+    ui.checkBox_keepSource->setChecked(sendUser.bKeepDir);
     ui.compare_content->setChecked(task.compareContent);
 
     ui.cbx_subdirfilter->setCurrentText(task.subDirTemplate);
@@ -445,7 +460,7 @@ CollectUser CollectSetDlg::getSendUserInfoFromDirID(const QString &CollectDirId)
     //{
     //    retUser = user.lstUser[0];
     //}
-	retUser = user.sendUser;
+    retUser = user.sendUser;
 
     return retUser;
 }
@@ -558,68 +573,68 @@ void CollectSetDlg::onRemoteColTest()
 
 void CollectSetDlg::onRemoteDestTest()
 {
-	// 查询分发用户的基本信息
-	CollectUser oSendUser = getSendUserInfoFromName(ui.comboBox_sendUser->currentText());
+    // 查询分发用户的基本信息
+    CollectUser oSendUser = getSendUserInfoFromName(ui.comboBox_sendUser->currentText());
 
-	// 0-FILE，1-FTP, 2-SFTP
-	if (0 == oSendUser.user.sendType)
-	{
-		QStringList retUrls = CPathBuilder::getFinalPathFromUrl(oSendUser.user.rootPath + "/" + ui.lineEdit_rtvpath->text());
-		//QStringList retUrls = CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text());
-		foreach(QString strUrl, retUrls)
-		{
-			QUrl url = QUrl::fromLocalFile(strUrl);
-			if (url.isLocalFile())
-			{
-				QDir qdir(strUrl);
-				if (qdir.exists())
-				{
-					emit testok(strUrl);
-				}
-				else
-				{
-					emit testfail(strUrl);
-				}
-			}
-		}
+    // 0-FILE，1-FTP, 2-SFTP
+    if (0 == oSendUser.user.sendType)
+    {
+        QStringList retUrls = CPathBuilder::getFinalPathFromUrl(oSendUser.user.rootPath + "/" + ui.lineEdit_rtvpath->text());
+        //QStringList retUrls = CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text());
+        foreach(QString strUrl, retUrls)
+        {
+            QUrl url = QUrl::fromLocalFile(strUrl);
+            if (url.isLocalFile())
+            {
+                QDir qdir(strUrl);
+                if (qdir.exists())
+                {
+                    emit testok(strUrl);
+                }
+                else
+                {
+                    emit testfail(strUrl);
+                }
+            }
+        }
 
 
-	}
-	else
-	{
-		QSharedPointer<FtpBase> pFtpBase;
-		//char url[256] = { 0 };
-		if (1 == oSendUser.user.sendType)
-		{
-			pFtpBase = QSharedPointer<FtpBase>(new CFtp());
+    }
+    else
+    {
+        QSharedPointer<FtpBase> pFtpBase;
+        //char url[256] = { 0 };
+        if (1 == oSendUser.user.sendType)
+        {
+            pFtpBase = QSharedPointer<FtpBase>(new CFtp());
 
-		}
-		else
-		{
-			pFtpBase = QSharedPointer<FtpBase>(new SFtp());
-		}
-		QStringList retUrls = CPathBuilder::getFinalPathFromUrl(oSendUser.user.rootPath + "/" + ui.lineEdit_rtvpath->text());
-		foreach(QString strUrl, retUrls)
-		{
+        }
+        else
+        {
+            pFtpBase = QSharedPointer<FtpBase>(new SFtp());
+        }
+        QStringList retUrls = CPathBuilder::getFinalPathFromUrl(oSendUser.user.rootPath + "/" + ui.lineEdit_rtvpath->text());
+        foreach(QString strUrl, retUrls)
+        {
 
-			// 使用主动，默认为被动
-			if (1 == ui.comboBox_passive->currentIndex())
-			{
-				pFtpBase->setTransferMode(Active);
-			}
-			QString url = QString("ftp://%1:%2").arg(oSendUser.user.ip).arg(oSendUser.user.port);
-			//sprintf(url, "ftp://%s:%d", oSendUser.user.ip.toStdString().c_str(), oSendUser.user.port);
-			pFtpBase->connectToHost(oSendUser.user.ip, oSendUser.user.port);
-			if (CURLE_OK != pFtpBase->login(oSendUser.user.lgUser, oSendUser.user.lgPass))
-			{
-				emit testfail(url);
-			}
-			else
-			{
-				emit testok(url);
-			}
-		}
-	}
+            // 使用主动，默认为被动
+            if (1 == ui.comboBox_passive->currentIndex())
+            {
+                pFtpBase->setTransferMode(Active);
+            }
+            QString url = QString("ftp://%1:%2").arg(oSendUser.user.ip).arg(oSendUser.user.port);
+            //sprintf(url, "ftp://%s:%d", oSendUser.user.ip.toStdString().c_str(), oSendUser.user.port);
+            pFtpBase->connectToHost(oSendUser.user.ip, oSendUser.user.port);
+            if (CURLE_OK != pFtpBase->login(oSendUser.user.lgUser, oSendUser.user.lgPass))
+            {
+                emit testfail(url);
+            }
+            else
+            {
+                emit testok(url);
+            }
+        }
+    }
 }
 
 void CollectSetDlg::onTestOk(const QString &url)
@@ -656,11 +671,11 @@ void CollectSetDlg::onWaitForTestSource()
 
 void CollectSetDlg::onWaitForTestDest()
 {
-	QPalette pal;
-	pal.setColor(QPalette::WindowText, Qt::black);
-	ui.label_result->setPalette(pal);
-	ui.label_result->setText(QStringLiteral("正在测试分发目录网络连接，请稍后..."));
-	QTimer::singleShot(300, this, SLOT(onRemoteDestTest()));
+    QPalette pal;
+    pal.setColor(QPalette::WindowText, Qt::black);
+    ui.label_result->setPalette(pal);
+    ui.label_result->setText(QStringLiteral("正在测试分发目录网络连接，请稍后..."));
+    QTimer::singleShot(300, this, SLOT(onRemoteDestTest()));
 }
 
 QString CollectSetDlg::getSendUserNameFromDirID(const QString &CollectDirId)
@@ -711,7 +726,22 @@ void CollectSetDlg::onSubDirFilterEdit()
 
 void CollectSetDlg::resetDirId(const QString &dirId)
 {
-	m_task.dirID = dirId;
+    m_task.dirID = dirId;
+}
+
+void CollectSetDlg::onBtnDir1()
+{
+    ui.lineEdit_rtvpath->insert("/%t%Y/%t%Y%t%m/%t%Y%t%m%t%d");
+}
+
+void CollectSetDlg::onBtnDir2()
+{
+    ui.lineEdit_rtvpath->insert("/%t%Y/%t%m/%t%d");
+}
+
+void CollectSetDlg::onBtnDir3()
+{
+    ui.lineEdit_rtvpath->insert("/%t%Y%t%m%t%d");
 }
 
 
