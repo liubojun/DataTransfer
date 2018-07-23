@@ -38,5 +38,6 @@
         <file>broadcast.png</file>
         <file>dataclean.png</file>
         <file>help.png</file>
+        <file>copy.png</file>
     </qresource>
 </RCC>

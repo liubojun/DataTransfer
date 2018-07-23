@@ -57,7 +57,7 @@ void MainWindow::InitUI()
     m_pEnableAct = new QAction(QIcon(":/stop.png"), QStringLiteral("停止"), this);
 
     m_pAddAct = new QAction(QIcon(":/add.png"), QStringLiteral("新增"), this);
-    m_pCopyAct = new QAction(QStringLiteral("复制"), this);
+	m_pCopyAct = new QAction(QIcon(":/copy.png"), QStringLiteral("复制"), this);
     m_pDeletAct = new QAction(QIcon(":/delete.png"), QStringLiteral("删除"), this);
     m_pEditAct = new QAction(QIcon(":/property.png"), QStringLiteral("属性"), this);
 
@@ -1407,7 +1407,7 @@ void MainWindow::onBroadcastTest()
 void MainWindow::onHelp()
 {
     QMessageBox::about(this, QString::fromLocal8Bit("数据传输工具"), QString::fromLocal8Bit("数据传输工具\n"
-                       "版本：2.1.0\n"
+                       "版本：2.1.1 2018-07-23\n"
                        "copyright: 雷达系统事业部系统工程中心\n"
                        "E-mail: liubojun@glarun.com"));
 };
