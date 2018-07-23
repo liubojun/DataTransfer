@@ -311,7 +311,7 @@ bool DataBase::QueryUserInfo(TaskUser &user)
 			user.sendUser.rltvPath = query.value(1).toString();
 			user.sendUser.rename_rule = query.value(2).toString();
 			user.sendUser.iTimeRule = query.value(3).toInt();
-			user.sendUser.bKeepDir = query.value(3).toBool();
+			user.sendUser.bKeepDir = query.value(4).toBool();
             //user.lstUser.append(cUser);
         }
 

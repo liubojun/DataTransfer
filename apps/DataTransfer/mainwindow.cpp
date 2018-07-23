@@ -1072,18 +1072,19 @@ void MainWindow::onProperty()
                 bRestart = true;
             }
 
+			task = m_pCollectDlg->m_task;
+			// 设置列表图标状态
+			int iSendType = oSender.user.sendType >= 1 ? 1 : 0;
+			int iCollectType = m_pCollectDlg->m_task.collectType >= 1 ? 1 : 0;
+			int nIcon = iCollectType + iSendType * 2 + task.enable * 4;
+			MyItemWidget *pItemWidget = (MyItemWidget *)ui.listWidget->itemWidget(pItem);
+			pItemWidget->SetIcon((ICONTYPE)nIcon);
+			pItemWidget->SetName(task.dirName);
+
             if (!bRestart)
             {
                 return;
             }
-            task = m_pCollectDlg->m_task;
-            // 设置列表图标状态
-            int iSendType = oSender.user.sendType >= 1 ? 1 : 0;
-            int iCollectType = m_pCollectDlg->m_task.collectType >= 1 ? 1 : 0;
-            int nIcon = iCollectType + iSendType * 2 + task.enable * 4;
-            MyItemWidget *pItemWidget = (MyItemWidget *)ui.listWidget->itemWidget(pItem);
-            pItemWidget->SetIcon((ICONTYPE)nIcon);
-            pItemWidget->SetName(task.dirName);
 
             if (0 == task.collectType)
             {
