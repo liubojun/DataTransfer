@@ -18,6 +18,8 @@ public:
 
     void resetDirId(const QString &dirId);
 
+	void resetQuartzRule();
+
     // 根据收集目录ID获取分发用户名
     QString getSendUserNameFromDirID(const QString &CollectDirId);
 

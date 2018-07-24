@@ -727,6 +727,7 @@ void CollectSetDlg::onSubDirFilterEdit()
 void CollectSetDlg::resetDirId(const QString &dirId)
 {
     m_task.dirID = dirId;
+	resetQuartzRule();
 }
 
 void CollectSetDlg::onBtnDir1()
@@ -742,6 +743,13 @@ void CollectSetDlg::onBtnDir2()
 void CollectSetDlg::onBtnDir3()
 {
     ui.lineEdit_rtvpath->insert("/%t%Y%t%m%t%d");
+}
+
+void CollectSetDlg::resetQuartzRule()
+{
+	int sRand = qrand() % 60;
+	QString timeR = QString::number(sRand) + " * * * * *";
+	ui.lineEdit_3->setText(timeR);
 }
 
 
