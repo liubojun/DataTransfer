@@ -275,6 +275,7 @@ bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSour
         //strDstFile = task.dstFilePath + task.strDestFileName;
 
         QString strDestFileFullPath(task.dstFilePath + task.strDestFileName);
+		strDstFile = strDestFileFullPath;
         QDir oDir(task.dstFilePath);
         if (!oDir.exists())
         {
@@ -362,6 +363,8 @@ bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSour
             emit emitLog(logInfo, BAD);
             return false;
         }
+
+		strDstFile = pFtpDest->makeUrl2(task.dstFilePath + task.strDestFileName);
     }
 
     QString strInfo = QStringLiteral("文件[%1]发送完成。").arg(task.fileName);
