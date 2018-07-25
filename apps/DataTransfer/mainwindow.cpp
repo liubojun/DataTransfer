@@ -1405,7 +1405,7 @@ void MainWindow::onBroadcastTest()
 void MainWindow::onHelp()
 {
     QMessageBox::about(this, QString::fromLocal8Bit("数据传输工具"), QString::fromLocal8Bit("数据传输工具\n"
-                       "版本：2.1.1 2018-07-23\n"
-                       "copyright: 雷达系统事业部系统工程中心\n"
+                       "版本：2.1.2 2018-07-25\n"
+                       "copyright: 南京恩瑞特\n"
                        "E-mail: liubojun@glarun.com"));
 };
