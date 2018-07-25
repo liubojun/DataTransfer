@@ -487,16 +487,16 @@ QString CurlFtp::parseMlsdInfo(const QString &rootPath, const QString &info, Fil
         }
 
         // ftp获取的时间格式不定，如果使用增量轮训，可能会出现问题，所以在ftp收集模式下，应该禁用根据收集时间段收集配置
-        //QString nMdfyTime("");
-        //if (oneInfo.strMdfyTime.length() >= 14)
-        //{
-        //    nMdfyTime = oneInfo.strMdfyTime.mid(0, 14);
-        //}
-        //else
-        //{
-        //    QSLOG_ERROR("oneInfo.strMdfyTime length is incorrect.");
-        //    continue;
-        //}
+		QString nMdfyTime("");
+		if (oneInfo.strMdfyTime.length() >= 14)
+		{
+			nMdfyTime = oneInfo.strMdfyTime.mid(0, 14);
+		}
+		else
+		{
+			QSLOG_ERROR("oneInfo.strMdfyTime length is incorrect.");
+			continue;
+		}
 
         // LIST命令只能获取到分钟，所以出现分钟一样的文件，应该与目标目录下进行比较
         //if (nMdfyTime > iLastModifiedTime)
@@ -544,14 +544,14 @@ QString CurlFtp::parseMlsdInfo(const QString &rootPath, const QString &info, Fil
 
             // 必须大于设置的时间范围才收集
 
-            //if (m_pCoBase->m_collectSet.col_timerange != -1)
-            //{
-            //    // 分钟转秒
-            //    if (nMdfyTime < QDateTime::currentDateTime().addSecs(-m_pCoBase->m_collectSet.col_timerange*60).toString("yyyyMMddhhmmss"))
-            //    {
-            //        continue;
-            //    }
-            //}
+            if (m_pCoBase->m_collectSet.col_timerange != -1)
+            {
+                // 分钟转秒
+                if (nMdfyTime < QDateTime::currentDateTime().addSecs(-m_pCoBase->m_collectSet.col_timerange*60).toString("yyyyMMddhhmmss"))
+                {
+                    continue;
+                }
+            }
 
             // if (fInfo.strMdyTime)
 

@@ -16,10 +16,10 @@
 #define ftpCollector_H_
 
 #include "CollectorBase.h"
-#include "LibCurlFtpBase.h"
+#include "LibCurlFtp.h"
 
 
-class CurlFtp;
+
 class CDirRecord;
 
 class DLL_EXPORT_CLASS_DECL FtpCollector : public CollectorBase
@@ -30,11 +30,11 @@ public:
     ~FtpCollector();
 
     virtual int start();
+
     virtual int reStart();
 
 public slots:
     virtual int stop();
-
 
     /**
      * @brief  删除收集实例
@@ -49,32 +49,34 @@ public:
 
     virtual void getNewFiles(const CollectTask &in_oTask);
 
+	void getNewFiles(const CollectTask &in_oTask, QSharedPointer<FtpBase> pFtpPtr);
+
     virtual bool testCollection();
 
     virtual void taskDone(bool bFlag, const FileInfo &file);
 
     // 相同返回true，不同返回false
-	bool compareWithDest(QSharedPointer<FtpBase> &pFtpTemp, const FileInfo &fi, TransTask &tTask);
+    bool compareWithDest(QSharedPointer<FtpBase> &oCurlFtp, const CFileInfo &fi, TransTask &tTask);
 
     void setProcess(QProcess *in_pro);
 
-private slots:
-	void ftpDone(CDirRecord &io_record);
+	virtual void resetFtpInstance();
+
+public slots:
+    void ftpDone(const QList<CFileInfo> &files, CDirRecord &io_record);
 
     void readOutput();
 
-private:
+public:
     QSharedPointer<QObject> m_pTimerObj;
-
-    QSharedPointer<CurlFtp> m_pCftp;	///< libcurl ftp 测试
-
-    FileInfoList m_fileList;
 
     bool m_bChildProcessRunning;	// 子进程运行标识
 
     QProcess *m_pro;
 
     bool m_bBeingDeleted;   // 设置删除标识
+
+	QSharedPointer<FtpBase> m_pFtp;
 };
 
 #endif

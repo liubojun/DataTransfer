@@ -15,62 +15,22 @@
 #ifndef sftpCollector_H_
 #define sftpCollector_H_
 
-#include "CollectorBase.h"
+#include "ftpCollector.h"
 #include "LibCurlSFtp.h"
 
 
-
-class CDirRecord;
-
-class DLL_EXPORT_CLASS_DECL SFtpCollector : public CollectorBase
+class DLL_EXPORT_CLASS_DECL SFtpCollector : public FtpCollector
 {
     Q_OBJECT
 public:
     SFtpCollector(QWaitCondition &in_oCond, QMutex &in_oLocker, int &in_iLogsize);
+
     ~SFtpCollector();
 
-    virtual int start();
-    virtual int reStart();
-
-public slots:
-    virtual int stop();
-
-
-    /**
-     * @brief  删除收集实例
-     * @return void
-     */
-    virtual void deleteSelf();
-
-    // 接收到子进程退出消息
-    void stoprcv(int exitcode, QProcess::ExitStatus status);
 public:
-    virtual void getNewFiles();
-
     virtual void getNewFiles(const CollectTask &in_oTask);
 
-    virtual bool testCollection();
-
-    virtual void taskDone(bool bFlag, const FileInfo &file);
-
-    // 相同返回true，不同返回false
-    bool compareWithDest(QSharedPointer<FtpBase> &oCurlFtp, const CFileInfo &fi, TransTask &tTask);
-
-    void setProcess(QProcess *in_pro);
-
-private slots:
-    void ftpDone(const QList<CFileInfo> &files, CDirRecord &io_record);
-
-    void readOutput();
-
-private:
-    QSharedPointer<QObject> m_pTimerObj;
-
-    bool m_bChildProcessRunning;	// 子进程运行标识
-
-    QProcess *m_pro;
-
-    bool m_bBeingDeleted;   // 设置删除标识
+	virtual void resetFtpInstance();
 };
 
 #endif

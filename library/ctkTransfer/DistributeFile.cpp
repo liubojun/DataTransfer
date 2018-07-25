@@ -260,6 +260,8 @@ bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSour
             emit emitLog(logInfo, BAD);
             return false;
         }
+
+		strBroadMsgFile = pFtpSource->makeUrl2(task.srcFileFullPath);
     }
 
     bool bRes = false;
