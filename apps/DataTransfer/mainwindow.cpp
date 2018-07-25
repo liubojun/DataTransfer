@@ -258,9 +258,7 @@ bool MainWindow::addCollect(CollectTask &task, bool bDb /*= true*/)
 
     if (0 == task.collectType)
     {
-        //QUrl oUrl(task.rltvPath.replace("\\", "/"));
         task.rltvPath = task.rltvPath.replace("\\", "/");
-        //qDebug() << oUrl.path();
     }
 
     // 记录到内存
@@ -1088,7 +1086,6 @@ void MainWindow::onProperty()
 
             if (0 == task.collectType)
             {
-                //QUrl oUrl(task.rltvPath.replace("\\", "/"));
                 task.rltvPath = task.rltvPath.replace("\\", "/");
             }
             // 记录到数据库
@@ -1175,7 +1172,7 @@ void MainWindow::setTaskIcon(const CollectTask &task, int sendWay, int normal)
     tUser.taskID = task.dirID;
     m_sqlite->QueryUserInfo(tUser);
     int iSendType = tUser.sendUser.user.sendType >= 1 ? 1 : 0;
-    int iCollectType = task.collectType + iSendType >= 1 ? 1 : 0;
+    int iCollectType = task.collectType >= 1 ? 1 : 0;
     int nIcon = iCollectType + iSendType * 2 + task.enable * 4 + normal * 8;
     QMap<QListWidgetItem*, QString>::const_iterator it = m_ItemTask.begin();
     while (it != m_ItemTask.end())

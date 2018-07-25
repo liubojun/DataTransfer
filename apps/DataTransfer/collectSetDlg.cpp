@@ -300,6 +300,8 @@ void CollectSetDlg::showTask(const CollectTask &task)
         return;
     }
 
+	m_task = task;
+
     ui.le_DirName->setText(task.dirName);
     bool bFile = true;
     if (task.collectType == 0)
@@ -622,10 +624,10 @@ void CollectSetDlg::onRemoteDestTest()
             {
                 pFtpBase->setTransferMode(Active);
             }
-            QString url = QString("ftp://%1:%2").arg(oSendUser.user.ip).arg(oSendUser.user.port);
+			QString url = QString("ftp://%1:%2%3").arg(oSendUser.user.ip).arg(oSendUser.user.port).arg(strUrl);
             //sprintf(url, "ftp://%s:%d", oSendUser.user.ip.toStdString().c_str(), oSendUser.user.port);
-            pFtpBase->connectToHost(oSendUser.user.ip, oSendUser.user.port);
-            if (CURLE_OK != pFtpBase->login(oSendUser.user.lgUser, oSendUser.user.lgPass))
+			pFtpBase->connectToHost(oSendUser.user.ip, oSendUser.user.port, oSendUser.user.lgUser, oSendUser.user.lgPass);
+			if (CURLE_OK != pFtpBase->cd(strUrl))
             {
                 emit testfail(url);
             }
