@@ -337,7 +337,7 @@ void CollectSetDlg::showTask(const CollectTask &task)
     ui.checkBox_2->setChecked(task.subdirFlag);
 //    ui.checkBox_6->setChecked(task.moveFlag);
 
-    // 0:所有，1:30分钟，2：1小时，3：2小时，4：3小时，5：6小时，6：12小时，7：1天，8：2天，9：3天
+    // 0:所有，1:10分钟，2:30分钟，3：1小时，4：2小时，5：3小时，6：6小时，7：12小时，8：1天，9：2天，10：3天
     int index = 0;
     bool enterUserDefineItem = false;
     switch (task.col_timerange)
@@ -345,32 +345,35 @@ void CollectSetDlg::showTask(const CollectTask &task)
     case -1:
         index = 0;
         break;
+	case 10:
+		index = 1;
+		break;
     case 30:
-        index = 1;
-        break;
-    case 60:
         index = 2;
         break;
-    case 60*2:
+    case 60:
         index = 3;
         break;
-    case 60*3:
+    case 60*2:
         index = 4;
         break;
-    case 60*6:
+    case 60*3:
         index = 5;
         break;
-    case 60*12:
+    case 60*6:
         index = 6;
         break;
-    case 60*24:
+    case 60*12:
         index = 7;
         break;
-    case 60*48:
+    case 60*24:
         index = 8;
         break;
-    case 60*72:
+    case 60*48:
         index = 9;
+        break;
+    case 60*72:
+        index = 10;
         break;
     default:
         enterUserDefineItem = true;
