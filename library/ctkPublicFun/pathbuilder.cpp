@@ -455,6 +455,7 @@ QStringList CPathBuilder::parseFromUrl(const QString &url, QDateTime in_oDt)
                     return strNewUrl;
                 }
 
+				qDebug() << tmpFinalDateTime;
                 oDateTimeLists.append(tmpFinalDateTime);
             }
 
@@ -466,53 +467,66 @@ QStringList CPathBuilder::parseFromUrl(const QString &url, QDateTime in_oDt)
         }
 
         QStringList strTimeBody = strUrl.mid(index2).split("%t");
-        QString strDateTimeFormat;
-        foreach(QString strBody, strTimeBody)
-        {
-            if (strBody.isEmpty())
-            {
-                continue;
-            }
+        
+		foreach(const QDateTime &tmpDt, oDateTimeLists)
+		{
+			QString strDateTimeFormat;
+			foreach(QString strBody, strTimeBody)
+			{
+				if (strBody.isEmpty())
+				{
+					continue;
+				}
 
-            QString strUnit = strBody.mid(0, 2);
-            QString strOther = strBody.mid(2);
+				QString strUnit = strBody.mid(0, 2);
+				QString strOther = strBody.mid(2);
 
-            // %y%m%d%H%M%s
-            if ("%Y" == strUnit)
-            {
-                strDateTimeFormat.append("yyyy").append(strOther);
-            }
-            else if ("%m" == strUnit)
-            {
-                strDateTimeFormat.append("MM").append(strOther);
-            }
-            else if ("%d" == strUnit)
-            {
-                strDateTimeFormat.append("dd").append(strOther);
-            }
-            else if ("%H" == strUnit)
-            {
-                strDateTimeFormat.append("hh").append(strOther);
-            }
-            else if ("%M" == strUnit)
-            {
-                strDateTimeFormat.append("mm").append(strOther);
-            }
-            else if ("%S" == strUnit)
-            {
-                strDateTimeFormat.append("ss").append(strOther);
-            }
-            else
-            {
-                //QSLOG_ERROR("The character after %t is incorrect, should be ymdHMs ");
-                return strNewUrl;
-            }
-        }
 
-        foreach(const QDateTime &tmpDt , oDateTimeLists)
-        {
-            strFinalUrl.append(tmpDt.toString(strDateTimeFormat) + "/");
-        }
+				// %y%m%d%H%M%s
+				if ("%Y" == strUnit)
+				{
+					strDateTimeFormat.append(tmpDt.toString("yyyy")).append(strOther);
+					//strDateTimeFormat.append("yyyy").append(strOther);
+				}
+				else if ("%m" == strUnit)
+				{
+					strDateTimeFormat.append(tmpDt.toString("MM")).append(strOther);
+					//strDateTimeFormat.append("MM").append(strOther);
+				}
+				else if ("%d" == strUnit)
+				{
+					strDateTimeFormat.append(tmpDt.toString("dd")).append(strOther);
+					//strDateTimeFormat.append("dd").append(strOther);
+				}
+				else if ("%H" == strUnit)
+				{
+					strDateTimeFormat.append(tmpDt.toString("hh")).append(strOther);
+					//strDateTimeFormat.append("hh").append(strOther);
+				}
+				else if ("%M" == strUnit)
+				{
+					strDateTimeFormat.append(tmpDt.toString("mm")).append(strOther);
+					//strDateTimeFormat.append("mm").append(strOther);
+				}
+				else if ("%S" == strUnit)
+				{
+					strDateTimeFormat.append(tmpDt.toString("ss")).append(strOther);
+					//strDateTimeFormat.append("ss").append(strOther);
+				}
+				else
+				{
+					//QSLOG_ERROR("The character after %t is incorrect, should be ymdHMs ");
+					return strNewUrl;
+				}
+			}
+
+			strFinalUrl.append(strDateTimeFormat + "/");
+		}
+
+        //foreach(const QDateTime &tmpDt , oDateTimeLists)
+        //{
+        //    strFinalUrl.append(tmpDt.toString(strDateTimeFormat) + "/");
+        //}
 
 
     }
@@ -534,27 +548,33 @@ QStringList CPathBuilder::parseFromUrl(const QString &url, QDateTime in_oDt)
             // %y%m%d%H%M%s
             if ("%Y" == strUnit)
             {
-                strDateTimeFormat.append("yyyy").append(strOther);
+				strDateTimeFormat.append(finalDateTime.toString("yyyy")).append(strOther);
+                //strDateTimeFormat.append("yyyy").append(strOther);
             }
             else if ("%m" == strUnit)
             {
-                strDateTimeFormat.append("MM").append(strOther);
+				strDateTimeFormat.append(finalDateTime.toString("MM")).append(strOther);
+                //strDateTimeFormat.append("MM").append(strOther);
             }
             else if ("%d" == strUnit)
             {
-                strDateTimeFormat.append("dd").append(strOther);
+				strDateTimeFormat.append(finalDateTime.toString("dd")).append(strOther);
+                //strDateTimeFormat.append("dd").append(strOther);
             }
             else if ("%H" == strUnit)
             {
-                strDateTimeFormat.append("hh").append(strOther);
+				strDateTimeFormat.append(finalDateTime.toString("hh")).append(strOther);
+                //strDateTimeFormat.append("hh").append(strOther);
             }
             else if ("%M" == strUnit)
             {
-                strDateTimeFormat.append("mm").append(strOther);
+				strDateTimeFormat.append(finalDateTime.toString("mm")).append(strOther);
+                //strDateTimeFormat.append("mm").append(strOther);
             }
             else if ("%S" == strUnit)
             {
-                strDateTimeFormat.append("ss").append(strOther);
+				strDateTimeFormat.append(finalDateTime.toString("ss")).append(strOther);
+                //strDateTimeFormat.append("ss").append(strOther);
             }
             else
             {
@@ -562,8 +582,8 @@ QStringList CPathBuilder::parseFromUrl(const QString &url, QDateTime in_oDt)
                 return strNewUrl;
             }
         }
-
-        strFinalUrl.append(finalDateTime.toString(strDateTimeFormat) + "/");
+		strFinalUrl.append(strDateTimeFormat + "/");
+        //strFinalUrl.append(finalDateTime.toString(strDateTimeFormat) + "/");
     }
     else
     {
