@@ -302,10 +302,13 @@ bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSour
             {
                 destfile.remove();
                 bNeedCopy = true;
+				QSLOG_DEBUG("destfile exist, size not equal");
+
             }
             else
             {
                 bNeedRename = true;
+				QSLOG_DEBUG("destfile exist, size equal");
             }
 
         }
@@ -313,6 +316,7 @@ bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSour
         {
             bNeedRename = true;
             bNeedCopy = true;
+			QSLOG_DEBUG("destfile not exist, need to copy it");
         }
 
         if (bNeedCopy && !sourcefile.copy(strDestFileFullPath + task.userInfo.sendSuffix))
@@ -329,16 +333,25 @@ bool DistributeFile::transfer(TransTask &task, QSharedPointer<FtpBase> &pFtpSour
 			QFile destFileFinal(strDestFileFullPath);
 			if (destFileFinal.exists())
 			{
-				destFileFinal.remove();
+				QSLOG_DEBUG("destfile exist, remove it");
+				if (!destFileFinal.remove())
+				{
+					QString logInfo = QStringLiteral("文件[%1]删除失败。").arg(task.fileName);
+					QSLOG_ERROR(logInfo + ",reason:" + destFileFinal.errorString());
+				}	
 			}
             QFile destFile(strDestFileFullPath + task.userInfo.sendSuffix);
             if (!destFile.rename(strDestFileFullPath))
             {
                 QString logInfo = QStringLiteral("文件[%1]重命名失败。").arg(task.fileName);
                 emit emitLog(logInfo, BAD);
-                QSLOG_ERROR(logInfo + ",reason:" + sourcefile.errorString());
+				QSLOG_ERROR(logInfo + ",reason:" + destFile.errorString());
                 return false;
             }
+			else
+			{
+				QSLOG_DEBUG("destfile remove successful");
+			}
         }
 
 

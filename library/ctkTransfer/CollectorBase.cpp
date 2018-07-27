@@ -137,7 +137,7 @@ void CollectorBase::emitLog(const QString &info, int infoType)
     //m_iLogsize++;
     //emit showLog(m_collectSet, info, infoType);
 
-    QSLOG_DEBUG("LOG");
+    //QSLOG_DEBUG("LOG");
     try
     {
         //printf("111111111111111111\n");
