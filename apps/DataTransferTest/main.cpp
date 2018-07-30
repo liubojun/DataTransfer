@@ -3,10 +3,7 @@
 
 #include <QProcess>
 #include <QDebug>
-#include "ctkLog.h"
-#include "pathbuilder.h"
-#include "change_name.h"
-#include "DataBase.h"
+
 #include "CollectorBase.h"
 #include "ftpCollector.h"
 #include "sftpCollector.h"
@@ -33,6 +30,7 @@ int main(int argc, char **argv)
 		qDebug() << "param num is incorrect!";
 		return -1;
 	}
+	curl_global_init(CURL_GLOBAL_ALL);
 
 	QString strParam(argv[1]);
 	QStringList oparams = strParam.split(",");
@@ -69,6 +67,7 @@ int main(int argc, char **argv)
 	{
 		QString strDir = allInitDirs.at(i);
 		QString url = QString("ftp://%1:%2%3").arg(strIp).arg(nPort).arg(strDir);
+		qDebug() << "**************connect to" << i << "dir************";
 		if (CURLE_OK != FtpPtr->cd(strDir))
 		{
 			qDebug()
@@ -89,5 +88,7 @@ int main(int argc, char **argv)
 		}
 
 	}
+
+	qDebug() << "**************all dir test finish************";
     return app.exec();
 }
