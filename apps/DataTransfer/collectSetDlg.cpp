@@ -539,40 +539,37 @@ void CollectSetDlg::onRemoteColTest()
     }
     else
     {
-        QSharedPointer<FtpBase> pFtpBase;
-        char url[256] = { 0 };
+		int nFtpSendType;
         if (ui.radFtp->isChecked())
         {
-            pFtpBase = QSharedPointer<FtpBase>(new CFtp());
+			nFtpSendType = 1;
 
         }
         else
         {
-            pFtpBase = QSharedPointer<FtpBase>(new SFtp());
+			nFtpSendType = 2;
         }
         QStringList retUrls = CPathBuilder::getFinalPathFromUrl(ui.le_RelvPath->text());
-        foreach(QString strUrl, retUrls)
-        {
+		
+		QString allUrls;
+		foreach(QString strUrl, retUrls)
+		{
+			allUrls.append(strUrl).append(";");
+		}
 
-            // 使用主动，默认为被动
-            if (1 == ui.comboBox_passive->currentIndex())
-            {
-                pFtpBase->setTransferMode(Active);
-            }
+		QStringList args;
 
-            sprintf(url, "ftp://%s:%d%s", ui.lineEdit_7->text().toStdString().c_str(), ui.lineEdit_8->text().toInt(), strUrl.toLocal8Bit().data());
-            //sprintf(usrPwd, "%s:%s", ui.lineEdit_5->text().toStdString().c_str(), ui.lineEdit_6->text().toStdString().c_str());
-            pFtpBase->connectToHost(ui.lineEdit_7->text(), ui.lineEdit_8->text().toInt());
-            pFtpBase->login(ui.lineEdit_5->text(), ui.lineEdit_6->text());
-            if (CURLE_OK != pFtpBase->cd(strUrl))
-            {
-                emit testfail(QString(url));
-            }
-            else
-            {
-                emit testok(QString(url));
-            }
-        }
+		args << QString("FtpType=%1,TransferMode=%2,Ip=%3,Port=%4,User=%5,Password=%6,InitDir=%7").
+			arg(nFtpSendType).
+			arg(ui.comboBox_passive->currentIndex()).
+			arg(ui.lineEdit_7->text()).
+			arg(ui.lineEdit_8->text().toInt()).
+			arg(ui.lineEdit_5->text()).
+			arg(ui.lineEdit_6->text()).
+			arg(allUrls);
+		QProcess::startDetached("DataTransferTest", args);
+		//emit testok("");
+
     }
 }
 
@@ -607,38 +604,26 @@ void CollectSetDlg::onRemoteDestTest()
     }
     else
     {
-        QSharedPointer<FtpBase> pFtpBase;
-        //char url[256] = { 0 };
-        if (1 == oSendUser.user.sendType)
-        {
-            pFtpBase = QSharedPointer<FtpBase>(new CFtp());
-
-        }
-        else
-        {
-            pFtpBase = QSharedPointer<FtpBase>(new SFtp());
-        }
         QStringList retUrls = CPathBuilder::getFinalPathFromUrl(oSendUser.user.rootPath + "/" + ui.lineEdit_rtvpath->text());
-        foreach(QString strUrl, retUrls)
-        {
 
-            // 使用主动，默认为被动
-            if (1 == ui.comboBox_passive->currentIndex())
-            {
-                pFtpBase->setTransferMode(Active);
-            }
-			QString url = QString("ftp://%1:%2%3").arg(oSendUser.user.ip).arg(oSendUser.user.port).arg(strUrl);
-            //sprintf(url, "ftp://%s:%d", oSendUser.user.ip.toStdString().c_str(), oSendUser.user.port);
-			pFtpBase->connectToHost(oSendUser.user.ip, oSendUser.user.port, oSendUser.user.lgUser, oSendUser.user.lgPass);
-			if (CURLE_OK != pFtpBase->cd(strUrl))
-            {
-                emit testfail(url);
-            }
-            else
-            {
-                emit testok(url);
-            }
-        }
+		QString allUrls;
+		foreach(QString strUrl, retUrls)
+		{
+			allUrls.append(strUrl).append(";");
+		}
+
+		QStringList args;
+
+		args << QString("FtpType=%1,TransferMode=%2,Ip=%3,Port=%4,User=%5,Password=%6,InitDir=%7").
+			arg(oSendUser.user.sendType).
+			arg(ui.comboBox_passive->currentIndex()).
+			arg(oSendUser.user.ip).
+			arg(oSendUser.user.port).
+			arg(oSendUser.user.lgUser).
+			arg(oSendUser.user.lgPass).
+			arg(allUrls);
+		QProcess::startDetached("DataTransferTest", args);
+		//emit testok("");
     }
 }
 
