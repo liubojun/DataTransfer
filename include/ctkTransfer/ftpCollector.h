@@ -42,8 +42,6 @@ public slots:
      */
     virtual void deleteSelf();
 
-    // 接收到子进程退出消息
-    void stoprcv(int exitcode, QProcess::ExitStatus status);
 public:
     virtual void getNewFiles();
 
@@ -70,11 +68,7 @@ public slots:
 public:
     QSharedPointer<QObject> m_pTimerObj;
 
-    bool m_bChildProcessRunning;	// 子进程运行标识
-
     QProcess *m_pro;
-
-    bool m_bBeingDeleted;   // 设置删除标识
 
 	QSharedPointer<FtpBase> m_pFtp;
 };

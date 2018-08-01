@@ -219,12 +219,11 @@ public slots:
     // added by liubojun @20180622, 收集文件成功之后，发送广播消息
     void emitBroadCast(const QString &srcfile, const QString &dstfile);
 
+	// 接收到子进程退出信号
+	void stoprcv(int exitcode, QProcess::ExitStatus status);
+
 public:
     void doWork();
-    //virtual void setEnable(bool bFlag) = 0;
-
-    //void emitLog(const QString &dirName, const QString &info);
-
 
     /**
      * @brief  遍历监控目录，找出新文件，发送到消息队列中。
@@ -424,21 +423,16 @@ protected:
     QMutex &m_oLocker;
     int &m_iLogsize;
 
-    //RCF::RcfInitDeinit m_oRcfInit;
-    //RcfClient<I_LogPrint> *m_oRcfClient;
-
-    // 日志端口
-    //int m_iUdpLogPort;
-
-    //QUdpSocket m_oLogSocket;
-
     CUdpLogSender m_oLogSender;
 
     // 当前收集器的唯一标识
     QUuid m_oId;
 
-    //QSharedPointer<QProcess> m_oDataTransferPro;
     QMutex m_oTaskLocker;
+
+	bool m_bChildProcessRunning;	// 子进程运行标识
+
+	bool m_bBeingDeleted;   // 设置删除标识
 
 };
 

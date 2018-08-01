@@ -19,8 +19,6 @@
 FtpCollector::FtpCollector(QWaitCondition &in_oCond, QMutex &in_oLocker, int &in_iLogsize)
     : CollectorBase(in_oCond, in_oLocker, in_iLogsize)
 {
-    m_bBeingDeleted = false;
-
 	
 }
 
@@ -47,10 +45,6 @@ void FtpCollector::deleteSelf()
     m_bBeingDeleted = true;
 }
 
-void FtpCollector::stoprcv(int exitcode, QProcess::ExitStatus status)
-{
-    m_bChildProcessRunning = false;
-}
 
 void FtpCollector::getNewFiles()
 {

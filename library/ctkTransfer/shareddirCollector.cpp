@@ -133,85 +133,101 @@ int SharedDirCollector::reStart()
 
 void SharedDirCollector::getNewFiles()
 {
-    if (!m_oTaskLocker.tryLock())
-    {
-        return;
-    }
+	if (!m_oTaskLocker.tryLock())
+	{
+		return;
+	}
 
-    QSharedPointer<QMutex> autoUnlock(&m_oTaskLocker, &QMutex::unlock);
+	QSharedPointer<QMutex> autoUnlock(&m_oTaskLocker, &QMutex::unlock);
+	if (!readSet())
+	{
+		QSLOG_ERROR("query database error.");
+		m_bFinish = true;
+		return;
+	}
 
-    if (!readSet())
-    {
-        return;
-    }
+	m_bRun = (bool)m_collectSet.enable;
+	if (!m_bRun)
+	{
+		QSLOG_DEBUG("task is stopped.");
+		return;
+	}
 
-    m_bRun = (bool)m_collectSet.enable;
-    if (!m_bRun)
-    {
-        return;
-    }
+	///////////////////////////////////////////////////////////////
+	// 使用共享内存，查看当前的QProcess是否存在，如果存在的话，则无需再次启动针对该目录ID的收集任务
+	if (!checkProcessFinished(m_collectSet.dirID))
+	{
+		QSLOG_DEBUG("Last ftp collect isn't finished.");
+		return;
+	}
 
-    emit print(QStringLiteral("[%1]: 开始收集任务 %2[%3]").arg(QDateTime::currentDateTime().toString(Qt::ISODate)).arg(m_collectSet.dirName)
-               .arg(m_collectSet.rltvPath));
+	QString strLogInfo(QStringLiteral("开始收集任务 %1[%2]").arg(m_collectSet.dirName).arg(m_collectSet.rltvPath));
+	emit print(strLogInfo);
+	QSLOG_DEBUG(strLogInfo);
+	m_nLineState = 0;
+	emit taskState(m_collectSet, 0, m_nLineState);
+	bool bConnect = true;
 
-    // E:/workspace/DataTransfer/DataTransfer_code_20170831/vs2013/apps/DataTransfer/%T-1H%t%y/%t%m/%td
-    // modified by liubojun. 支持按照特定时间获取数据
-    QStringList finalDirs = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
+	// 测试收集目录是否能够正常访问
+	QStringList finalDirs = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
+	foreach(QString strDir, finalDirs)
+	{
+		bConnect = testFileConnection(strDir);
+		if (bConnect)
+		{
+			break;
+		}
+	}
+	
+	if (!bConnect)
+	{
+		m_nLineState = 1;
+		emit taskState(m_collectSet, 0, m_nLineState);
+		QSLOG_DEBUG("test shareddir error");
+		return;
+	}
 
-    m_oSubDirFilter.init();
-    foreach (QString strDir, finalDirs)
-    {
-
-        bool bConnect = true;
-        // 先测试源路径是否正常
-
-        bConnect = testFileConnection(strDir);
-
-        if (!bConnect)
-        {
-            m_nLineState = 1;
-            emit taskState(m_collectSet, 0, m_nLineState);
-            return;
-        }
-
-        if (bConnect)
-        {
-            //QSLOG_INFO(QString("[%1] begin to getNewFiles.").arg(m_collectSet.dirName));
-            m_nLineState = 0;
-            //emit taskState(m_collectSet, m_userInfo.user.sendType, m_nLineState);
-            emit taskState(m_collectSet, 0, m_nLineState);
-            emit startGif(m_collectSet.dirID, true);
-            QTime tt;
-            tt.start();
-            CDirRecord oRecord(m_collectSet.dirName);
-            if (m_collectSet.recordLatestTime)
-            {
-                oRecord.loadLatestFileSize();
-            }
-
-            DIRLEVEL oDirLevel;
-            oDirLevel.dir = strDir;
-            oDirLevel.level = 0;	// 根目录层级为0
-            m_strSubDirTemplate = m_collectSet.subDirTemplate;
+	// 如果连接是正常的话
 
 
-            getSynclessFiles(oDirLevel, m_collectSet.subdirFlag, oRecord);
-            if (m_collectSet.recordLatestTime)
-            {
-                oRecord.reflush();
-            }
-            emit startGif(m_collectSet.dirID, false);
-            QSLOG_INFO(QString("[%1] finish to getNewFiles, cost time: %2 seconds").arg(m_collectSet.dirName).arg(tt.elapsed()/1000.f));
-        }
-        else
-        {
-            m_nLineState = 1;
-            emit taskState(m_collectSet, 0, m_nLineState);
-        }
+	emit startGif(m_collectSet.dirID, true);
 
-    }
+	QProcess oProcess;
 
-    emit finished();
+	oProcess.start("DataTransferPro", QStringList() << m_collectSet.dirID);
+
+	// 初始化，设置子进程运行标识
+
+	m_bChildProcessRunning = true;
+	connect(&oProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(stoprcv(int, QProcess::ExitStatus)));
+	QSLOG_DEBUG("start data transfer pro");
+
+	while (m_bChildProcessRunning)
+	{
+		QCoreApplication::processEvents();
+		QThread::sleep(1);
+		// added by liubojun @20180620
+		if (!m_bRun)
+		{
+			oProcess.kill();
+			QSLOG_DEBUG("task is stopped.");
+			break;
+		}
+	}
+
+	emit startGif(m_collectSet.dirID, false);
+	QSLOG_DEBUG("finish process.");
+	if (m_bBeingDeleted)
+	{
+		if (m_bChildProcessRunning)
+		{
+			oProcess.kill();
+			QSLOG_DEBUG("kill child process.");
+		}
+		deleteLater();
+	}
+	return;
+
 }
 
 void SharedDirCollector::getNewDirs(QString strDir, QStringList &lstDir)
@@ -357,7 +373,69 @@ void SharedDirCollector::getNewFiles(QString strDir, FileInfoList &fileList, boo
 
 void SharedDirCollector::getNewFiles(const CollectTask &in_oTask)
 {
+	m_collectSet = in_oTask;
 
+	if (!readSet())
+	{
+		return;
+	}
+
+	m_bRun = (bool)m_collectSet.enable;
+	if (!m_bRun)
+	{
+		return;
+	}
+
+	// E:/workspace/DataTransfer/DataTransfer_code_20170831/vs2013/apps/DataTransfer/%T-1H%t%y/%t%m/%td
+	// modified by liubojun. 支持按照特定时间获取数据
+	QStringList finalDirs = CPathBuilder::getFinalPathFromUrl(m_collectSet.rltvPath);
+
+	m_oSubDirFilter.init();
+	foreach(QString strDir, finalDirs)
+	{
+
+		bool bConnect = true;
+		// 先测试源路径是否正常
+
+		bConnect = testFileConnection(strDir);
+
+		if (!bConnect)
+		{
+			continue;
+		}
+
+		if (bConnect)
+		{
+			//QSLOG_INFO(QString("[%1] begin to getNewFiles.").arg(m_collectSet.dirName));
+			//m_nLineState = 0;
+			//emit taskState(m_collectSet, m_userInfo.user.sendType, m_nLineState);
+			QTime tt;
+			tt.start();
+			CDirRecord oRecord(m_collectSet.dirName);
+			if (m_collectSet.recordLatestTime)
+			{
+				oRecord.loadLatestFileSize();
+			}
+
+			DIRLEVEL oDirLevel;
+			oDirLevel.dir = strDir;
+			oDirLevel.level = 0;	// 根目录层级为0
+			m_strSubDirTemplate = m_collectSet.subDirTemplate;
+
+			getSynclessFiles(oDirLevel, m_collectSet.subdirFlag, oRecord);
+			if (m_collectSet.recordLatestTime)
+			{
+				oRecord.reflush();
+			}
+			QSLOG_INFO(QString("[%1] finish to getNewFiles, cost time: %2 seconds").arg(m_collectSet.dirName).arg(tt.elapsed() / 1000.f));
+		}
+		else
+		{
+		}
+
+	}
+
+	emit finished();
 }
 
 void SharedDirCollector::getAllFiles(FileInfoList &fileList, QString strPath)

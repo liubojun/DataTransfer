@@ -15,11 +15,10 @@
 #include "change_name.h"
 #include "DataBase.h"
 #include "CollectorBase.h"
+#include "shareddirCollector.h"
 #include "ftpCollector.h"
 #include "sftpCollector.h"
 #include "subdirfilter.h"
-//#include "LibCurlFtp.h"
-//#include "LibCurlSFtp.h"
 #include <QDebug>
 #include <QByteArray>
 
@@ -29,47 +28,7 @@ int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
 
-    //FTP::CFtp oFtp;
-    //oFtp.connectToHost("127.0.0.1");
-    //oFtp.login("nriet", "123456");
-    //oFtp.rmdir("test");
-    //oFtp.put("E:/workspace/DataTransfer/build/datatransfer/debug/bin/Debug/ctkPluginManager.pdb", "/test/remote.bin", ".tmp");
-    //oFtp.getFileSize("/test/remote.bin");
-    //oFtp.cd("/test");
-    ////oFtp.cd("/home/Administrator/");
-    ////oFtp.cd("/usr/i686-w64-mingw32/lib");
-    ////oFtp.cd("ldscripts");
-    //oFtp.list();
-    ////oFtp.cd("../../");
-    ////oFtp.list("/home/Administrator");
-    ////oFtp.get("mintty.exe.stackdump", "E:");
-    //oFtp.remove("/20171225/Z_QH_QPE60_20170605061800.bin.bz2");
-    //qDebug() << oFtp.errorString();
-    // 查询基本信息
-
-	//FTP::CFtp oFtp;
-	//oFtp.connectToHost("58.213.107.90", 9015);
-	//oFtp.login("serv", "nrietserv123");
-	//oFtp.cd("/home/serv");
-	//oFtp.list();
-
-	/*SFtp osFtp;
-	osFtp.enableDebugLevel(true);
-	osFtp.connectToHost("218.94.36.211", 10051);
-	osFtp.setTransferMode(Active);
-	osFtp.login("jslj", "jslj");
-	if (CURLE_OK != osFtp.get("/home/jslj/temp/bin/findg", "E:/findg"))
-	{
-
-	}
-	if (CURLE_OK != osFtp.get("/home/jslj/temp/bin/rassplit", "E:/rassplit"))
-	{
-
-	}*/
-	//osFtp.cd("/home/nankong");
-	//osFtp.list();
-	////osFtp.put("F:/TEST/DataTransfer_20170928.rar", "/home/nankong/DataTransfer_20170928.rar", ".tmp");
-	//qDebug() << osFtp.getFileSize("/home/nankong/DataTransfer_20170928.rar");
+   
     GlobalConfig oGConfig;
     DataBase::getInstance()->queryBaseInfo(oGConfig);
 
@@ -116,7 +75,11 @@ int main(int argc, char **argv)
     DataBase::getInstance()->QueryCollectTask(oTask);
 
 	CollectorBase *pCollect = NULL;
-	if (oTask.collectType == 1)
+	if (oTask.collectType == 0)
+	{
+		pCollect = new SharedDirCollector(oCnd, oLocker, iLogSize);
+	}
+	else if (oTask.collectType == 1)
 	{
 		pCollect = new FtpCollector(oCnd, oLocker, iLogSize);
 	}

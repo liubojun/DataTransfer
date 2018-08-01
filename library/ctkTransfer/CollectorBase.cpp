@@ -40,33 +40,17 @@ CollectorBase::CollectorBase(QWaitCondition &in_oCond, QMutex &in_oLocker, int &
     m_pLastTime = NULL;
     m_bRun = false;
     m_nLineState = 0;
+	m_bBeingDeleted = false;
 
-    //m_oThread.start();
-    //this->moveToThread(&m_oThread);
     connect(this, SIGNAL(begin()), this, SLOT(onBegined()));
 
     m_oId = QUuid::createUuid();
-    //int threadnum;
-    //bool enableLog;
-    //DataBase::getInstance()->queryBaseInfo(threadnum, m_iUdpLogPort, enableLog);
-    //if (!m_oLogSocket.waitForConnected())
-    //{
-    //	QSLOG_ERROR(QString("cannot connect to host, error:") + m_oLogSocket.errorString());
-    //}
-    //m_oRcfClient = new RcfClient<I_LogPrint>(RCF::TcpEndpoint(m_iUdpLogPort));
+
 }
 
 CollectorBase::~CollectorBase()
 {
-    //m_oThread.requestInterruption();
-    //m_oThread.quit();
-    //m_oThread.wait();
-    //m_oThread.terminate();
     emit showIdentify(m_oId.toString());
-    //m_oLogSocket.close();
-    //delete m_oRcfClient;
-    //m_oRcfClient = NULL;
-
 }
 
 void CollectorBase::init()
@@ -411,10 +395,7 @@ QString CollectorBase::getTaskLockFilePath(const QString &dirId)
     return strLockPath + dirId;
 }
 
-
-
-
-// void CollectorBase::setEnable(bool bFlag)
-// {
-//
-// }
+void CollectorBase::stoprcv(int exitcode, QProcess::ExitStatus status)
+{
+	m_bChildProcessRunning = false;
+}
